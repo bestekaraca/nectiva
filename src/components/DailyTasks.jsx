@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { isOverdue, isToday } from "../data/store";
 import FollowUpRow from "./FollowUpRow";
+import CompletedFollowUpsModal from "./CompletedFollowUpsModal";
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
@@ -23,6 +24,7 @@ export default function DailyTasks({
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDue, setTaskDue] = useState(todayStr());
   const [showDone, setShowDone] = useState(false);
+  const [showCompletedFollowUps, setShowCompletedFollowUps] = useState(false);
 
   const [followUpLeadId, setFollowUpLeadId] = useState("");
   const [followUpDate, setFollowUpDate] = useState(todayStr());
@@ -52,6 +54,14 @@ export default function DailyTasks({
         l.followupStatus !== "arandi"
     )
     .sort((a, b) => (a.nextActionDate < b.nextActionDate ? -1 : 1));
+
+  const completedFollowUps = leads
+    .filter((l) => l.followupStatus === "arandi")
+    .sort((a, b) => (a.nextActionDate < b.nextActionDate ? 1 : -1));
+
+  const handleReopenFollowUp = (leadId) => {
+    onUpdateFollowUpStatus(leadId, "takip_edilecek");
+  };
 
   const openTasks = tasks
     .filter((t) => !t.done)
@@ -185,6 +195,15 @@ export default function DailyTasks({
             ))}
           </div>
         )}
+
+        {completedFollowUps.length > 0 && (
+          <button
+            onClick={() => setShowCompletedFollowUps(true)}
+            className="mt-3 flex items-center gap-1.5 text-xs font-medium text-emerald-600 hover:text-emerald-700"
+          >
+            ✅ Tamamlanan Follow-up'lar ({completedFollowUps.length})
+          </button>
+        )}
       </Section>
 
       {/* Görev listesi */}
@@ -296,6 +315,15 @@ export default function DailyTasks({
           </div>
         )}
       </Section>
+
+      {showCompletedFollowUps && (
+        <CompletedFollowUpsModal
+          leads={completedFollowUps}
+          onClose={() => setShowCompletedFollowUps(false)}
+          onOpenLead={onOpenLead}
+          onReopen={handleReopenFollowUp}
+        />
+      )}
     </div>
   );
 }
