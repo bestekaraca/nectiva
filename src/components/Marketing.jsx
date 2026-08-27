@@ -5,6 +5,7 @@ import {
   CONTENT_STATUSES,
   CAMPAIGN_CHANNELS,
 } from "../data/store";
+import ContentCalendar from "./ContentCalendar";
 
 export default function Marketing({
   leads,
@@ -22,13 +23,37 @@ export default function Marketing({
   onAddMarketingTask,
   onToggleTask,
   onDeleteTask,
+  marketNotes,
+  onAddMarketNote,
+  onDeleteMarketNote,
 }) {
+  const summary = {
+    contentDone: content.filter((c) => c.status === "tamamlandi").length,
+    contentOpen: content.filter((c) => c.status !== "tamamlandi").length,
+    campaignCount: campaigns.length,
+    emailCount: marketingEmails.length,
+    openTasks: marketingTasks.filter((t) => !t.done).length,
+  };
+
   return (
     <div>
       <h1 className="font-display font-semibold text-2xl text-ink mb-1">Marketing</h1>
       <p className="text-sm text-ink/40 mb-6">
         İçerik üretimi, kampanya sonuçları ve mail marketing takibi tek yerde.
       </p>
+
+      {/* Özet paneli */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-8">
+        <SummaryCard icon="✅" label="Tamamlanan İçerik" count={summary.contentDone} accent="emerald" />
+        <SummaryCard icon="🕓" label="Açık İçerik" count={summary.contentOpen} accent="amber" />
+        <SummaryCard icon="📣" label="Kampanya Sayısı" count={summary.campaignCount} accent="violet" />
+        <SummaryCard icon="✉️" label="Mail Gönderimi" count={summary.emailCount} accent="blue" />
+        <SummaryCard icon="📋" label="Açık Görev" count={summary.openTasks} accent="rose" />
+      </div>
+
+      <Section title="İçerik Takvimi" subtitle="Bitiş tarihi girilen içerikler ay görünümünde">
+        <ContentCalendar content={content} />
+      </Section>
 
       <ContentSection content={content} onAdd={onAddContent} onUpdateStatus={onUpdateContentStatus} onDelete={onDeleteContent} />
       <CampaignSection campaigns={campaigns} onAdd={onAddCampaign} onDelete={onDeleteCampaign} />
@@ -38,12 +63,30 @@ export default function Marketing({
         onAdd={onAddMarketingEmail}
         onDelete={onDeleteMarketingEmail}
       />
+      <MarketNotesSection notes={marketNotes} onAdd={onAddMarketNote} onDelete={onDeleteMarketNote} />
       <MarketingTasksSection
         tasks={marketingTasks}
         onAdd={onAddMarketingTask}
         onToggle={onToggleTask}
         onDelete={onDeleteTask}
       />
+    </div>
+  );
+}
+
+function SummaryCard({ icon, label, count, accent }) {
+  const border = {
+    emerald: "border-l-emerald-500",
+    amber: "border-l-amber-500",
+    violet: "border-l-violet-500",
+    blue: "border-l-blue-500",
+    rose: "border-l-rose-500",
+  }[accent];
+  return (
+    <div className={`glass rounded-card p-3.5 border-l-[3px] ${border}`}>
+      <div className="text-lg leading-none mb-1.5">{icon}</div>
+      <div className="font-display font-bold text-2xl text-ink">{count}</div>
+      <div className="text-xs text-ink/45 mt-0.5">{label}</div>
     </div>
   );
 }
@@ -392,6 +435,53 @@ function MailMarketingSection({ leads, entries, onAdd, onDelete }) {
           )}
         </>
       )}
+    </Section>
+  );
+}
+
+function MarketNotesSection({ notes, onAdd, onDelete }) {
+  const [text, setText] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+
+  const handleAdd = async () => {
+    if (!text.trim()) return;
+    await onAdd(text.trim(), date);
+    setText("");
+  };
+
+  return (
+    <Section title="Rakip / Pazar Notları" subtitle="Rakiplerin hareketleri, pazar gözlemleri — serbest not">
+      <div className="flex flex-wrap gap-2 mb-4">
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+          placeholder="Örn: Rakip X, RedFlag'e benzer bir özellik duyurdu"
+          className="input flex-1 min-w-[220px]"
+        />
+        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="input font-mono !w-auto" />
+        <button
+          onClick={handleAdd}
+          className="px-4 py-2 bg-gradient-to-r from-violet-600 to-blue-500 text-white text-sm font-medium rounded-lg hover:shadow-glow-sm shrink-0"
+        >
+          Ekle
+        </button>
+      </div>
+
+      <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
+        {notes.length === 0 && <div className="text-sm text-ink/30">Henüz not eklenmedi.</div>}
+        {notes.map((n) => (
+          <div key={n.id} className="flex items-start justify-between gap-3 bg-white border border-mist rounded-lg px-3 py-2.5">
+            <div>
+              <div className="text-xs font-mono text-ink/35">{n.date}</div>
+              <div className="text-sm text-ink/75 mt-0.5">{n.text}</div>
+            </div>
+            <button onClick={() => onDelete(n.id)} className="text-ink/25 hover:text-rose-500 text-sm shrink-0">
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
     </Section>
   );
 }

@@ -409,3 +409,29 @@ export async function deleteMarketingEmail(id) {
   const { error } = await supabase.from("marketing_emails").delete().eq("id", id);
   if (error) throw error;
 }
+
+// --- Rakip / pazar notları ---------------------------------------------------
+
+export async function fetchMarketNotes() {
+  const { data, error } = await supabase
+    .from("market_notes")
+    .select("*")
+    .order("date", { ascending: false });
+  if (error) throw error;
+  return data.map((n) => ({ id: n.id, text: n.text, date: n.date }));
+}
+
+export async function insertMarketNote(text, date, userId) {
+  const { data, error } = await supabase
+    .from("market_notes")
+    .insert({ text, date, user_id: userId })
+    .select()
+    .single();
+  if (error) throw error;
+  return { id: data.id, text: data.text, date: data.date };
+}
+
+export async function deleteMarketNote(id) {
+  const { error } = await supabase.from("market_notes").delete().eq("id", id);
+  if (error) throw error;
+}

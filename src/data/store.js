@@ -43,6 +43,7 @@ export const CAMPAIGN_CHANNELS = [
   { id: "mailing", label: "Mailing", icon: "✉️", color: "#7C3AED" },
   { id: "google_analytics", label: "Google Analytics", icon: "📈", color: "#F59E0B" },
   { id: "etkinlik", label: "Etkinlik / Konferans", icon: "🎪", color: "#EC4899" },
+  { id: "strateji", label: "Paket / Strateji", icon: "📦", color: "#10B981" },
   { id: "diger", label: "Diğer", icon: "📌", color: "#6B7280" },
 ];
 

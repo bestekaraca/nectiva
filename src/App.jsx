@@ -31,6 +31,9 @@ import {
   fetchMarketingEmails,
   insertMarketingEmail,
   deleteMarketingEmail,
+  fetchMarketNotes,
+  insertMarketNote,
+  deleteMarketNote,
 } from "./lib/db";
 import { isToday } from "./data/store";
 import Sidebar from "./components/Sidebar";
@@ -57,6 +60,7 @@ export default function App() {
   const [marketingContent, setMarketingContent] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
   const [marketingEmails, setMarketingEmails] = useState([]);
+  const [marketNotes, setMarketNotes] = useState([]);
   const [loadingLeads, setLoadingLeads] = useState(false);
   const [loadError, setLoadError] = useState(null);
   const [view, setView] = useState("dashboard");
@@ -83,6 +87,7 @@ export default function App() {
     fetchMarketingContent().then(setMarketingContent).catch((e) => setLoadError(e.message));
     fetchCampaigns().then(setCampaigns).catch((e) => setLoadError(e.message));
     fetchMarketingEmails().then(setMarketingEmails).catch((e) => setLoadError(e.message));
+    fetchMarketNotes().then(setMarketNotes).catch((e) => setLoadError(e.message));
   }, [session]);
 
   if (session === undefined) {
@@ -270,6 +275,19 @@ export default function App() {
     setTasks((prev) => [...prev, task]);
   };
 
+  const handleAddMarketNote = async (text, date) => {
+    const note = await insertMarketNote(text, date, session.user.id);
+    setMarketNotes((prev) => [note, ...prev]);
+  };
+  const handleDeleteMarketNote = async (id) => {
+    setMarketNotes((prev) => prev.filter((n) => n.id !== id));
+    try {
+      await deleteMarketNote(id);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
   const todayCount = leads.filter(
     (l) => isToday(l.nextActionDate) && l.followupStatus !== "arandi"
   ).length;
@@ -350,6 +368,9 @@ export default function App() {
                 onAddMarketingTask={handleAddMarketingTask}
                 onToggleTask={handleToggleTask}
                 onDeleteTask={handleDeleteTask}
+                marketNotes={marketNotes}
+                onAddMarketNote={handleAddMarketNote}
+                onDeleteMarketNote={handleDeleteMarketNote}
               />
             )}
             {view === "reports" && (
