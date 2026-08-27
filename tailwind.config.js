@@ -7,12 +7,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        night: "#0A0813",   // ana arka plan
-        panel: "#15101F",   // kart / yükseltilmiş yüzey (opacity ile cam efekti)
-        ivory: "#F4F1FB",   // birincil metin
+        night: "#0A0813",   // sadece koyu kenar çubuğu (sidebar) için
+        panel: "#15101F",   // koyu vurgu yüzeyi (sidebar aktif öğe vb.)
+        ivory: "#F4F1FB",   // koyu yüzeyler üstündeki açık metin (sidebar)
+        paper: "#F8F7FC",   // ANA açık arka plan
+        ink: "#1E1B2E",     // ANA koyu metin (açık yüzeyler için)
+        card: "#FFFFFF",    // beyaz kart yüzeyi
+        mist: "#E9E5F6",    // açık kenarlık/ayraç tonu
       },
       fontFamily: {
-        display: ["Fraunces", "serif"],
+        display: ["Space Grotesk", "sans-serif"],
         body: ["Inter", "system-ui", "sans-serif"],
         mono: ["IBM Plex Mono", "monospace"],
       },
@@ -20,9 +24,9 @@ export default {
         card: "14px",
       },
       boxShadow: {
-        glow: "0 0 20px rgba(139,92,246,0.45), 0 0 44px rgba(59,130,246,0.22)",
-        "glow-lg": "0 0 34px rgba(139,92,246,0.55), 0 0 72px rgba(59,130,246,0.3)",
-        "glow-sm": "0 0 12px rgba(139,92,246,0.35)",
+        glow: "0 0 20px rgba(139,92,246,0.35), 0 0 44px rgba(59,130,246,0.18)",
+        "glow-lg": "0 8px 40px rgba(139,92,246,0.22), 0 0 70px rgba(59,130,246,0.14)",
+        "glow-sm": "0 0 14px rgba(139,92,246,0.28)",
       },
       keyframes: {
         glowPulse: {

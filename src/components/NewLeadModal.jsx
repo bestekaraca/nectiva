@@ -25,12 +25,12 @@ export default function NewLeadModal({ onClose, onCreate }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={onClose}>
+    <div className="fixed inset-0 bg-ink/25 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={onClose}>
       <div
         className="glass rounded-3xl w-full max-w-sm shadow-glow-lg p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="font-display text-xl mb-4 text-ivory">Yeni fırsat</h2>
+        <h2 className="font-display font-semibold text-xl mb-4 text-ink">Yeni fırsat</h2>
         <div className="flex flex-col gap-3">
           <input
             autoFocus
@@ -63,21 +63,21 @@ export default function NewLeadModal({ onClose, onCreate }) {
           </div>
           <div className="grid grid-cols-2 gap-2">
             <select value={sector} onChange={(e) => setSector(e.target.value)} className="input">
-              <option value="" className="bg-panel">Sektör</option>
+              <option value="">Sektör</option>
               {SECTORS.map((s) => (
-                <option key={s} value={s} className="bg-panel">{s}</option>
+                <option key={s} value={s}>{s}</option>
               ))}
             </select>
             <select value={source} onChange={(e) => setSource(e.target.value)} className="input">
-              <option value="" className="bg-panel">Kaynak</option>
+              <option value="">Kaynak</option>
               {SOURCES.map((s) => (
-                <option key={s} value={s} className="bg-panel">{s}</option>
+                <option key={s} value={s}>{s}</option>
               ))}
             </select>
           </div>
         </div>
         <div className="flex justify-end gap-2 mt-5">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-white/50 hover:text-white">
+          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-ink/50 hover:text-ink">
             Vazgeç
           </button>
           <button

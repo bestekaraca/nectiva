@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
+import BoltIcon from "./BoltIcon";
 
 export default function Login() {
-  const [mode, setMode] = useState("signin"); // signin | signup
+  const [mode, setMode] = useState("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,34 +33,34 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-night flex items-center justify-center p-4">
-      {/* Hareketli gradyan ışık kütleleri (blob) */}
+    <div className="min-h-screen relative overflow-hidden bg-paper flex items-center justify-center p-4">
       <div className="pointer-events-none absolute inset-0">
-        <div className="blob absolute -top-32 -left-24 w-96 h-96 rounded-full bg-violet-600 animate-blob" />
-        <div className="blob absolute top-1/3 -right-32 w-[28rem] h-[28rem] rounded-full bg-blue-600 animate-blobSlow" />
-        <div className="blob absolute -bottom-40 left-1/4 w-96 h-96 rounded-full bg-fuchsia-600 animate-blob" />
+        <div className="blob absolute -top-32 -left-24 w-96 h-96 rounded-full bg-violet-400 animate-blob" />
+        <div className="blob absolute top-1/3 -right-32 w-[28rem] h-[28rem] rounded-full bg-blue-400 animate-blobSlow" />
+        <div className="blob absolute -bottom-40 left-1/4 w-96 h-96 rounded-full bg-fuchsia-300 animate-blob" />
       </div>
 
-      {/* İnce ızgara dokusu */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.07]"
+        className="pointer-events-none absolute inset-0 opacity-[0.05]"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
+            "linear-gradient(rgba(30,27,46,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(30,27,46,0.7) 1px, transparent 1px)",
           backgroundSize: "44px 44px",
         }}
       />
 
       <div className="relative glass rounded-3xl w-full max-w-sm p-8 shadow-glow-lg">
         <div className="flex items-center gap-2.5 mb-1">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-blue-500 shadow-glow-sm shrink-0" />
-          <div className="font-display text-2xl text-ivory tracking-tight">Nexivra</div>
+          <BoltIcon size={30} id="login" />
+          <div className="font-display font-semibold text-2xl tracking-tight bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent">
+            Nexivra
+          </div>
         </div>
-        <div className="text-xs text-violet-300/70 font-mono uppercase tracking-wider mb-7 ml-[42px]">
+        <div className="text-xs text-violet-500/70 font-mono uppercase tracking-wider mb-7 ml-[42px]">
           Satış Asistanı
         </div>
 
-        <div className="flex gap-1 mb-6 bg-white/5 rounded-xl p-1 border border-white/5">
+        <div className="flex gap-1 mb-6 bg-ink/5 rounded-xl p-1 border border-ink/5">
           <TabButton active={mode === "signin"} onClick={() => setMode("signin")}>
             Giriş yap
           </TabButton>
@@ -91,8 +92,8 @@ export default function Login() {
             <div
               className={`text-xs rounded-lg px-3 py-2 border ${
                 message.type === "error"
-                  ? "bg-rose-500/10 text-rose-300 border-rose-500/20"
-                  : "bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
+                  ? "bg-rose-50 text-rose-600 border-rose-200"
+                  : "bg-emerald-50 text-emerald-700 border-emerald-200"
               }`}
             >
               {message.text}
@@ -120,7 +121,7 @@ function TabButton({ active, onClick, children }) {
       className={`flex-1 text-sm font-medium py-1.5 rounded-lg transition-all ${
         active
           ? "bg-gradient-to-r from-violet-600 to-blue-500 text-white shadow-glow-sm"
-          : "text-white/45 hover:text-white/75"
+          : "text-ink/45 hover:text-ink/75"
       }`}
     >
       {children}

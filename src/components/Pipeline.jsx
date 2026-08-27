@@ -25,7 +25,7 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
   return (
     <div>
       <div className="flex items-center justify-between gap-4 mb-1">
-        <h1 className="font-display text-2xl text-ivory">Boru Hattı</h1>
+        <h1 className="font-display font-semibold text-2xl text-ink">Boru Hattı</h1>
         <input
           type="text"
           placeholder="Firma veya kişi ara..."
@@ -34,7 +34,7 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
           className="w-56 input"
         />
       </div>
-      <p className="text-sm text-white/40 mb-5">Kartları sürükleyerek aşama değiştirebilirsin.</p>
+      <p className="text-sm text-ink/40 mb-5">Kartları sürükleyerek aşama değiştirebilirsin.</p>
 
       <StageFlowBar leads={leads} />
 
@@ -52,12 +52,12 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
               onDragLeave={() => setDragOverStage(null)}
               onDrop={(e) => handleDrop(e, stage.id)}
               className={`w-64 shrink-0 rounded-xl transition-colors ${
-                dragOverStage === stage.id ? "bg-violet-500/10 ring-1 ring-violet-500/30" : ""
+                dragOverStage === stage.id ? "bg-violet-100/60 ring-1 ring-violet-300" : ""
               }`}
             >
               <div className="flex items-baseline justify-between px-1 mb-2.5">
-                <h2 className="font-semibold text-sm text-white/75">{stage.label}</h2>
-                <span className="font-mono text-xs text-white/35">
+                <h2 className="font-semibold text-sm text-ink/75">{stage.label}</h2>
+                <span className="font-mono text-xs text-ink/35">
                   {stageLeads.length} · {formatCurrency(stageValue)}
                 </span>
               </div>
@@ -72,7 +72,7 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
                   />
                 ))}
                 {stageLeads.length === 0 && (
-                  <div className="text-xs text-white/20 border border-dashed border-white/10 rounded-card py-4 text-center">
+                  <div className="text-xs text-ink/25 border border-dashed border-mist rounded-card py-4 text-center">
                     Boş
                   </div>
                 )}

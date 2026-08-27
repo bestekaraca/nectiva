@@ -64,26 +64,26 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
 
   return (
     <div
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-ink/25 backdrop-blur-sm flex items-center justify-center p-4 z-50"
       onClick={onClose}
     >
       <div
         className="glass rounded-3xl w-full max-w-xl max-h-[88vh] overflow-y-auto shadow-glow-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6 border-b border-white/8 flex items-center justify-between">
+        <div className="p-6 border-b border-mist flex items-center justify-between">
           <input
             value={form.company}
             onChange={(e) => update("company", e.target.value)}
-            className="font-display text-xl bg-transparent outline-none w-full text-ivory placeholder-white/30"
+            className="font-display font-semibold text-xl bg-transparent outline-none w-full text-ink placeholder-ink/30"
             placeholder="Firma adı"
           />
-          <button onClick={onClose} className="text-white/40 hover:text-white text-xl leading-none ml-3">
+          <button onClick={onClose} className="text-ink/40 hover:text-ink text-xl leading-none ml-3">
             ×
           </button>
         </div>
 
-        <div className="flex gap-1 px-6 pt-4 border-b border-white/8">
+        <div className="flex gap-1 px-6 pt-4 border-b border-mist">
           {[
             { id: "bilgiler", label: "Bilgiler" },
             { id: "gecmis", label: `Geçmiş (${lead.purchases.length})` },
@@ -94,8 +94,8 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
               onClick={() => setTab(t.id)}
               className={`px-3 pb-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${
                 tab === t.id
-                  ? "border-violet-400 text-ivory"
-                  : "border-transparent text-white/40 hover:text-white/65"
+                  ? "border-violet-500 text-ink"
+                  : "border-transparent text-ink/35 hover:text-ink/60"
               }`}
             >
               {t.label}
@@ -142,9 +142,9 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                     onChange={(e) => update("sector", e.target.value)}
                     className="input"
                   >
-                    <option value="" className="bg-panel">Seçilmedi</option>
+                    <option value="">Seçilmedi</option>
                     {SECTORS.map((s) => (
-                      <option key={s} value={s} className="bg-panel">{s}</option>
+                      <option key={s} value={s}>{s}</option>
                     ))}
                   </select>
                 </Field>
@@ -154,9 +154,9 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                     onChange={(e) => update("source", e.target.value)}
                     className="input"
                   >
-                    <option value="" className="bg-panel">Seçilmedi</option>
+                    <option value="">Seçilmedi</option>
                     {SOURCES.map((s) => (
-                      <option key={s} value={s} className="bg-panel">{s}</option>
+                      <option key={s} value={s}>{s}</option>
                     ))}
                   </select>
                 </Field>
@@ -175,7 +175,7 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                     className="input"
                   >
                     {STAGES.map((s) => (
-                      <option key={s.id} value={s.id} className="bg-panel">
+                      <option key={s.id} value={s.id}>
                         {s.label}
                       </option>
                     ))}
@@ -212,19 +212,19 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
               </div>
 
               <div>
-                <div className="text-xs font-medium text-white/45 mb-1.5">Etiketler</div>
+                <div className="text-xs font-medium text-ink/45 mb-1.5">Etiketler</div>
                 <div className="flex flex-wrap gap-1.5 mb-2">
                   {form.tags.map((t) => (
                     <span
                       key={t}
-                      className="flex items-center gap-1 bg-violet-500/15 text-violet-300 border border-violet-500/20 text-xs font-medium px-2 py-1 rounded-full"
+                      className="flex items-center gap-1 bg-violet-100 text-violet-700 border border-violet-200 text-xs font-medium px-2 py-1 rounded-full"
                     >
                       {t}
-                      <button onClick={() => handleRemoveTag(t)} className="hover:text-rose-400">×</button>
+                      <button onClick={() => handleRemoveTag(t)} className="hover:text-rose-500">×</button>
                     </span>
                   ))}
                   {form.tags.length === 0 && (
-                    <span className="text-xs text-white/25">Henüz etiket yok.</span>
+                    <span className="text-xs text-ink/25">Henüz etiket yok.</span>
                   )}
                 </div>
                 <div className="flex gap-2">
@@ -237,7 +237,7 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                   />
                   <button
                     onClick={handleAddTag}
-                    className="px-3 py-1.5 bg-white/8 text-ivory text-sm rounded-lg font-medium hover:bg-white/14"
+                    className="px-3 py-1.5 bg-ink/6 text-ink text-sm rounded-lg font-medium hover:bg-ink/10"
                   >
                     Ekle
                   </button>
@@ -249,8 +249,8 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
           {tab === "gecmis" && (
             <div>
               <div className="flex items-center justify-between mb-3">
-                <div className="text-sm text-white/55">Toplam geçmiş satış</div>
-                <div className="font-mono font-semibold text-emerald-400">
+                <div className="text-sm text-ink/55">Toplam geçmiş satış</div>
+                <div className="font-mono font-semibold text-emerald-600">
                   {formatCurrency(totalPurchases(lead))}
                 </div>
               </div>
@@ -282,20 +282,20 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
 
               <div className="flex flex-col gap-2 max-h-56 overflow-y-auto">
                 {lead.purchases.length === 0 && (
-                  <div className="text-xs text-white/30">
+                  <div className="text-xs text-ink/30">
                     Henüz geçmiş satış kaydı yok. Bu müşteriden önce alınan siparişleri buraya ekleyebilirsin.
                   </div>
                 )}
                 {lead.purchases.map((p) => (
                   <div
                     key={p.id}
-                    className="bg-white/5 border border-white/8 rounded-lg px-3 py-2 flex items-center justify-between"
+                    className="bg-white border border-mist rounded-lg px-3 py-2 flex items-center justify-between"
                   >
                     <div>
-                      <div className="text-sm text-white/80">{p.description}</div>
-                      <div className="text-xs font-mono text-white/35">{p.date}</div>
+                      <div className="text-sm text-ink/80">{p.description}</div>
+                      <div className="text-xs font-mono text-ink/35">{p.date}</div>
                     </div>
-                    <div className="font-mono text-sm font-medium text-white/65 shrink-0 ml-3">
+                    <div className="font-mono text-sm font-medium text-ink/65 shrink-0 ml-3">
                       {formatCurrency(p.amount)}
                     </div>
                   </div>
@@ -324,12 +324,12 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
               </div>
               <div className="flex flex-col gap-2 max-h-56 overflow-y-auto">
                 {lead.notes.length === 0 && (
-                  <div className="text-xs text-white/30">Henüz not yok.</div>
+                  <div className="text-xs text-ink/30">Henüz not yok.</div>
                 )}
                 {lead.notes.map((n) => (
-                  <div key={n.id} className="bg-white/5 border border-white/8 rounded-lg px-3 py-2">
-                    <div className="text-xs font-mono text-white/35">{n.date}</div>
-                    <div className="text-sm text-white/80">{n.text}</div>
+                  <div key={n.id} className="bg-white border border-mist rounded-lg px-3 py-2">
+                    <div className="text-xs font-mono text-ink/35">{n.date}</div>
+                    <div className="text-sm text-ink/80">{n.text}</div>
                   </div>
                 ))}
               </div>
@@ -337,17 +337,17 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
           )}
         </div>
 
-        <div className="p-6 border-t border-white/8 flex items-center justify-between">
+        <div className="p-6 border-t border-mist flex items-center justify-between">
           <button
             onClick={() => onDelete(form.id)}
-            className="text-sm text-rose-400 hover:text-rose-300 font-medium"
+            className="text-sm text-rose-500 hover:text-rose-600 font-medium"
           >
             Fırsatı sil
           </button>
           <div className="flex gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-white/50 hover:text-white"
+              className="px-4 py-2 text-sm font-medium text-ink/50 hover:text-ink"
             >
               Vazgeç
             </button>
@@ -367,7 +367,7 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
 function Field({ label, children }) {
   return (
     <label className="flex flex-col gap-1">
-      <span className="text-xs font-medium text-white/45">{label}</span>
+      <span className="text-xs font-medium text-ink/45">{label}</span>
       {children}
     </label>
   );

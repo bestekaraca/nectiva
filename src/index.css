@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -14,18 +14,18 @@ html, body, #root {
 
 body {
   margin: 0;
-  background-color: #0A0813;
-  color: #F4F1FB;
+  background-color: #F8F7FC;
+  color: #1E1B2E;
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background-color: rgba(139, 92, 246, 0.35);
+  background-color: rgba(139, 92, 246, 0.22);
 }
 
 :focus-visible {
-  outline: 2px solid #A78BFA;
+  outline: 2px solid #8B5CF6;
   outline-offset: 2px;
 }
 
@@ -41,7 +41,7 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #3B2E5C;
+  background: #D9D2F0;
   border-radius: 8px;
 }
 ::-webkit-scrollbar-track {
@@ -49,9 +49,9 @@ body {
 }
 
 .input {
-  background-color: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  color: #F4F1FB;
+  background-color: #FFFFFF;
+  border: 1px solid #E9E5F6;
+  color: #1E1B2E;
   border-radius: 10px;
   padding: 7px 11px;
   font-size: 0.875rem;
@@ -60,28 +60,28 @@ body {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .input::placeholder {
-  color: rgba(244, 241, 251, 0.32);
+  color: rgba(30, 27, 46, 0.35);
 }
 .input:focus {
-  border-color: #A78BFA;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+  border-color: #8B5CF6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.14);
 }
 
-/* Cam (glassmorphism) yüzey */
+/* Açık, hafif "cam" yüzey — ana içerik kartları ve giriş kartı için */
 .glass {
-  background: rgba(21, 16, 31, 0.55);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  box-shadow: 0 4px 28px rgba(139, 92, 246, 0.07);
 }
 
-/* Gradyan buton için hareketli arka plan boyutu */
 .gradient-anim {
   background-size: 200% 200%;
 }
 
-/* Bulanık, süzülen arka plan "blob"ları için */
+/* Açık zemin üstünde yumuşak, bulanık gradyan ışık kütleleri */
 .blob {
   filter: blur(90px);
-  opacity: 0.55;
+  opacity: 0.4;
 }

@@ -42,7 +42,7 @@ export default function App() {
   }, [session]);
 
   if (session === undefined) {
-    return <div className="min-h-screen bg-night" />;
+    return <div className="min-h-screen bg-paper" />;
   }
 
   if (!session) {
@@ -105,7 +105,7 @@ export default function App() {
   const todayCount = leads.filter((l) => isToday(l.nextActionDate)).length;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-night">
+    <div className="min-h-screen flex flex-col md:flex-row bg-paper">
       <Sidebar
         view={view}
         setView={setView}
@@ -117,12 +117,12 @@ export default function App() {
 
       <main className="flex-1 p-5 md:p-8 max-w-6xl">
         {loadError && (
-          <div className="bg-rose-500/10 text-rose-300 border border-rose-500/20 text-sm rounded-lg px-3 py-2 mb-4">
+          <div className="bg-rose-50 text-rose-600 border border-rose-200 text-sm rounded-lg px-3 py-2 mb-4">
             Bir hata oluştu: {loadError}
           </div>
         )}
         {loadingLeads ? (
-          <div className="text-sm text-white/40">Yükleniyor...</div>
+          <div className="text-sm text-ink/40">Yükleniyor...</div>
         ) : (
           <>
             {view === "dashboard" && (
