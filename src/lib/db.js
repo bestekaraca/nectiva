@@ -13,6 +13,8 @@ function rowToLead(row) {
     sector: row.sector || "",
     source: row.source || "",
     website: row.website || "",
+    position: row.position || "",
+    products: row.products || [],
     tags: row.tags || [],
     value: row.value || 0,
     stage: row.stage || "yeni",
@@ -38,6 +40,8 @@ function leadToRow(lead, userId) {
     sector: lead.sector,
     source: lead.source,
     website: lead.website,
+    position: lead.position,
+    products: lead.products,
     tags: lead.tags,
     value: lead.value,
     stage: lead.stage,
@@ -61,7 +65,7 @@ export async function fetchLeads() {
 export async function insertLead(partialLead, userId) {
   const { data, error } = await supabase
     .from("leads")
-    .insert(leadToRow({ tags: [], nextActionDate: null, nextActionNote: "", ...partialLead }, userId))
+    .insert(leadToRow({ tags: [], products: [], nextActionDate: null, nextActionNote: "", ...partialLead }, userId))
     .select()
     .single();
   if (error) throw error;

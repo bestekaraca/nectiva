@@ -31,6 +31,41 @@ export const SOURCES = [
   "Diğer",
 ];
 
+export const PRODUCTS = [
+  "RedFlag",
+  "SETS",
+  "SOBE",
+  "SEBE",
+  "SORS",
+  "EU SETS",
+  "The SOLV.AI",
+  "Dexperie",
+];
+
+// Her ürün için sabit renk sınıfları (Tailwind'in derleme zamanında
+// tanıyabilmesi için tam class isimleri burada literal olarak yazılıyor).
+export const PRODUCT_BADGE = {
+  RedFlag: "bg-rose-100 text-rose-700 border-rose-200",
+  SETS: "bg-blue-100 text-blue-700 border-blue-200",
+  SOBE: "bg-violet-100 text-violet-700 border-violet-200",
+  SEBE: "bg-fuchsia-100 text-fuchsia-700 border-fuchsia-200",
+  SORS: "bg-amber-100 text-amber-700 border-amber-200",
+  "EU SETS": "bg-teal-100 text-teal-700 border-teal-200",
+  "The SOLV.AI": "bg-cyan-100 text-cyan-700 border-cyan-200",
+  Dexperie: "bg-orange-100 text-orange-700 border-orange-200",
+};
+
+export const PRODUCT_DOT = {
+  RedFlag: "bg-rose-500",
+  SETS: "bg-blue-500",
+  SOBE: "bg-violet-500",
+  SEBE: "bg-fuchsia-500",
+  SORS: "bg-amber-500",
+  "EU SETS": "bg-teal-500",
+  "The SOLV.AI": "bg-cyan-500",
+  Dexperie: "bg-orange-500",
+};
+
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
@@ -43,6 +78,8 @@ function normalizeLead(lead) {
     sector: "",
     source: "",
     website: "",
+    position: "",
+    products: [],
     tags: [],
     purchases: [],
     ...lead,

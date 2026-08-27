@@ -3,6 +3,8 @@ import {
   STAGES,
   SECTORS,
   SOURCES,
+  PRODUCTS,
+  PRODUCT_BADGE,
   formatCurrency,
   totalPurchases,
 } from "../data/store";
@@ -43,6 +45,13 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
 
   const handleRemoveTag = (t) => {
     update("tags", form.tags.filter((tag) => tag !== t));
+  };
+
+  const toggleProduct = (p) => {
+    update(
+      "products",
+      form.products.includes(p) ? form.products.filter((x) => x !== p) : [...form.products, p]
+    );
   };
 
   const handleAddPurchase = async () => {
@@ -112,6 +121,14 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                     value={form.contactName}
                     onChange={(e) => update("contactName", e.target.value)}
                     className="input"
+                  />
+                </Field>
+                <Field label="Pozisyon">
+                  <input
+                    value={form.position}
+                    onChange={(e) => update("position", e.target.value)}
+                    className="input"
+                    placeholder="Örn: Satın Alma Müdürü"
                   />
                 </Field>
                 <Field label="Değer (₺)">
@@ -209,6 +226,29 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                     placeholder="Örn: fiyat için geri arayacak"
                   />
                 </Field>
+              </div>
+
+              <div>
+                <div className="text-xs font-medium text-ink/45 mb-1.5">Ürünler</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {PRODUCTS.map((p) => {
+                    const active = form.products.includes(p);
+                    return (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => toggleProduct(p)}
+                        className={`text-xs font-medium px-2.5 py-1 rounded-full border transition-all ${
+                          active
+                            ? PRODUCT_BADGE[p]
+                            : "bg-transparent text-ink/35 border-mist hover:border-ink/20"
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <div>

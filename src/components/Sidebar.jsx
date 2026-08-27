@@ -4,6 +4,7 @@ export default function Sidebar({ view, setView, onNewLead, todayCount, userEmai
   const items = [
     { id: "dashboard", label: "Panel" },
     { id: "pipeline", label: "Pipeline" },
+    { id: "contacts", label: "Kişiler" },
   ];
 
   return (

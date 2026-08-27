@@ -13,6 +13,7 @@ import { isToday } from "./data/store";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./components/Dashboard";
 import Pipeline from "./components/Pipeline";
+import Contacts from "./components/Contacts";
 import LeadModal from "./components/LeadModal";
 import NewLeadModal from "./components/NewLeadModal";
 import Login from "./components/Login";
@@ -134,6 +135,9 @@ export default function App() {
                 onMoveStage={handleMoveStage}
                 onOpen={(l) => setActiveLeadId(l.id)}
               />
+            )}
+            {view === "contacts" && (
+              <Contacts leads={leads} onOpen={(l) => setActiveLeadId(l.id)} />
             )}
           </>
         )}
