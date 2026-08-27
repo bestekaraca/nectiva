@@ -25,12 +25,12 @@ export default function NewLeadModal({ onClose, onCreate }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-ink/40 flex items-center justify-center p-4 z-50" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={onClose}>
       <div
-        className="bg-paper rounded-2xl w-full max-w-sm shadow-xl p-6"
+        className="glass rounded-3xl w-full max-w-sm shadow-glow-lg p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="font-display text-xl mb-4">Yeni fırsat</h2>
+        <h2 className="font-display text-xl mb-4 text-ivory">Yeni fırsat</h2>
         <div className="flex flex-col gap-3">
           <input
             autoFocus
@@ -63,26 +63,26 @@ export default function NewLeadModal({ onClose, onCreate }) {
           </div>
           <div className="grid grid-cols-2 gap-2">
             <select value={sector} onChange={(e) => setSector(e.target.value)} className="input">
-              <option value="">Sektör</option>
+              <option value="" className="bg-panel">Sektör</option>
               {SECTORS.map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s} className="bg-panel">{s}</option>
               ))}
             </select>
             <select value={source} onChange={(e) => setSource(e.target.value)} className="input">
-              <option value="">Kaynak</option>
+              <option value="" className="bg-panel">Kaynak</option>
               {SOURCES.map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s} className="bg-panel">{s}</option>
               ))}
             </select>
           </div>
         </div>
         <div className="flex justify-end gap-2 mt-5">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-ink/60 hover:text-ink">
+          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-white/50 hover:text-white">
             Vazgeç
           </button>
           <button
             onClick={handleCreate}
-            className="px-4 py-2 bg-amber text-ink text-sm font-semibold rounded-lg hover:bg-amber-dark"
+            className="px-4 py-2 bg-gradient-to-r from-violet-600 to-blue-500 text-white text-sm font-semibold rounded-lg hover:shadow-glow-sm"
           >
             Oluştur
           </button>

@@ -42,7 +42,7 @@ export default function App() {
   }, [session]);
 
   if (session === undefined) {
-    return <div className="min-h-screen bg-ink" />;
+    return <div className="min-h-screen bg-night" />;
   }
 
   if (!session) {
@@ -105,7 +105,7 @@ export default function App() {
   const todayCount = leads.filter((l) => isToday(l.nextActionDate)).length;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-paper">
+    <div className="min-h-screen flex flex-col md:flex-row bg-night">
       <Sidebar
         view={view}
         setView={setView}
@@ -117,12 +117,12 @@ export default function App() {
 
       <main className="flex-1 p-5 md:p-8 max-w-6xl">
         {loadError && (
-          <div className="bg-brick-light text-brick-dark text-sm rounded-lg px-3 py-2 mb-4">
+          <div className="bg-rose-500/10 text-rose-300 border border-rose-500/20 text-sm rounded-lg px-3 py-2 mb-4">
             Bir hata oluştu: {loadError}
           </div>
         )}
         {loadingLeads ? (
-          <div className="text-sm text-ink/40">Yükleniyor...</div>
+          <div className="text-sm text-white/40">Yükleniyor...</div>
         ) : (
           <>
             {view === "dashboard" && (
@@ -141,7 +141,7 @@ export default function App() {
 
       <button
         onClick={() => setShowNewLead(true)}
-        className="md:hidden fixed bottom-5 right-5 bg-amber text-ink font-semibold w-14 h-14 rounded-full shadow-lg text-2xl leading-none"
+        className="md:hidden fixed bottom-5 right-5 bg-gradient-to-br from-violet-600 to-blue-500 text-white font-semibold w-14 h-14 rounded-full shadow-glow text-2xl leading-none"
         aria-label="Yeni fırsat ekle"
       >
         +

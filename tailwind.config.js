@@ -7,30 +7,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: "#1C2321",
-        paper: "#ECF0EE",
-        card: "#FFFFFF",
-        line: "#D8DED9",
-        indigo: {
-          DEFAULT: "#3454D1",
-          dark: "#28409E",
-          light: "#E8ECFB",
-        },
-        amber: {
-          DEFAULT: "#E8A33D",
-          dark: "#B87A22",
-          light: "#FCEFDA",
-        },
-        teal: {
-          DEFAULT: "#2F7767",
-          dark: "#215A4D",
-          light: "#DEEFEA",
-        },
-        brick: {
-          DEFAULT: "#C4534B",
-          dark: "#9C3F39",
-          light: "#F7E3E1",
-        },
+        night: "#0A0813",   // ana arka plan
+        panel: "#15101F",   // kart / yükseltilmiş yüzey (opacity ile cam efekti)
+        ivory: "#F4F1FB",   // birincil metin
       },
       fontFamily: {
         display: ["Fraunces", "serif"],
@@ -38,7 +17,33 @@ export default {
         mono: ["IBM Plex Mono", "monospace"],
       },
       borderRadius: {
-        card: "10px",
+        card: "14px",
+      },
+      boxShadow: {
+        glow: "0 0 20px rgba(139,92,246,0.45), 0 0 44px rgba(59,130,246,0.22)",
+        "glow-lg": "0 0 34px rgba(139,92,246,0.55), 0 0 72px rgba(59,130,246,0.3)",
+        "glow-sm": "0 0 12px rgba(139,92,246,0.35)",
+      },
+      keyframes: {
+        glowPulse: {
+          "0%, 100%": { boxShadow: "0 0 18px rgba(139,92,246,0.4), 0 0 38px rgba(59,130,246,0.18)" },
+          "50%": { boxShadow: "0 0 30px rgba(139,92,246,0.7), 0 0 64px rgba(59,130,246,0.32)" },
+        },
+        blobMove: {
+          "0%, 100%": { transform: "translate(0px, 0px) scale(1)" },
+          "33%": { transform: "translate(40px, -50px) scale(1.12)" },
+          "66%": { transform: "translate(-30px, 30px) scale(0.92)" },
+        },
+        gradientShift: {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+      },
+      animation: {
+        glowPulse: "glowPulse 2.4s ease-in-out infinite",
+        blob: "blobMove 14s ease-in-out infinite",
+        blobSlow: "blobMove 19s ease-in-out infinite reverse",
+        gradientShift: "gradientShift 6s ease infinite",
       },
     },
   },

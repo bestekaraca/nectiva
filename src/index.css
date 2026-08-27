@@ -8,20 +8,24 @@
   box-sizing: border-box;
 }
 
+html, body, #root {
+  height: 100%;
+}
+
 body {
   margin: 0;
-  background-color: #ECF0EE;
-  color: #1C2321;
+  background-color: #0A0813;
+  color: #F4F1FB;
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background-color: #E8ECFB;
+  background-color: rgba(139, 92, 246, 0.35);
 }
 
 :focus-visible {
-  outline: 2px solid #3454D1;
+  outline: 2px solid #A78BFA;
   outline-offset: 2px;
 }
 
@@ -32,13 +36,12 @@ body {
   }
 }
 
-/* subtle scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #C7CFC8;
+  background: #3B2E5C;
   border-radius: 8px;
 }
 ::-webkit-scrollbar-track {
@@ -46,14 +49,39 @@ body {
 }
 
 .input {
-  background-color: #FFFFFF;
-  border: 1px solid #D8DED9;
-  border-radius: 8px;
-  padding: 6px 10px;
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: #F4F1FB;
+  border-radius: 10px;
+  padding: 7px 11px;
   font-size: 0.875rem;
   outline: none;
   width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input::placeholder {
+  color: rgba(244, 241, 251, 0.32);
 }
 .input:focus {
-  border-color: #3454D1;
+  border-color: #A78BFA;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+}
+
+/* Cam (glassmorphism) yüzey */
+.glass {
+  background: rgba(21, 16, 31, 0.55);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Gradyan buton için hareketli arka plan boyutu */
+.gradient-anim {
+  background-size: 200% 200%;
+}
+
+/* Bulanık, süzülen arka plan "blob"ları için */
+.blob {
+  filter: blur(90px);
+  opacity: 0.55;
 }

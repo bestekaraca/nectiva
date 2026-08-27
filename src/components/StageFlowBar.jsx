@@ -1,10 +1,17 @@
 import { STAGES } from "../data/store";
 
 const colorMap = {
-  indigo: "bg-indigo",
-  amber: "bg-amber",
-  teal: "bg-teal",
-  brick: "bg-brick",
+  indigo: "bg-gradient-to-r from-violet-500 to-blue-500",
+  amber: "bg-amber-400",
+  teal: "bg-emerald-500",
+  brick: "bg-rose-500",
+};
+
+const dotMap = {
+  indigo: "bg-violet-400",
+  amber: "bg-amber-400",
+  teal: "bg-emerald-400",
+  brick: "bg-rose-400",
 };
 
 export default function StageFlowBar({ leads }) {
@@ -16,7 +23,7 @@ export default function StageFlowBar({ leads }) {
 
   return (
     <div className="mb-6">
-      <div className="flex h-2.5 w-full rounded-full overflow-hidden bg-line">
+      <div className="flex h-2.5 w-full rounded-full overflow-hidden bg-white/5 border border-white/5">
         {counts.map((s) =>
           s.count > 0 ? (
             <div
@@ -30,10 +37,10 @@ export default function StageFlowBar({ leads }) {
       </div>
       <div className="flex flex-wrap gap-x-5 gap-y-1 mt-2.5">
         {counts.map((s) => (
-          <div key={s.id} className="flex items-center gap-1.5 text-xs text-ink/60">
-            <span className={`w-2 h-2 rounded-full ${colorMap[s.color]}`} />
+          <div key={s.id} className="flex items-center gap-1.5 text-xs text-white/50">
+            <span className={`w-2 h-2 rounded-full ${dotMap[s.color]}`} />
             <span className="font-medium">{s.label}</span>
-            <span className="font-mono text-ink/40">{s.count}</span>
+            <span className="font-mono text-white/30">{s.count}</span>
           </div>
         ))}
       </div>
