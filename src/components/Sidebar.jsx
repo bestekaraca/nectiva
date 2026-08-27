@@ -14,7 +14,7 @@ export default function Sidebar({ view, setView, onNewLead, todayCount, userEmai
         <BoltIcon size={26} id="sidebar" />
         <div>
           <div className="font-display font-semibold text-xl tracking-tight leading-none bg-gradient-to-r from-violet-300 to-blue-300 bg-clip-text text-transparent">
-            Nexivra
+            Nectiva
           </div>
           <div className="text-[10px] text-violet-300/60 font-mono uppercase tracking-wider mt-0.5">
             Satış Asistanı

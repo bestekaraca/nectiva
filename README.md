@@ -1,4 +1,4 @@
-# Nexivra Sales — Satış Asistanı
+# Nectiva Sales — Satış Asistanı
 
 Satış fırsatlarını takip etmek, boru hattını (pipeline) yönetmek, müşteri
 bilgilerini ve geçmiş satışları kayıt altına almak için bir web uygulaması.

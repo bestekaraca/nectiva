@@ -53,7 +53,7 @@ export default function Login() {
         <div className="flex items-center gap-2.5 mb-1">
           <BoltIcon size={30} id="login" />
           <div className="font-display font-semibold text-2xl tracking-tight bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent">
-            Nexivra
+            Nectiva
           </div>
         </div>
         <div className="text-xs text-violet-500/70 font-mono uppercase tracking-wider mb-7 ml-[42px]">
