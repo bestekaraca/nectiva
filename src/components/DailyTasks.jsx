@@ -6,6 +6,7 @@ const todayStr = () => new Date().toISOString().slice(0, 10);
 export default function DailyTasks({
   leads,
   onOpenLead,
+  onSetFollowUp,
   activityLogs,
   onAddActivity,
   onDeleteActivity,
@@ -19,6 +20,17 @@ export default function DailyTasks({
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDue, setTaskDue] = useState(todayStr());
   const [showDone, setShowDone] = useState(false);
+
+  const [followUpLeadId, setFollowUpLeadId] = useState("");
+  const [followUpDate, setFollowUpDate] = useState(todayStr());
+  const [followUpNote, setFollowUpNote] = useState("");
+
+  const handleAddFollowUp = async () => {
+    if (!followUpLeadId) return;
+    await onSetFollowUp(followUpLeadId, followUpDate, followUpNote.trim());
+    setFollowUpLeadId("");
+    setFollowUpNote("");
+  };
 
   const todaysCalls = activityLogs.filter((a) => a.type === "call" && a.date === todayStr()).length;
   const todaysEmails = activityLogs.filter((a) => a.type === "email" && a.date === todayStr()).length;
@@ -114,6 +126,41 @@ export default function DailyTasks({
 
       {/* Takip listesi */}
       <Section title="Takip Listesi" subtitle="Bugün ve gecikmiş takipler — tıklayınca fırsat detayı açılır">
+        <div className="flex flex-wrap gap-2 mb-4 pb-4 border-b border-mist">
+          <select
+            value={followUpLeadId}
+            onChange={(e) => setFollowUpLeadId(e.target.value)}
+            className="input flex-1 min-w-[180px]"
+          >
+            <option value="">Firma seç...</option>
+            {leads.map((l) => (
+              <option key={l.id} value={l.id}>
+                {l.company} {l.contactName ? `— ${l.contactName}` : ""}
+              </option>
+            ))}
+          </select>
+          <input
+            type="date"
+            value={followUpDate}
+            onChange={(e) => setFollowUpDate(e.target.value)}
+            className="input font-mono !w-auto"
+          />
+          <input
+            value={followUpNote}
+            onChange={(e) => setFollowUpNote(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleAddFollowUp()}
+            placeholder="Not (örn: fiyat için geri arayacak)"
+            className="input flex-1 min-w-[180px]"
+          />
+          <button
+            onClick={handleAddFollowUp}
+            disabled={!followUpLeadId}
+            className="px-4 py-2 bg-gradient-to-r from-violet-600 to-blue-500 text-white text-sm font-medium rounded-lg hover:shadow-glow-sm disabled:opacity-50 shrink-0"
+          >
+            Ekle
+          </button>
+        </div>
+
         {followUps.length === 0 ? (
           <div className="text-sm text-ink/30">Bugün için bekleyen takip yok.</div>
         ) : (
@@ -147,7 +194,16 @@ export default function DailyTasks({
       </Section>
 
       {/* Görev listesi */}
-      <Section title="Görev Listesi" subtitle="Fırsata bağlı olmayan genel görevler, bitiş tarihiyle">
+      <Section
+        title="Görev Listesi"
+        subtitle="Fırsata bağlı olmayan genel görevler, bitiş tarihiyle"
+      >
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <StatBox icon="📋" label="Toplam Görev" count={tasks.length} accent="violet" />
+          <StatBox icon="✅" label="Tamamlanan" count={doneTasks.length} accent="blue" />
+          <StatBox icon="🕓" label="Açık" count={openTasks.length} accent="amber" />
+        </div>
+
         <div className="flex flex-wrap gap-2 mb-4">
           <input
             value={taskTitle}
@@ -263,7 +319,11 @@ function Section({ title, subtitle, children }) {
 }
 
 function StatBox({ icon, label, count, accent }) {
-  const border = { blue: "border-l-blue-500", violet: "border-l-violet-500" }[accent];
+  const border = {
+    blue: "border-l-blue-500",
+    violet: "border-l-violet-500",
+    amber: "border-l-amber-500",
+  }[accent];
   return (
     <div className={`bg-white border border-mist ${border} border-l-[3px] rounded-lg p-3`}>
       <div className="text-base leading-none mb-1">{icon}</div>

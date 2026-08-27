@@ -5,6 +5,7 @@ import {
   insertLead,
   updateLead,
   updateLeadStage,
+  updateLeadFollowUp,
   deleteLead,
   insertNote,
   insertPurchase,
@@ -80,6 +81,17 @@ export default function App() {
     setLeads((prev) => prev.map((l) => (l.id === leadId ? { ...l, stage } : l)));
     try {
       await updateLeadStage(leadId, stage);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
+  const handleSetFollowUp = async (leadId, date, note) => {
+    setLeads((prev) =>
+      prev.map((l) => (l.id === leadId ? { ...l, nextActionDate: date, nextActionNote: note } : l))
+    );
+    try {
+      await updateLeadFollowUp(leadId, date, note);
     } catch (e) {
       setLoadError(e.message);
     }
@@ -227,6 +239,7 @@ export default function App() {
               <DailyTasks
                 leads={leads}
                 onOpenLead={(l) => setActiveLeadId(l.id)}
+                onSetFollowUp={handleSetFollowUp}
                 activityLogs={activityLogs}
                 onAddActivity={handleAddActivity}
                 onDeleteActivity={handleDeleteActivity}

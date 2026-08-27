@@ -82,6 +82,14 @@ export async function updateLeadStage(id, stage) {
   if (error) throw error;
 }
 
+export async function updateLeadFollowUp(id, nextActionDate, nextActionNote) {
+  const { error } = await supabase
+    .from("leads")
+    .update({ next_action_date: nextActionDate, next_action_note: nextActionNote })
+    .eq("id", id);
+  if (error) throw error;
+}
+
 export async function deleteLead(id) {
   const { error } = await supabase.from("leads").delete().eq("id", id);
   if (error) throw error;
