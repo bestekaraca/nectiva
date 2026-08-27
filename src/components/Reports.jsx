@@ -10,11 +10,6 @@ import {
   ResponsiveContainer,
   Cell,
   LabelList,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
 } from "recharts";
 import { STAGES, PRODUCTS, formatCurrency } from "../data/store";
 
@@ -184,32 +179,46 @@ export default function Reports({ leads, activityLogs }) {
         <ActivityCard icon="📄" label="Teklif" count={current.proposal} prev={previous.proposal} accent="amber" />
       </div>
 
-      <Section title="Dönem Karşılaştırması" subtitle={`Önceki dönem (${prevRange.start} – ${prevRange.end}) ile karşılaştırma — radar grafik`}>
-        <ResponsiveContainer width="100%" height={340}>
-          <RadarChart data={comparisonData} outerRadius="72%">
-            <PolarGrid stroke="#E9E5F6" />
-            <PolarAngleAxis dataKey="name" tick={{ fontSize: 12, fill: "#6B6478" }} />
-            <PolarRadiusAxis tick={{ fontSize: 10, fill: "#B5AFC7" }} allowDecimals={false} axisLine={false} />
-            <Radar
-              name="Önceki Dönem"
-              dataKey="onceki"
-              stroke="#A78BFA"
-              fill="#A78BFA"
-              fillOpacity={0.28}
-              strokeWidth={2}
+      <Section title="Dönem Karşılaştırması" subtitle={`Önceki dönem (${prevRange.start} – ${prevRange.end}) ile karşılaştırma`}>
+        <ResponsiveContainer width="100%" height={320}>
+          <BarChart
+            data={comparisonData}
+            layout="vertical"
+            margin={{ top: 10, right: 34, left: 10, bottom: 10 }}
+            barCategoryGap={18}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#E9E5F6" horizontal={false} />
+            <XAxis type="number" tick={{ fontSize: 12, fill: "#6B6478" }} allowDecimals={false} axisLine={false} />
+            <YAxis
+              type="category"
+              dataKey="name"
+              tick={{ fontSize: 12, fill: "#3F3A4D", fontWeight: 500 }}
+              width={80}
+              axisLine={{ stroke: "#E9E5F6" }}
+              tickLine={false}
             />
-            <Radar
-              name="Seçili Dönem"
-              dataKey="secili"
-              stroke="#7C3AED"
-              fill="#7C3AED"
-              fillOpacity={0.42}
-              strokeWidth={2}
-            />
-            <Legend wrapperStyle={{ fontSize: 12 }} />
             <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid #E9E5F6", fontSize: 12 }} />
-          </RadarChart>
+            <Legend wrapperStyle={{ fontSize: 12 }} />
+            <Bar dataKey="onceki" name="Önceki Dönem" fill="#DDD6FE" radius={[0, 6, 6, 0]} barSize={13}>
+              <LabelList dataKey="onceki" position="right" style={{ fontSize: 11, fill: "#8B7FB8", fontWeight: 600 }} />
+            </Bar>
+            <Bar dataKey="secili" name="Seçili Dönem" fill="#7C3AED" radius={[0, 6, 6, 0]} barSize={13}>
+              <LabelList dataKey="secili" position="right" style={{ fontSize: 11, fill: "#5B21B6", fontWeight: 700 }} />
+            </Bar>
+          </BarChart>
         </ResponsiveContainer>
+        <div className="flex flex-wrap gap-x-5 gap-y-1.5 mt-3 pt-3 border-t border-mist">
+          {comparisonData.map((d) => {
+            const diff = d.secili - d.onceki;
+            const color = diff > 0 ? "text-emerald-600" : diff < 0 ? "text-rose-500" : "text-ink/35";
+            const sign = diff > 0 ? "+" : "";
+            return (
+              <span key={d.name} className="text-xs text-ink/50">
+                {d.name}: <span className={`font-semibold ${color}`}>{sign}{diff}</span>
+              </span>
+            );
+          })}
+        </div>
       </Section>
 
       <Section title="Pipeline Dağılımı" subtitle={`Toplam ${leads.length} fırsat · ${formatCurrency(totalValue)} — sütun grafik`}>
