@@ -52,7 +52,14 @@ export default function Login() {
       <div className="relative glass rounded-3xl w-full max-w-sm p-8 shadow-glow-lg">
         <div className="flex items-center gap-2.5 mb-1">
           <BoltIcon size={30} id="login" />
-          <div className="font-display font-semibold text-2xl tracking-tight bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent">
+          <div
+            className="font-display font-bold text-2xl tracking-tight bg-clip-text text-transparent animate-shimmer drop-shadow-[0_2px_14px_rgba(139,92,246,0.3)]"
+            style={{
+              backgroundImage:
+                "linear-gradient(90deg, #7C3AED 0%, #7C3AED 35%, #ffffff 50%, #2563EB 65%, #2563EB 100%)",
+              backgroundSize: "250% 100%",
+            }}
+          >
             Nectiva
           </div>
         </div>

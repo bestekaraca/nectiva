@@ -42,12 +42,17 @@ export default {
           "0%, 100%": { backgroundPosition: "0% 50%" },
           "50%": { backgroundPosition: "100% 50%" },
         },
+        shimmer: {
+          "0%": { backgroundPosition: "-150% 0" },
+          "100%": { backgroundPosition: "150% 0" },
+        },
       },
       animation: {
         glowPulse: "glowPulse 2.4s ease-in-out infinite",
         blob: "blobMove 14s ease-in-out infinite",
         blobSlow: "blobMove 19s ease-in-out infinite reverse",
         gradientShift: "gradientShift 6s ease infinite",
+        shimmer: "shimmer 2.8s ease-in-out infinite",
       },
     },
   },

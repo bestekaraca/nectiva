@@ -13,7 +13,14 @@ export default function Sidebar({ view, setView, onNewLead, todayCount, userEmai
       <div className="relative px-5 pt-6 pb-4 hidden md:flex items-center gap-2.5">
         <BoltIcon size={26} id="sidebar" />
         <div>
-          <div className="font-display font-semibold text-xl tracking-tight leading-none bg-gradient-to-r from-violet-300 to-blue-300 bg-clip-text text-transparent">
+          <div
+            className="font-display font-bold text-xl tracking-tight leading-none bg-clip-text text-transparent animate-shimmer drop-shadow-[0_1px_10px_rgba(139,92,246,0.35)]"
+            style={{
+              backgroundImage:
+                "linear-gradient(90deg, #C4B5FD 0%, #A78BFA 30%, #ffffff 50%, #93C5FD 70%, #93C5FD 100%)",
+              backgroundSize: "250% 100%",
+            }}
+          >
             Nectiva
           </div>
           <div className="text-[10px] text-violet-300/60 font-mono uppercase tracking-wider mt-0.5">
