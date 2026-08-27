@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CONTENT_TYPES, CONTENT_STATUSES } from "../data/store";
+import { CONTENT_TYPES, CAMPAIGN_CHANNELS } from "../data/store";
 
 const WEEKDAYS = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
 const MONTH_NAMES = [
@@ -7,8 +7,13 @@ const MONTH_NAMES = [
   "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık",
 ];
 
+// ÖNEMLİ: toISOString() UTC'ye çevirir, bu da Türkiye gibi UTC+ dilimlerinde
+// tarihi bir gün geriye kaydırabilir. Yerel yıl/ay/gün'den elle string kuruyoruz.
 function toISO(d) {
-  return d.toISOString().slice(0, 10);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
 function getMonthGrid(year, month) {
@@ -29,9 +34,12 @@ const statusDot = {
   devam: "bg-amber-400",
   tamamlandi: "bg-emerald-400",
 };
+const STATUS_CYCLE = ["yapilacak", "devam", "tamamlandi"];
 
-export default function ContentCalendar({ content }) {
+export default function ContentCalendar({ content, campaigns, onAddContent, onCycleStatus }) {
   const [cursor, setCursor] = useState(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  const [addingDate, setAddingDate] = useState(null);
+  const [quickTitle, setQuickTitle] = useState("");
 
   const cells = getMonthGrid(cursor.getFullYear(), cursor.getMonth());
   const todayISO = toISO(new Date());
@@ -39,8 +47,23 @@ export default function ContentCalendar({ content }) {
   const contentByDate = {};
   content.forEach((c) => {
     if (!c.dueDate) return;
-    (contentByDate[c.dueDate] ||= []).push(c);
+    (contentByDate[c.dueDate] ||= []).push({ ...c, _kind: "content" });
   });
+  const campaignsByDate = {};
+  (campaigns || []).forEach((c) => {
+    if (!c.date) return;
+    (campaignsByDate[c.date] ||= []).push({ ...c, _kind: "campaign" });
+  });
+
+  const handleQuickAdd = async (iso) => {
+    if (!quickTitle.trim()) {
+      setAddingDate(null);
+      return;
+    }
+    await onAddContent({ title: quickTitle.trim(), product: "", contentType: "post", dueDate: iso, note: "" });
+    setQuickTitle("");
+    setAddingDate(null);
+  };
 
   return (
     <div>
@@ -70,6 +93,10 @@ export default function ContentCalendar({ content }) {
         </div>
       </div>
 
+      <p className="text-[11px] text-ink/35 mb-2">
+        Bir güne tıklayıp hızlıca içerik ekle · bir etikete tıklayınca durumu ilerler (Yapılacak → Devam → Tamamlandı)
+      </p>
+
       <div className="grid grid-cols-7 gap-1.5 mb-1.5">
         {WEEKDAYS.map((d) => (
           <div key={d} className="text-center text-[11px] font-medium text-ink/35 py-1">
@@ -80,16 +107,19 @@ export default function ContentCalendar({ content }) {
 
       <div className="grid grid-cols-7 gap-1.5">
         {cells.map((date, i) => {
-          if (!date) return <div key={i} className="min-h-[70px]" />;
+          if (!date) return <div key={i} className="min-h-[78px]" />;
           const iso = toISO(date);
           const items = contentByDate[iso] || [];
+          const campaignItems = campaignsByDate[iso] || [];
           const isToday = iso === todayISO;
+          const isAdding = addingDate === iso;
           return (
             <div
               key={i}
-              className={`min-h-[70px] rounded-lg border p-1.5 ${
-                isToday ? "bg-violet-50 border-violet-300" : "bg-white border-mist"
+              className={`min-h-[78px] rounded-lg border p-1.5 cursor-pointer transition-colors ${
+                isToday ? "bg-violet-50 border-violet-300" : "bg-white border-mist hover:border-violet-200"
               }`}
+              onClick={() => !isAdding && setAddingDate(iso)}
             >
               <div className={`text-[11px] font-mono mb-1 ${isToday ? "text-violet-700 font-bold" : "text-ink/35"}`}>
                 {date.getDate()}
@@ -100,8 +130,13 @@ export default function ContentCalendar({ content }) {
                   return (
                     <div
                       key={c.id}
-                      title={c.title}
-                      className="flex items-center gap-1 text-[10px] bg-mist/60 rounded px-1 py-0.5 truncate"
+                      title={`${c.title} — tıkla, durumu değiştir`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(c.status) + 1) % 3];
+                        onCycleStatus(c.id, next);
+                      }}
+                      className="flex items-center gap-1 text-[10px] bg-mist/60 hover:bg-mist rounded px-1 py-0.5 truncate"
                     >
                       <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusDot[c.status]}`} />
                       <span className="truncate text-ink/70">
@@ -110,10 +145,43 @@ export default function ContentCalendar({ content }) {
                     </div>
                   );
                 })}
-                {items.length > 3 && (
-                  <div className="text-[10px] text-ink/30">+{items.length - 3} daha</div>
+                {campaignItems.slice(0, 2).map((c) => {
+                  const chInfo = CAMPAIGN_CHANNELS.find((ch) => ch.id === c.channel);
+                  return (
+                    <div
+                      key={c.id}
+                      title={`${c.title} (${chInfo?.label || c.channel})`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center gap-1 text-[10px] bg-violet-100/70 rounded px-1 py-0.5 truncate"
+                    >
+                      <span className="shrink-0">{chInfo?.icon}</span>
+                      <span className="truncate text-violet-800">{c.title}</span>
+                    </div>
+                  );
+                })}
+                {items.length + campaignItems.length > 5 && (
+                  <div className="text-[10px] text-ink/30">
+                    +{items.length + campaignItems.length - 5} daha
+                  </div>
                 )}
               </div>
+
+              {isAdding && (
+                <div className="mt-1" onClick={(e) => e.stopPropagation()}>
+                  <input
+                    autoFocus
+                    value={quickTitle}
+                    onChange={(e) => setQuickTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleQuickAdd(iso);
+                      if (e.key === "Escape") setAddingDate(null);
+                    }}
+                    onBlur={() => handleQuickAdd(iso)}
+                    placeholder="İçerik adı..."
+                    className="w-full text-[10px] px-1.5 py-1 border border-violet-300 rounded outline-none"
+                  />
+                </div>
+              )}
             </div>
           );
         })}

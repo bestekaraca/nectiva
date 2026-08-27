@@ -60,8 +60,13 @@ export default function Marketing({
         <SummaryCard icon="📋" label="Açık Görev" count={summary.openTasks} accent="rose" />
       </div>
 
-      <Section title="İçerik Takvimi" subtitle="Bitiş tarihi girilen içerikler ay görünümünde">
-        <ContentCalendar content={content} />
+      <Section title="İçerik Takvimi" subtitle="Bitiş tarihi girilen içerikler ve kampanyalar ay görünümünde">
+        <ContentCalendar
+          content={content}
+          campaigns={campaigns}
+          onAddContent={onAddContent}
+          onCycleStatus={onUpdateContentStatus}
+        />
       </Section>
 
       <ContentSection content={content} onAdd={onAddContent} onUpdateStatus={onUpdateContentStatus} onDelete={onDeleteContent} />
