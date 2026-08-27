@@ -13,6 +13,8 @@ export default function Contacts({ leads, onOpen }) {
     return matchesProduct && matchesQuery;
   });
 
+  const uniqueCompanies = new Set(leads.map((l) => l.company).filter(Boolean)).size;
+
   return (
     <div>
       <div className="flex items-center justify-between gap-4 mb-1">
@@ -25,7 +27,14 @@ export default function Contacts({ leads, onOpen }) {
           className="w-64 input"
         />
       </div>
-      <p className="text-sm text-ink/40 mb-5">Tüm müşteri kişilerin, ürüne göre filtrelenebilir.</p>
+      <p className="text-sm text-ink/40 mb-1">Tüm müşteri kişilerin, ürüne göre filtrelenebilir.</p>
+      <p className="text-sm text-ink/60 font-medium mb-5">
+        Toplam <span className="text-violet-600 font-semibold">{leads.length}</span> kişi ·{" "}
+        <span className="text-violet-600 font-semibold">{uniqueCompanies}</span> firma
+        {(productFilter || query) && (
+          <span className="text-ink/40 font-normal"> (filtre sonrası {filtered.length} kayıt)</span>
+        )}
+      </p>
 
       {/* Ürün filtre sekmeleri */}
       <div className="flex flex-wrap gap-1.5 mb-5">
