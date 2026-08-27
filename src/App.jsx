@@ -200,7 +200,9 @@ export default function App() {
     }
   };
 
-  const todayCount = leads.filter((l) => isToday(l.nextActionDate)).length;
+  const todayCount = leads.filter(
+    (l) => isToday(l.nextActionDate) && l.followupStatus !== "arandi"
+  ).length;
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-paper">

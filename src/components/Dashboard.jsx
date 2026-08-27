@@ -16,8 +16,8 @@ export default function Dashboard({
   const wonValue = leads
     .filter((l) => l.stage === "kazanildi")
     .reduce((s, l) => s + (l.value || 0), 0);
-  const overdueLeads = leads.filter((l) => isOverdue(l.nextActionDate));
-  const todayLeads = leads.filter((l) => isToday(l.nextActionDate));
+  const overdueLeads = leads.filter((l) => isOverdue(l.nextActionDate) && l.followupStatus !== "arandi");
+  const todayLeads = leads.filter((l) => isToday(l.nextActionDate) && l.followupStatus !== "arandi");
   const todaysTasks = tasks
     .filter((t) => !t.done && t.dueDate && (isToday(t.dueDate) || isOverdue(t.dueDate)))
     .sort((a, b) => (a.dueDate < b.dueDate ? -1 : 1));

@@ -45,7 +45,12 @@ export default function DailyTasks({
   };
 
   const followUps = leads
-    .filter((l) => l.nextActionDate && (isToday(l.nextActionDate) || isOverdue(l.nextActionDate)))
+    .filter(
+      (l) =>
+        l.nextActionDate &&
+        (isToday(l.nextActionDate) || isOverdue(l.nextActionDate)) &&
+        l.followupStatus !== "arandi"
+    )
     .sort((a, b) => (a.nextActionDate < b.nextActionDate ? -1 : 1));
 
   const openTasks = tasks
