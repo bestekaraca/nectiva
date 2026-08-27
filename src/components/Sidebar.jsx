@@ -6,6 +6,7 @@ export default function Sidebar({ view, setView, onNewLead, todayCount, userEmai
     { id: "pipeline", label: "Pipeline" },
     { id: "contacts", label: "Kişiler" },
     { id: "daily", label: "Günlük Görevler" },
+    { id: "marketing", label: "Marketing" },
     { id: "reports", label: "Rapor" },
   ];
 

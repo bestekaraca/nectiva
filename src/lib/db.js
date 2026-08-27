@@ -230,17 +230,23 @@ export async function fetchTasks() {
     .select("*")
     .order("due_date", { ascending: true, nullsFirst: false });
   if (error) throw error;
-  return data.map((t) => ({ id: t.id, title: t.title, dueDate: t.due_date, done: t.done }));
+  return data.map((t) => ({
+    id: t.id,
+    title: t.title,
+    dueDate: t.due_date,
+    done: t.done,
+    category: t.category || "genel",
+  }));
 }
 
-export async function insertTask(title, dueDate, userId) {
+export async function insertTask(title, dueDate, userId, category = "genel") {
   const { data, error } = await supabase
     .from("tasks")
-    .insert({ title, due_date: dueDate || null, user_id: userId })
+    .insert({ title, due_date: dueDate || null, user_id: userId, category })
     .select()
     .single();
   if (error) throw error;
-  return { id: data.id, title: data.title, dueDate: data.due_date, done: data.done };
+  return { id: data.id, title: data.title, dueDate: data.due_date, done: data.done, category: data.category };
 }
 
 export async function updateTaskDone(id, done) {
@@ -250,5 +256,156 @@ export async function updateTaskDone(id, done) {
 
 export async function deleteTask(id) {
   const { error } = await supabase.from("tasks").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// --- Marketing: İçerik üretim takibi ---------------------------------------
+
+export async function fetchMarketingContent() {
+  const { data, error } = await supabase
+    .from("marketing_content")
+    .select("*")
+    .order("due_date", { ascending: true, nullsFirst: false });
+  if (error) throw error;
+  return data.map((c) => ({
+    id: c.id,
+    title: c.title,
+    product: c.product,
+    contentType: c.content_type,
+    status: c.status,
+    dueDate: c.due_date,
+    note: c.note,
+  }));
+}
+
+export async function insertMarketingContent({ title, product, contentType, dueDate, note }, userId) {
+  const { data, error } = await supabase
+    .from("marketing_content")
+    .insert({
+      title,
+      product,
+      content_type: contentType,
+      due_date: dueDate || null,
+      note,
+      user_id: userId,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return {
+    id: data.id,
+    title: data.title,
+    product: data.product,
+    contentType: data.content_type,
+    status: data.status,
+    dueDate: data.due_date,
+    note: data.note,
+  };
+}
+
+export async function updateMarketingContentStatus(id, status) {
+  const { error } = await supabase.from("marketing_content").update({ status }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteMarketingContent(id) {
+  const { error } = await supabase.from("marketing_content").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// --- Marketing: Kampanyalar --------------------------------------------------
+
+export async function fetchCampaigns() {
+  const { data, error } = await supabase
+    .from("marketing_campaigns")
+    .select("*")
+    .order("date", { ascending: false });
+  if (error) throw error;
+  return data.map((c) => ({
+    id: c.id,
+    title: c.title,
+    channel: c.channel,
+    product: c.product,
+    date: c.date,
+    description: c.description,
+    metricLabel: c.metric_label,
+    metricValue: c.metric_value,
+    goalValue: c.goal_value,
+  }));
+}
+
+export async function insertCampaign(
+  { title, channel, product, date, description, metricLabel, metricValue, goalValue },
+  userId
+) {
+  const { data, error } = await supabase
+    .from("marketing_campaigns")
+    .insert({
+      title,
+      channel,
+      product,
+      date,
+      description,
+      metric_label: metricLabel,
+      metric_value: metricValue || null,
+      goal_value: goalValue || null,
+      user_id: userId,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return {
+    id: data.id,
+    title: data.title,
+    channel: data.channel,
+    product: data.product,
+    date: data.date,
+    description: data.description,
+    metricLabel: data.metric_label,
+    metricValue: data.metric_value,
+    goalValue: data.goal_value,
+  };
+}
+
+export async function deleteCampaign(id) {
+  const { error } = await supabase.from("marketing_campaigns").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// --- Marketing: Mail marketing takibi ---------------------------------------
+
+export async function fetchMarketingEmails() {
+  const { data, error } = await supabase
+    .from("marketing_emails")
+    .select("*, leads(company)")
+    .order("date", { ascending: false });
+  if (error) throw error;
+  return data.map((e) => ({
+    id: e.id,
+    leadId: e.lead_id,
+    company: e.leads?.company || "—",
+    campaign: e.campaign,
+    date: e.date,
+  }));
+}
+
+export async function insertMarketingEmail(leadId, campaign, date, userId) {
+  const { data, error } = await supabase
+    .from("marketing_emails")
+    .insert({ lead_id: leadId, campaign, date, user_id: userId })
+    .select("*, leads(company)")
+    .single();
+  if (error) throw error;
+  return {
+    id: data.id,
+    leadId: data.lead_id,
+    company: data.leads?.company || "—",
+    campaign: data.campaign,
+    date: data.date,
+  };
+}
+
+export async function deleteMarketingEmail(id) {
+  const { error } = await supabase.from("marketing_emails").delete().eq("id", id);
   if (error) throw error;
 }

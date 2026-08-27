@@ -23,6 +23,29 @@ export const FOLLOWUP_STATUSES = [
   { id: "takip_edilecek", label: "Takip Edilecek", badge: "bg-rose-100 text-rose-700 border-rose-300" },
 ];
 
+export const CONTENT_TYPES = [
+  { id: "sunum", label: "Sunum", icon: "📊" },
+  { id: "one_pager", label: "One-Pager", icon: "📄" },
+  { id: "post", label: "Post", icon: "📱" },
+  { id: "brosur", label: "Broşür", icon: "📰" },
+  { id: "kartvizit", label: "Kartvizit", icon: "🪪" },
+  { id: "diger", label: "Diğer", icon: "📎" },
+];
+
+export const CONTENT_STATUSES = [
+  { id: "yapilacak", label: "Yapılacak", badge: "bg-rose-100 text-rose-700 border-rose-300" },
+  { id: "devam", label: "Devam Ediyor", badge: "bg-amber-100 text-amber-700 border-amber-300" },
+  { id: "tamamlandi", label: "Tamamlandı", badge: "bg-emerald-100 text-emerald-700 border-emerald-300" },
+];
+
+export const CAMPAIGN_CHANNELS = [
+  { id: "linkedin", label: "LinkedIn", icon: "💼", color: "#0A66C2" },
+  { id: "mailing", label: "Mailing", icon: "✉️", color: "#7C3AED" },
+  { id: "google_analytics", label: "Google Analytics", icon: "📈", color: "#F59E0B" },
+  { id: "etkinlik", label: "Etkinlik / Konferans", icon: "🎪", color: "#EC4899" },
+  { id: "diger", label: "Diğer", icon: "📌", color: "#6B7280" },
+];
+
 export const SECTORS = [
   "Perakende",
   "Üretim",

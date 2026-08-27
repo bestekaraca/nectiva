@@ -21,6 +21,16 @@ import {
   insertTask,
   updateTaskDone,
   deleteTask,
+  fetchMarketingContent,
+  insertMarketingContent,
+  updateMarketingContentStatus,
+  deleteMarketingContent,
+  fetchCampaigns,
+  insertCampaign,
+  deleteCampaign,
+  fetchMarketingEmails,
+  insertMarketingEmail,
+  deleteMarketingEmail,
 } from "./lib/db";
 import { isToday } from "./data/store";
 import Sidebar from "./components/Sidebar";
@@ -28,6 +38,7 @@ import Dashboard from "./components/Dashboard";
 import Pipeline from "./components/Pipeline";
 import Contacts from "./components/Contacts";
 import DailyTasks from "./components/DailyTasks";
+import Marketing from "./components/Marketing";
 import LeadModal from "./components/LeadModal";
 import NewLeadModal from "./components/NewLeadModal";
 import Login from "./components/Login";
@@ -43,6 +54,9 @@ export default function App() {
   const [saleEntries, setSaleEntries] = useState([]);
   const [activityLogs, setActivityLogs] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [marketingContent, setMarketingContent] = useState([]);
+  const [campaigns, setCampaigns] = useState([]);
+  const [marketingEmails, setMarketingEmails] = useState([]);
   const [loadingLeads, setLoadingLeads] = useState(false);
   const [loadError, setLoadError] = useState(null);
   const [view, setView] = useState("dashboard");
@@ -66,6 +80,9 @@ export default function App() {
     fetchSaleEntries().then(setSaleEntries).catch((e) => setLoadError(e.message));
     fetchActivityLogs().then(setActivityLogs).catch((e) => setLoadError(e.message));
     fetchTasks().then(setTasks).catch((e) => setLoadError(e.message));
+    fetchMarketingContent().then(setMarketingContent).catch((e) => setLoadError(e.message));
+    fetchCampaigns().then(setCampaigns).catch((e) => setLoadError(e.message));
+    fetchMarketingEmails().then(setMarketingEmails).catch((e) => setLoadError(e.message));
   }, [session]);
 
   if (session === undefined) {
@@ -200,6 +217,59 @@ export default function App() {
     }
   };
 
+  // --- Marketing ---
+  const handleAddContent = async (payload) => {
+    const item = await insertMarketingContent(payload, session.user.id);
+    setMarketingContent((prev) => [...prev, item]);
+  };
+  const handleUpdateContentStatus = async (id, status) => {
+    setMarketingContent((prev) => prev.map((c) => (c.id === id ? { ...c, status } : c)));
+    try {
+      await updateMarketingContentStatus(id, status);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+  const handleDeleteContent = async (id) => {
+    setMarketingContent((prev) => prev.filter((c) => c.id !== id));
+    try {
+      await deleteMarketingContent(id);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
+  const handleAddCampaign = async (payload) => {
+    const item = await insertCampaign(payload, session.user.id);
+    setCampaigns((prev) => [item, ...prev]);
+  };
+  const handleDeleteCampaign = async (id) => {
+    setCampaigns((prev) => prev.filter((c) => c.id !== id));
+    try {
+      await deleteCampaign(id);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
+  const handleAddMarketingEmail = async (leadId, campaign, date) => {
+    const item = await insertMarketingEmail(leadId, campaign, date, session.user.id);
+    setMarketingEmails((prev) => [item, ...prev]);
+  };
+  const handleDeleteMarketingEmail = async (id) => {
+    setMarketingEmails((prev) => prev.filter((e) => e.id !== id));
+    try {
+      await deleteMarketingEmail(id);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
+  const handleAddMarketingTask = async (title, dueDate) => {
+    const task = await insertTask(title, dueDate, session.user.id, "marketing");
+    setTasks((prev) => [...prev, task]);
+  };
+
   const todayCount = leads.filter(
     (l) => isToday(l.nextActionDate) && l.followupStatus !== "arandi"
   ).length;
@@ -259,6 +329,25 @@ export default function App() {
                 onDeleteActivity={handleDeleteActivity}
                 tasks={tasks}
                 onAddTask={handleAddTask}
+                onToggleTask={handleToggleTask}
+                onDeleteTask={handleDeleteTask}
+              />
+            )}
+            {view === "marketing" && (
+              <Marketing
+                leads={leads}
+                content={marketingContent}
+                onAddContent={handleAddContent}
+                onUpdateContentStatus={handleUpdateContentStatus}
+                onDeleteContent={handleDeleteContent}
+                campaigns={campaigns}
+                onAddCampaign={handleAddCampaign}
+                onDeleteCampaign={handleDeleteCampaign}
+                marketingEmails={marketingEmails}
+                onAddMarketingEmail={handleAddMarketingEmail}
+                onDeleteMarketingEmail={handleDeleteMarketingEmail}
+                marketingTasks={tasks.filter((t) => t.category === "marketing")}
+                onAddMarketingTask={handleAddMarketingTask}
                 onToggleTask={handleToggleTask}
                 onDeleteTask={handleDeleteTask}
               />
