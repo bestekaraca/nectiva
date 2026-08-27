@@ -25,7 +25,7 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
   return (
     <div>
       <div className="flex items-center justify-between gap-4 mb-1">
-        <h1 className="font-display font-semibold text-2xl text-ink">Boru Hattı</h1>
+        <h1 className="font-display font-semibold text-2xl text-ink">Pipeline</h1>
         <input
           type="text"
           placeholder="Firma veya kişi ara..."

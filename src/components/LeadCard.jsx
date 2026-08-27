@@ -1,8 +1,10 @@
 import { formatCurrency, isOverdue, isToday } from "../data/store";
 
 const stripeColor = {
-  indigo: "before:bg-gradient-to-b before:from-violet-500 before:to-blue-500",
+  blue: "before:bg-blue-500",
+  violet: "before:bg-violet-500",
   amber: "before:bg-amber-400",
+  fuchsia: "before:bg-fuchsia-500",
   teal: "before:bg-emerald-500",
   brick: "before:bg-rose-500",
 };

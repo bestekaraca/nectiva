@@ -1,15 +1,19 @@
 import { STAGES } from "../data/store";
 
 const colorMap = {
-  indigo: "bg-gradient-to-r from-violet-500 to-blue-500",
+  blue: "bg-blue-500",
+  violet: "bg-violet-500",
   amber: "bg-amber-400",
+  fuchsia: "bg-fuchsia-500",
   teal: "bg-emerald-500",
   brick: "bg-rose-500",
 };
 
 const dotMap = {
-  indigo: "bg-violet-500",
+  blue: "bg-blue-500",
+  violet: "bg-violet-500",
   amber: "bg-amber-400",
+  fuchsia: "bg-fuchsia-500",
   teal: "bg-emerald-500",
   brick: "bg-rose-500",
 };

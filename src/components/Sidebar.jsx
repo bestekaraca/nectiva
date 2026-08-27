@@ -3,7 +3,7 @@ import BoltIcon from "./BoltIcon";
 export default function Sidebar({ view, setView, onNewLead, todayCount, userEmail, onSignOut }) {
   const items = [
     { id: "dashboard", label: "Panel" },
-    { id: "pipeline", label: "Boru Hattı" },
+    { id: "pipeline", label: "Pipeline" },
   ];
 
   return (
