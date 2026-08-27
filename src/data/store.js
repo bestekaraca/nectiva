@@ -9,6 +9,14 @@ export const STAGES = [
   { id: "kaybedildi", label: "Kaybedildi", color: "brick" },
 ];
 
+export const ACTIVITY_TYPES = [
+  { id: "note", label: "Genel Not", icon: "📝" },
+  { id: "call", label: "Arama", icon: "📞" },
+  { id: "email", label: "Mail", icon: "✉️" },
+  { id: "meeting", label: "Toplantı", icon: "🤝" },
+  { id: "proposal", label: "Teklif", icon: "📄" },
+];
+
 export const SECTORS = [
   "Perakende",
   "Üretim",

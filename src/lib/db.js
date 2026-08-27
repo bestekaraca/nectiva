@@ -22,7 +22,7 @@ function rowToLead(row) {
     nextActionNote: row.next_action_note || "",
     createdAt: row.created_at,
     notes: (row.notes || [])
-      .map((n) => ({ id: n.id, date: n.date, text: n.text }))
+      .map((n) => ({ id: n.id, date: n.date, text: n.text, type: n.type || "note" }))
       .sort((a, b) => (a.date < b.date ? 1 : -1)),
     purchases: (row.purchases || [])
       .map((p) => ({ id: p.id, date: p.date, description: p.description, amount: p.amount }))
@@ -87,14 +87,14 @@ export async function deleteLead(id) {
   if (error) throw error;
 }
 
-export async function insertNote(leadId, text) {
+export async function insertNote(leadId, text, type = "note") {
   const { data, error } = await supabase
     .from("notes")
-    .insert({ lead_id: leadId, text })
+    .insert({ lead_id: leadId, text, type })
     .select()
     .single();
   if (error) throw error;
-  return { id: data.id, date: data.date, text: data.text };
+  return { id: data.id, date: data.date, text: data.text, type: data.type };
 }
 
 export async function insertPurchase(leadId, description, amount) {

@@ -18,6 +18,7 @@ import Sidebar from "./components/Sidebar";
 import Dashboard from "./components/Dashboard";
 import Pipeline from "./components/Pipeline";
 import Contacts from "./components/Contacts";
+import Reports from "./components/Reports";
 import LeadModal from "./components/LeadModal";
 import NewLeadModal from "./components/NewLeadModal";
 import Login from "./components/Login";
@@ -97,8 +98,8 @@ export default function App() {
     }
   };
 
-  const handleAddNote = async (leadId, text) => {
-    const note = await insertNote(leadId, text);
+  const handleAddNote = async (leadId, text, type = "note") => {
+    const note = await insertNote(leadId, text, type);
     setLeads((prev) =>
       prev.map((l) => (l.id === leadId ? { ...l, notes: [note, ...l.notes] } : l))
     );
@@ -168,6 +169,7 @@ export default function App() {
             {view === "contacts" && (
               <Contacts leads={leads} onOpen={(l) => setActiveLeadId(l.id)} />
             )}
+            {view === "reports" && <Reports leads={leads} />}
           </>
         )}
       </main>

@@ -5,6 +5,7 @@ import {
   SOURCES,
   PRODUCTS,
   PRODUCT_BADGE,
+  ACTIVITY_TYPES,
   formatCurrency,
   totalPurchases,
 } from "../data/store";
@@ -12,6 +13,7 @@ import {
 export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, onAddPurchase }) {
   const [form, setForm] = useState({ ...lead });
   const [noteText, setNoteText] = useState("");
+  const [noteType, setNoteType] = useState("note");
   const [tagText, setTagText] = useState("");
   const [purchaseDesc, setPurchaseDesc] = useState("");
   const [purchaseAmount, setPurchaseAmount] = useState("");
@@ -29,7 +31,7 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
     if (!noteText.trim() || busyNote) return;
     setBusyNote(true);
     try {
-      await onAddNote(lead.id, noteText.trim());
+      await onAddNote(lead.id, noteText.trim(), noteType);
       setNoteText("");
     } finally {
       setBusyNote(false);
@@ -346,6 +348,22 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
 
           {tab === "notlar" && (
             <div>
+              <div className="flex flex-wrap gap-1.5 mb-2.5">
+                {ACTIVITY_TYPES.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setNoteType(t.id)}
+                    className={`text-xs font-medium px-2.5 py-1 rounded-full border transition-all ${
+                      noteType === t.id
+                        ? "bg-violet-600 text-white border-violet-600"
+                        : "bg-white text-ink/50 border-mist hover:border-violet-300"
+                    }`}
+                  >
+                    {t.icon} {t.label}
+                  </button>
+                ))}
+              </div>
               <div className="flex gap-2 mb-3">
                 <input
                   value={noteText}
@@ -368,7 +386,14 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                 )}
                 {lead.notes.map((n) => (
                   <div key={n.id} className="bg-white border border-mist rounded-lg px-3 py-2">
-                    <div className="text-xs font-mono text-ink/35">{n.date}</div>
+                    <div className="flex items-center gap-2 text-xs font-mono text-ink/35 mb-0.5">
+                      <span>{n.date}</span>
+                      <span className="text-ink/20">·</span>
+                      <span>
+                        {ACTIVITY_TYPES.find((t) => t.id === n.type)?.icon}{" "}
+                        {ACTIVITY_TYPES.find((t) => t.id === n.type)?.label || "Not"}
+                      </span>
+                    </div>
                     <div className="text-sm text-ink/80">{n.text}</div>
                   </div>
                 ))}
