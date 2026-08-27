@@ -53,7 +53,7 @@ export default function Login() {
         <div className="flex items-center gap-2.5 mb-1">
           <BoltIcon size={30} id="login" />
           <div
-            className="font-display font-bold text-2xl tracking-tight bg-clip-text text-transparent animate-shimmer drop-shadow-[0_2px_14px_rgba(139,92,246,0.3)]"
+            className="font-display font-bold text-3xl tracking-tight bg-clip-text text-transparent animate-shimmer drop-shadow-[0_2px_14px_rgba(139,92,246,0.3)]"
             style={{
               backgroundImage:
                 "linear-gradient(90deg, #7C3AED 0%, #7C3AED 35%, #ffffff 50%, #2563EB 65%, #2563EB 100%)",
@@ -64,7 +64,7 @@ export default function Login() {
           </div>
         </div>
         <div className="text-xs text-violet-500/70 font-mono uppercase tracking-wider mb-7 ml-[42px]">
-          Satış Asistanı
+          Kapat. Büyü. Tekrarla.
         </div>
 
         <div className="flex gap-1 mb-6 bg-ink/5 rounded-xl p-1 border border-ink/5">

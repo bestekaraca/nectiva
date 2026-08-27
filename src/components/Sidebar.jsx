@@ -14,7 +14,7 @@ export default function Sidebar({ view, setView, onNewLead, todayCount, userEmai
         <BoltIcon size={26} id="sidebar" />
         <div>
           <div
-            className="font-display font-bold text-xl tracking-tight leading-none bg-clip-text text-transparent animate-shimmer drop-shadow-[0_1px_10px_rgba(139,92,246,0.35)]"
+            className="font-display font-bold text-2xl tracking-tight leading-none bg-clip-text text-transparent animate-shimmer drop-shadow-[0_1px_10px_rgba(139,92,246,0.35)]"
             style={{
               backgroundImage:
                 "linear-gradient(90deg, #C4B5FD 0%, #A78BFA 30%, #ffffff 50%, #93C5FD 70%, #93C5FD 100%)",
@@ -24,7 +24,7 @@ export default function Sidebar({ view, setView, onNewLead, todayCount, userEmai
             Nectiva
           </div>
           <div className="text-[10px] text-violet-300/60 font-mono uppercase tracking-wider mt-0.5">
-            Satış Asistanı
+            Kapat. Büyü. Tekrarla.
           </div>
         </div>
       </div>
