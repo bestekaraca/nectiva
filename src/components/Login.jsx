@@ -64,7 +64,7 @@ export default function Login() {
           </div>
         </div>
         <div className="text-xs text-violet-500/70 font-mono uppercase tracking-wider mb-7 ml-[42px]">
-          Kapat. Büyü. Tekrarla.
+          Sales & Marketing Assistant
         </div>
 
         <div className="flex gap-1 mb-6 bg-ink/5 rounded-xl p-1 border border-ink/5">

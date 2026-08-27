@@ -24,7 +24,7 @@ export default function Sidebar({ view, setView, onNewLead, todayCount, userEmai
             Nectiva
           </div>
           <div className="text-[10px] text-violet-300/60 font-mono uppercase tracking-wider mt-0.5">
-            Kapat. Büyü. Tekrarla.
+            Sales & Marketing Assistant
           </div>
         </div>
       </div>
