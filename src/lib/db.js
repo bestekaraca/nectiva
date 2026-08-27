@@ -435,3 +435,39 @@ export async function deleteMarketNote(id) {
   const { error } = await supabase.from("market_notes").delete().eq("id", id);
   if (error) throw error;
 }
+
+// --- LinkedIn Marketing Strategy (esnek sekme verisi) -----------------------
+
+export async function fetchStrategyRows() {
+  const { data, error } = await supabase
+    .from("linkedin_strategy_rows")
+    .select("*")
+    .order("sheet_key", { ascending: true })
+    .order("row_index", { ascending: true });
+  if (error) throw error;
+  const bySheet = {};
+  data.forEach((r) => {
+    (bySheet[r.sheet_key] ||= []).push({ id: r.id, ...r.data });
+  });
+  return bySheet;
+}
+
+export async function insertStrategyRow(sheetKey, rowData, rowIndex, userId) {
+  const { data, error } = await supabase
+    .from("linkedin_strategy_rows")
+    .insert({ sheet_key: sheetKey, row_index: rowIndex, data: rowData, user_id: userId })
+    .select()
+    .single();
+  if (error) throw error;
+  return { id: data.id, ...data.data };
+}
+
+export async function updateStrategyRow(id, rowData) {
+  const { error } = await supabase.from("linkedin_strategy_rows").update({ data: rowData }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteStrategyRow(id) {
+  const { error } = await supabase.from("linkedin_strategy_rows").delete().eq("id", id);
+  if (error) throw error;
+}

@@ -34,6 +34,10 @@ import {
   fetchMarketNotes,
   insertMarketNote,
   deleteMarketNote,
+  fetchStrategyRows,
+  insertStrategyRow,
+  updateStrategyRow,
+  deleteStrategyRow,
 } from "./lib/db";
 import { isToday } from "./data/store";
 import Sidebar from "./components/Sidebar";
@@ -42,6 +46,7 @@ import Pipeline from "./components/Pipeline";
 import Contacts from "./components/Contacts";
 import DailyTasks from "./components/DailyTasks";
 import Marketing from "./components/Marketing";
+const LinkedInStrategy = lazy(() => import("./components/LinkedInStrategy"));
 import LeadModal from "./components/LeadModal";
 import NewLeadModal from "./components/NewLeadModal";
 import Login from "./components/Login";
@@ -61,6 +66,7 @@ export default function App() {
   const [campaigns, setCampaigns] = useState([]);
   const [marketingEmails, setMarketingEmails] = useState([]);
   const [marketNotes, setMarketNotes] = useState([]);
+  const [strategyData, setStrategyData] = useState({});
   const [loadingLeads, setLoadingLeads] = useState(false);
   const [loadError, setLoadError] = useState(null);
   const [view, setView] = useState("dashboard");
@@ -88,6 +94,7 @@ export default function App() {
     fetchCampaigns().then(setCampaigns).catch((e) => setLoadError(e.message));
     fetchMarketingEmails().then(setMarketingEmails).catch((e) => setLoadError(e.message));
     fetchMarketNotes().then(setMarketNotes).catch((e) => setLoadError(e.message));
+    fetchStrategyRows().then(setStrategyData).catch((e) => setLoadError(e.message));
   }, [session]);
 
   if (session === undefined) {
@@ -288,6 +295,41 @@ export default function App() {
     }
   };
 
+  // --- LinkedIn Strategy ---
+  const handleAddStrategyRow = async (sheetKey, rowData) => {
+    const currentCount = (strategyData[sheetKey] || []).length;
+    const row = await insertStrategyRow(sheetKey, rowData, currentCount, session.user.id);
+    setStrategyData((prev) => ({ ...prev, [sheetKey]: [...(prev[sheetKey] || []), row] }));
+  };
+
+  const handleUpdateStrategyCell = async (sheetKey, rowId, key, value) => {
+    setStrategyData((prev) => ({
+      ...prev,
+      [sheetKey]: (prev[sheetKey] || []).map((r) => (r.id === rowId ? { ...r, [key]: value } : r)),
+    }));
+    const row = (strategyData[sheetKey] || []).find((r) => r.id === rowId);
+    if (!row) return;
+    const { id, ...rest } = row;
+    try {
+      await updateStrategyRow(rowId, { ...rest, [key]: value });
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
+  const handleDeleteStrategyRow = async (rowId) => {
+    setStrategyData((prev) => {
+      const next = {};
+      for (const k in prev) next[k] = prev[k].filter((r) => r.id !== rowId);
+      return next;
+    });
+    try {
+      await deleteStrategyRow(rowId);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
   const todayCount = leads.filter(
     (l) => isToday(l.nextActionDate) && l.followupStatus !== "arandi"
   ).length;
@@ -371,7 +413,19 @@ export default function App() {
                 marketNotes={marketNotes}
                 onAddMarketNote={handleAddMarketNote}
                 onDeleteMarketNote={handleDeleteMarketNote}
+                onOpenLinkedInStrategy={() => setView("linkedin_strategy")}
               />
+            )}
+            {view === "linkedin_strategy" && (
+              <Suspense fallback={<div className="text-sm text-ink/40">Yükleniyor...</div>}>
+                <LinkedInStrategy
+                  strategyData={strategyData}
+                  onAddRow={handleAddStrategyRow}
+                  onUpdateCell={handleUpdateStrategyCell}
+                  onDeleteRow={handleDeleteStrategyRow}
+                  onBack={() => setView("marketing")}
+                />
+              </Suspense>
             )}
             {view === "reports" && (
               <Suspense fallback={<div className="text-sm text-ink/40">Yükleniyor...</div>}>

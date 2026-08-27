@@ -26,6 +26,7 @@ export default function Marketing({
   marketNotes,
   onAddMarketNote,
   onDeleteMarketNote,
+  onOpenLinkedInStrategy,
 }) {
   const summary = {
     contentDone: content.filter((c) => c.status === "tamamlandi").length,
@@ -37,7 +38,15 @@ export default function Marketing({
 
   return (
     <div>
-      <h1 className="font-display font-semibold text-2xl text-ink mb-1">Marketing</h1>
+      <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+        <h1 className="font-display font-semibold text-2xl text-ink">Marketing</h1>
+        <button
+          onClick={onOpenLinkedInStrategy}
+          className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-[#0A66C2] to-violet-600 text-white text-sm font-medium rounded-lg hover:shadow-glow-sm"
+        >
+          💼 LinkedIn Marketing Strategy
+        </button>
+      </div>
       <p className="text-sm text-ink/40 mb-6">
         İçerik üretimi, kampanya sonuçları ve mail marketing takibi tek yerde.
       </p>
