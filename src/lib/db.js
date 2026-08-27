@@ -447,7 +447,9 @@ export async function fetchStrategyRows() {
   if (error) throw error;
   const bySheet = {};
   data.forEach((r) => {
-    (bySheet[r.sheet_key] ||= []).push({ id: r.id, ...r.data });
+    // Onemli: gercek satir kimligi (r.id) her zaman en sonda kalmali,
+    // yoksa Excel'deki "ID" sutunu (orn. "1", "2") onun uzerine yazar.
+    (bySheet[r.sheet_key] ||= []).push({ ...r.data, id: r.id });
   });
   return bySheet;
 }
@@ -459,7 +461,7 @@ export async function insertStrategyRow(sheetKey, rowData, rowIndex, userId) {
     .select()
     .single();
   if (error) throw error;
-  return { id: data.id, ...data.data };
+  return { ...data.data, id: data.id };
 }
 
 export async function updateStrategyRow(id, rowData) {

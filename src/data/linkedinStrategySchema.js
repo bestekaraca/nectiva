@@ -20,7 +20,7 @@ export const LINKEDIN_SHEETS = [
 
 export const LINKEDIN_SCHEMAS = {
   master_roadmap: [
-    { key: "id", label: "ID", type: "text", width: 50 },
+    { key: "no", label: "ID", type: "text", width: 50 },
     { key: "asama", label: "Aşama", type: "text", width: 110 },
     { key: "task", label: "Task", type: "text", width: 200 },
     { key: "altTask", label: "Alt Task / Açıklama", type: "text", width: 220 },
@@ -32,7 +32,7 @@ export const LINKEDIN_SCHEMAS = {
     { key: "not", label: "Not", type: "text", width: 200 },
   ],
   campaign_setup: [
-    { key: "id", label: "ID", type: "text", width: 40 },
+    { key: "no", label: "ID", type: "text", width: 40 },
     { key: "islem", label: "Yapılacak İşlem", type: "text", width: 180 },
     { key: "nereden", label: "Nereden Yapılır?", type: "text", width: 180 },
     { key: "sonuc", label: "Beklenen Sonuç", type: "text", width: 180 },
@@ -90,7 +90,7 @@ export const LINKEDIN_SCHEMAS = {
     { key: "not", label: "Not", type: "text", width: 180 },
   ],
   insight_tag: [
-    { key: "id", label: "ID", type: "text", width: 40 },
+    { key: "no", label: "ID", type: "text", width: 40 },
     { key: "task", label: "Task", type: "text", width: 200 },
     { key: "nereden", label: "Nereden / Nasıl", type: "text", width: 280 },
     { key: "owner", label: "Owner", type: "text", width: 110 },

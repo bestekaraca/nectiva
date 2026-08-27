@@ -78,6 +78,21 @@ export default function EditableSheetTable({ schema, rows, onUpdateCell, onAddRo
   );
 }
 
+const STATUS_COLOR_RULES = [
+  [/completed|tamamland|^qualified$|^evet$|kazanıldı|kazanildi|^tier 1$/i, "bg-emerald-50 text-emerald-700 border-emerald-300"],
+  [/in progress|devam|contacted|iletişimde|iletisimde|toplantı|toplanti|^demo$|^tier 2$|^medium$/i, "bg-amber-50 text-amber-700 border-amber-300"],
+  [/blocked|disqualified|^hayır$|^hayir$|kaybedildi|do not target|^high$/i, "bg-rose-50 text-rose-600 border-rose-300"],
+  [/not started|bekleyen|research|^yeni$|belirsiz|^tier 3$|^low$/i, "bg-blue-50 text-blue-700 border-blue-300"],
+];
+
+function getStatusBadgeClass(value) {
+  if (!value) return "";
+  for (const [re, cls] of STATUS_COLOR_RULES) {
+    if (re.test(value)) return cls;
+  }
+  return "";
+}
+
 function Cell({ value, column, onChange }) {
   const [local, setLocal] = useState(value ?? "");
 
@@ -86,16 +101,19 @@ function Cell({ value, column, onChange }) {
   };
 
   if (column.type === "select") {
+    const badgeClass = getStatusBadgeClass(value);
     return (
       <select
         value={value || ""}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-2 py-1.5 bg-transparent outline-none text-xs cursor-pointer"
+        className={`w-full px-2 py-1 m-0.5 outline-none text-xs cursor-pointer rounded-md border font-semibold transition-colors ${
+          badgeClass || "bg-transparent border-transparent text-ink/50"
+        }`}
         style={{ minWidth: column.width }}
       >
         <option value=""></option>
         {column.options.map((o) => (
-          <option key={o} value={o}>
+          <option key={o} value={o} className="bg-white text-ink font-normal">
             {o}
           </option>
         ))}
