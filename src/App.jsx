@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { supabase } from "./lib/supabaseClient";
 import {
   fetchLeads,
@@ -18,10 +18,13 @@ import Sidebar from "./components/Sidebar";
 import Dashboard from "./components/Dashboard";
 import Pipeline from "./components/Pipeline";
 import Contacts from "./components/Contacts";
-import Reports from "./components/Reports";
 import LeadModal from "./components/LeadModal";
 import NewLeadModal from "./components/NewLeadModal";
 import Login from "./components/Login";
+
+// Recharts büyük bir kütüphane olduğu için Rapor sayfası sadece
+// ziyaret edildiğinde yüklenir, uygulamanın açılış hızını etkilemez.
+const Reports = lazy(() => import("./components/Reports"));
 
 export default function App() {
   const [session, setSession] = useState(undefined); // undefined = yükleniyor
@@ -169,7 +172,11 @@ export default function App() {
             {view === "contacts" && (
               <Contacts leads={leads} onOpen={(l) => setActiveLeadId(l.id)} />
             )}
-            {view === "reports" && <Reports leads={leads} />}
+            {view === "reports" && (
+              <Suspense fallback={<div className="text-sm text-ink/40">Yükleniyor...</div>}>
+                <Reports leads={leads} />
+              </Suspense>
+            )}
           </>
         )}
       </main>

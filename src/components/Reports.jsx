@@ -1,142 +1,264 @@
-import { STAGES, ACTIVITY_TYPES, formatCurrency } from "../data/store";
+import { useMemo, useState } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Cell,
+  LabelList,
+} from "recharts";
+import { STAGES, PRODUCTS, formatCurrency } from "../data/store";
 
-function getWeekRange() {
-  const now = new Date();
-  const day = now.getDay(); // 0=Pazar .. 6=Cumartesi
-  const diffToMonday = day === 0 ? 6 : day - 1;
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - diffToMonday);
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
+const STAGE_HEX = {
+  blue: "#3B82F6",
+  violet: "#8B5CF6",
+  amber: "#F59E0B",
+  fuchsia: "#D946EF",
+  teal: "#10B981",
+  brick: "#F43F5E",
+};
+
+function toISO(d) {
+  return d.toISOString().slice(0, 10);
+}
+function addDays(dateStr, n) {
+  const d = new Date(dateStr + "T00:00:00");
+  d.setDate(d.getDate() + n);
+  return toISO(d);
+}
+function mondayOf(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? 6 : day - 1;
+  d.setDate(d.getDate() - diff);
+  return toISO(d);
+}
+
+function getRange(mode, customStart, customEnd) {
+  const today = new Date();
+  if (mode === "thisWeek") {
+    const start = mondayOf(today);
+    return { start, end: addDays(start, 6), label: "Bu Hafta" };
+  }
+  if (mode === "lastWeek") {
+    const thisMonday = mondayOf(today);
+    const start = addDays(thisMonday, -7);
+    return { start, end: addDays(start, 6), label: "Geçen Hafta" };
+  }
+  if (mode === "thisMonth") {
+    const start = toISO(new Date(today.getFullYear(), today.getMonth(), 1));
+    const end = toISO(new Date(today.getFullYear(), today.getMonth() + 1, 0));
+    return { start, end, label: "Bu Ay" };
+  }
+  return { start: customStart, end: customEnd, label: "Özel Aralık" };
+}
+
+function getPreviousPeriod(start, end) {
+  const lengthDays = Math.round((new Date(end) - new Date(start)) / 86400000) + 1;
+  const prevEnd = addDays(start, -1);
+  const prevStart = addDays(prevEnd, -(lengthDays - 1));
+  return { start: prevStart, end: prevEnd };
+}
+
+function countActivities(leads, start, end) {
+  const within = (d) => d && d >= start && d <= end;
+  const notes = leads.flatMap((l) => l.notes);
   return {
-    startStr: monday.toISOString().slice(0, 10),
-    endStr: sunday.toISOString().slice(0, 10),
-    label: `${monday.toLocaleDateString("tr-TR")} – ${sunday.toLocaleDateString("tr-TR")}`,
+    newLeads: leads.filter((l) => within(l.createdAt?.slice(0, 10))).length,
+    call: notes.filter((n) => n.type === "call" && within(n.date)).length,
+    email: notes.filter((n) => n.type === "email" && within(n.date)).length,
+    meeting: notes.filter((n) => n.type === "meeting" && within(n.date)).length,
+    proposal: notes.filter((n) => n.type === "proposal" && within(n.date)).length,
   };
 }
 
-const TYPE_STYLE = {
-  note: "bg-ink/5 text-ink/60",
-  call: "bg-blue-100 text-blue-700",
-  email: "bg-violet-100 text-violet-700",
-  meeting: "bg-emerald-100 text-emerald-700",
-  proposal: "bg-amber-100 text-amber-700",
-};
-
 export default function Reports({ leads }) {
-  const { startStr, endStr, label } = getWeekRange();
-  const isThisWeek = (d) => d && d >= startStr && d <= endStr;
+  const [rangeMode, setRangeMode] = useState("thisWeek");
+  const [customStart, setCustomStart] = useState(addDays(toISO(new Date()), -6));
+  const [customEnd, setCustomEnd] = useState(toISO(new Date()));
 
-  const allNotes = leads.flatMap((l) => l.notes.map((n) => ({ ...n, company: l.company })));
-  const weeklyNotes = allNotes.filter((n) => isThisWeek(n.date));
+  const range = useMemo(
+    () => getRange(rangeMode, customStart, customEnd),
+    [rangeMode, customStart, customEnd]
+  );
+  const prevRange = useMemo(() => getPreviousPeriod(range.start, range.end), [range]);
 
-  const weeklyByType = ACTIVITY_TYPES.map((t) => ({
-    ...t,
-    count: weeklyNotes.filter((n) => n.type === t.id).length,
+  const current = useMemo(() => countActivities(leads, range.start, range.end), [leads, range]);
+  const previous = useMemo(
+    () => countActivities(leads, prevRange.start, prevRange.end),
+    [leads, prevRange]
+  );
+
+  const comparisonData = [
+    { name: "Yeni Fırsat", onceki: previous.newLeads, secili: current.newLeads },
+    { name: "Arama", onceki: previous.call, secili: current.call },
+    { name: "Mail", onceki: previous.email, secili: current.email },
+    { name: "Toplantı", onceki: previous.meeting, secili: current.meeting },
+    { name: "Teklif", onceki: previous.proposal, secili: current.proposal },
+  ];
+
+  const stageData = STAGES.map((s) => ({
+    name: s.label,
+    count: leads.filter((l) => l.stage === s.id).length,
+    color: STAGE_HEX[s.color],
   }));
 
-  const newLeadsThisWeek = leads.filter((l) => isThisWeek(l.createdAt?.slice(0, 10))).length;
-
-  const stageStats = STAGES.map((s) => {
-    const stageLeads = leads.filter((l) => l.stage === s.id);
+  const productData = PRODUCTS.map((p) => {
+    const withProduct = leads.filter((l) => l.products.includes(p));
     return {
-      ...s,
-      count: stageLeads.length,
-      value: stageLeads.reduce((sum, l) => sum + (l.value || 0), 0),
+      name: p,
+      teklif: withProduct.filter((l) => l.stage === "teklif").length,
+      sunum: withProduct.reduce(
+        (sum, l) => sum + l.notes.filter((n) => n.type === "meeting").length,
+        0
+      ),
     };
   });
 
   const totalValue = leads.reduce((sum, l) => sum + (l.value || 0), 0);
-  const totalCount = leads.length;
 
   return (
     <div>
       <h1 className="font-display font-semibold text-2xl text-ink mb-1">Rapor</h1>
-      <p className="text-sm text-ink/40 mb-6">Haftalık temponu ve genel boru hattı durumunu gör.</p>
+      <p className="text-sm text-ink/40 mb-6">Yönetici özeti: dönem karşılaştırması, pipeline ve ürün analizi.</p>
 
-      {/* Haftalık aktivite */}
-      <div className="mb-8">
-        <div className="flex items-baseline justify-between mb-3">
-          <h2 className="font-semibold text-sm text-ink/75">Bu Hafta</h2>
-          <span className="text-xs font-mono text-ink/35">{label}</span>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          <ActivityCard icon="✨" label="Yeni Fırsat" count={newLeadsThisWeek} accent="violet" />
-          {weeklyByType
-            .filter((t) => t.id !== "note")
-            .map((t) => (
-              <ActivityCard
-                key={t.id}
-                icon={t.icon}
-                label={t.label}
-                count={t.count}
-                accent={
-                  t.id === "call" ? "blue" : t.id === "email" ? "violet" : t.id === "meeting" ? "emerald" : "amber"
-                }
-              />
-            ))}
-        </div>
-        {weeklyNotes.filter((n) => n.type === "note").length > 0 && (
-          <p className="text-xs text-ink/35 mt-2.5">
-            + bu hafta {weeklyNotes.filter((n) => n.type === "note").length} genel not eklendi.
-          </p>
+      <div className="flex flex-wrap items-center gap-2 mb-6">
+        {[
+          { id: "thisWeek", label: "Bu Hafta" },
+          { id: "lastWeek", label: "Geçen Hafta" },
+          { id: "thisMonth", label: "Bu Ay" },
+          { id: "custom", label: "Özel Aralık" },
+        ].map((m) => (
+          <button
+            key={m.id}
+            onClick={() => setRangeMode(m.id)}
+            className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
+              rangeMode === m.id
+                ? "bg-ink text-white border-ink"
+                : "bg-white text-ink/55 border-mist hover:border-ink/25"
+            }`}
+          >
+            {m.label}
+          </button>
+        ))}
+        {rangeMode === "custom" && (
+          <div className="flex items-center gap-1.5 ml-1">
+            <input
+              type="date"
+              value={customStart}
+              onChange={(e) => setCustomStart(e.target.value)}
+              className="input font-mono !w-auto text-xs py-1"
+            />
+            <span className="text-ink/30 text-xs">–</span>
+            <input
+              type="date"
+              value={customEnd}
+              onChange={(e) => setCustomEnd(e.target.value)}
+              className="input font-mono !w-auto text-xs py-1"
+            />
+          </div>
         )}
+        <span className="text-xs font-mono text-ink/30 ml-1">
+          {range.start} → {range.end}
+        </span>
       </div>
 
-      {/* Genel pipeline özeti */}
-      <div>
-        <div className="flex items-baseline justify-between mb-3">
-          <h2 className="font-semibold text-sm text-ink/75">Genel Pipeline</h2>
-          <span className="text-xs font-mono text-ink/35">
-            {totalCount} fırsat · {formatCurrency(totalValue)}
-          </span>
-        </div>
-        <div className="glass rounded-card overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-mist text-left">
-                <th className="px-4 py-2.5 text-xs font-semibold text-ink/50 uppercase tracking-wide">Aşama</th>
-                <th className="px-4 py-2.5 text-xs font-semibold text-ink/50 uppercase tracking-wide">Fırsat Sayısı</th>
-                <th className="px-4 py-2.5 text-xs font-semibold text-ink/50 uppercase tracking-wide">Toplam Değer</th>
-                <th className="px-4 py-2.5 text-xs font-semibold text-ink/50 uppercase tracking-wide">Dağılım</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stageStats.map((s) => (
-                <tr key={s.id} className="border-b border-mist last:border-0">
-                  <td className="px-4 py-2.5 font-medium text-ink/80">{s.label}</td>
-                  <td className="px-4 py-2.5 text-ink/60">{s.count}</td>
-                  <td className="px-4 py-2.5 font-mono text-ink/60">{formatCurrency(s.value)}</td>
-                  <td className="px-4 py-2.5">
-                    <div className="w-32 h-2 rounded-full bg-mist overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-violet-500 to-blue-500"
-                        style={{ width: `${totalCount ? (s.count / totalCount) * 100 : 0}%` }}
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
+        <ActivityCard icon="✨" label="Yeni Fırsat" count={current.newLeads} prev={previous.newLeads} accent="violet" />
+        <ActivityCard icon="📞" label="Arama" count={current.call} prev={previous.call} accent="blue" />
+        <ActivityCard icon="✉️" label="Mail" count={current.email} prev={previous.email} accent="violet" />
+        <ActivityCard icon="🤝" label="Toplantı" count={current.meeting} prev={previous.meeting} accent="emerald" />
+        <ActivityCard icon="📄" label="Teklif" count={current.proposal} prev={previous.proposal} accent="amber" />
       </div>
+
+      <Section title="Dönem Karşılaştırması" subtitle={`Önceki dönem (${prevRange.start} – ${prevRange.end}) ile karşılaştırma`}>
+        <ResponsiveContainer width="100%" height={280}>
+          <BarChart data={comparisonData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E9E5F6" vertical={false} />
+            <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#6B6478" }} axisLine={{ stroke: "#E9E5F6" }} />
+            <YAxis tick={{ fontSize: 12, fill: "#6B6478" }} allowDecimals={false} axisLine={false} />
+            <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid #E9E5F6", fontSize: 12 }} />
+            <Legend wrapperStyle={{ fontSize: 12 }} />
+            <Bar dataKey="onceki" name="Önceki Dönem" fill="#DDD6FE" radius={[6, 6, 0, 0]} />
+            <Bar dataKey="secili" name="Seçili Dönem" fill="#7C3AED" radius={[6, 6, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </Section>
+
+      <Section title="Pipeline Dağılımı" subtitle={`Toplam ${leads.length} fırsat · ${formatCurrency(totalValue)}`}>
+        <ResponsiveContainer width="100%" height={280}>
+          <BarChart data={stageData} margin={{ top: 24, right: 10, left: -10, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E9E5F6" vertical={false} />
+            <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#6B6478" }} axisLine={{ stroke: "#E9E5F6" }} />
+            <YAxis tick={{ fontSize: 12, fill: "#6B6478" }} allowDecimals={false} axisLine={false} />
+            <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid #E9E5F6", fontSize: 12 }} />
+            <Bar dataKey="count" name="Fırsat Sayısı" radius={[6, 6, 0, 0]}>
+              {stageData.map((s, i) => (
+                <Cell key={i} fill={s.color} />
+              ))}
+              <LabelList dataKey="count" position="top" style={{ fontSize: 12, fill: "#1E1B2E", fontWeight: 600 }} />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </Section>
+
+      <Section title="Ürün Bazlı Analiz" subtitle="Her ürün için açık teklif sayısı ve yapılan sunum (toplantı) sayısı">
+        <ResponsiveContainer width="100%" height={320}>
+          <BarChart data={productData} margin={{ top: 10, right: 10, left: -10, bottom: 40 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E9E5F6" vertical={false} />
+            <XAxis
+              dataKey="name"
+              tick={{ fontSize: 11, fill: "#6B6478" }}
+              axisLine={{ stroke: "#E9E5F6" }}
+              angle={-25}
+              textAnchor="end"
+              interval={0}
+            />
+            <YAxis tick={{ fontSize: 12, fill: "#6B6478" }} allowDecimals={false} axisLine={false} />
+            <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid #E9E5F6", fontSize: 12 }} />
+            <Legend wrapperStyle={{ fontSize: 12 }} />
+            <Bar dataKey="teklif" name="Teklif" fill="#F59E0B" radius={[6, 6, 0, 0]} />
+            <Bar dataKey="sunum" name="Sunum" fill="#3B82F6" radius={[6, 6, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </Section>
     </div>
   );
 }
 
-function ActivityCard({ icon, label, count, accent }) {
+function Section({ title, subtitle, children }) {
+  return (
+    <div className="mb-8">
+      <div className="mb-3">
+        <h2 className="font-semibold text-sm text-ink/75">{title}</h2>
+        <p className="text-xs text-ink/35">{subtitle}</p>
+      </div>
+      <div className="glass rounded-card p-4">{children}</div>
+    </div>
+  );
+}
+
+function ActivityCard({ icon, label, count, prev, accent }) {
   const border = {
     violet: "border-l-violet-500",
     blue: "border-l-blue-500",
     emerald: "border-l-emerald-500",
     amber: "border-l-amber-500",
   }[accent];
+  const diff = count - prev;
+  const diffLabel =
+    diff === 0 ? "değişim yok" : diff > 0 ? `+${diff} önceki döneme göre` : `${diff} önceki döneme göre`;
+  const diffColor = diff > 0 ? "text-emerald-600" : diff < 0 ? "text-rose-500" : "text-ink/30";
   return (
     <div className={`glass rounded-card p-3.5 border-l-[3px] ${border}`}>
       <div className="text-lg leading-none mb-1.5">{icon}</div>
       <div className="font-display font-bold text-2xl text-ink">{count}</div>
       <div className="text-xs text-ink/45 mt-0.5">{label}</div>
+      <div className={`text-[11px] mt-1 font-medium ${diffColor}`}>{diffLabel}</div>
     </div>
   );
 }
