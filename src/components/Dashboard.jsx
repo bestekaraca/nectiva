@@ -1,6 +1,7 @@
 import { formatCurrency, isOverdue, isToday } from "../data/store";
+import GoalCard from "./GoalCard";
 
-export default function Dashboard({ leads, onOpen }) {
+export default function Dashboard({ leads, onOpen, goal, saleEntries, onAddSale, onDeleteSale }) {
   const activeLeads = leads.filter((l) => l.stage !== "kazanildi" && l.stage !== "kaybedildi");
   const pipelineValue = activeLeads.reduce((s, l) => s + (l.value || 0), 0);
   const wonValue = leads
@@ -13,6 +14,8 @@ export default function Dashboard({ leads, onOpen }) {
     <div>
       <h1 className="font-display font-semibold text-2xl text-ink mb-1">Panel</h1>
       <p className="text-sm text-ink/45 mb-6">Bugün nereye odaklanman gerektiğine bak.</p>
+
+      <GoalCard goal={goal} saleEntries={saleEntries} onAddSale={onAddSale} onDeleteSale={onDeleteSale} />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
         <StatCard label="Açık boru hattı" value={formatCurrency(pipelineValue)} sub={`${activeLeads.length} fırsat`} tone="violet" />

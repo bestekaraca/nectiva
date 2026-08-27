@@ -268,6 +268,14 @@ export function formatCurrency(n) {
   }).format(n || 0);
 }
 
+export function formatEUR(n) {
+  return new Intl.NumberFormat("tr-TR", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(n || 0);
+}
+
 export function isOverdue(dateStr) {
   if (!dateStr) return false;
   const today = new Date().toISOString().slice(0, 10);

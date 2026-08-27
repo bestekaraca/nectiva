@@ -8,6 +8,10 @@ import {
   deleteLead,
   insertNote,
   insertPurchase,
+  fetchGoal,
+  fetchSaleEntries,
+  insertSaleEntry,
+  deleteSaleEntry,
 } from "./lib/db";
 import { isToday } from "./data/store";
 import Sidebar from "./components/Sidebar";
@@ -21,6 +25,8 @@ import Login from "./components/Login";
 export default function App() {
   const [session, setSession] = useState(undefined); // undefined = yükleniyor
   const [leads, setLeads] = useState([]);
+  const [goal, setGoal] = useState(null);
+  const [saleEntries, setSaleEntries] = useState([]);
   const [loadingLeads, setLoadingLeads] = useState(false);
   const [loadError, setLoadError] = useState(null);
   const [view, setView] = useState("dashboard");
@@ -40,6 +46,8 @@ export default function App() {
       .then(setLeads)
       .catch((e) => setLoadError(e.message))
       .finally(() => setLoadingLeads(false));
+    fetchGoal().then(setGoal).catch((e) => setLoadError(e.message));
+    fetchSaleEntries().then(setSaleEntries).catch((e) => setLoadError(e.message));
   }, [session]);
 
   if (session === undefined) {
@@ -103,6 +111,20 @@ export default function App() {
     );
   };
 
+  const handleAddSale = async (amount, note, date) => {
+    const entry = await insertSaleEntry(amount, note, date, session.user.id);
+    setSaleEntries((prev) => [entry, ...prev]);
+  };
+
+  const handleDeleteSale = async (id) => {
+    setSaleEntries((prev) => prev.filter((e) => e.id !== id));
+    try {
+      await deleteSaleEntry(id);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
   const todayCount = leads.filter((l) => isToday(l.nextActionDate)).length;
 
   return (
@@ -127,7 +149,14 @@ export default function App() {
         ) : (
           <>
             {view === "dashboard" && (
-              <Dashboard leads={leads} onOpen={(l) => setActiveLeadId(l.id)} />
+              <Dashboard
+                leads={leads}
+                onOpen={(l) => setActiveLeadId(l.id)}
+                goal={goal}
+                saleEntries={saleEntries}
+                onAddSale={handleAddSale}
+                onDeleteSale={handleDeleteSale}
+              />
             )}
             {view === "pipeline" && (
               <Pipeline

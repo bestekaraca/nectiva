@@ -106,3 +106,76 @@ export async function insertPurchase(leadId, description, amount) {
   if (error) throw error;
   return { id: data.id, date: data.date, description: data.description, amount: data.amount };
 }
+
+// --- Yıllık satış hedefi ---------------------------------------------------
+
+export async function fetchGoal() {
+  const { data, error } = await supabase
+    .from("sales_goals")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  return {
+    id: data.id,
+    targetAmount: data.target_amount,
+    currency: data.currency,
+    startDate: data.start_date,
+    endDate: data.end_date,
+  };
+}
+
+export async function upsertGoal({ id, targetAmount, startDate, endDate }, userId) {
+  if (id) {
+    const { error } = await supabase
+      .from("sales_goals")
+      .update({ target_amount: targetAmount, start_date: startDate, end_date: endDate })
+      .eq("id", id);
+    if (error) throw error;
+    return { id, targetAmount, currency: "EUR", startDate, endDate };
+  }
+  const { data, error } = await supabase
+    .from("sales_goals")
+    .insert({ target_amount: targetAmount, start_date: startDate, end_date: endDate, user_id: userId })
+    .select()
+    .single();
+  if (error) throw error;
+  return {
+    id: data.id,
+    targetAmount: data.target_amount,
+    currency: data.currency,
+    startDate: data.start_date,
+    endDate: data.end_date,
+  };
+}
+
+export async function fetchSaleEntries() {
+  const { data, error } = await supabase
+    .from("sale_entries")
+    .select("*")
+    .order("date", { ascending: false });
+  if (error) throw error;
+  return data.map((e) => ({
+    id: e.id,
+    amount: e.amount,
+    note: e.note,
+    date: e.date,
+  }));
+}
+
+export async function insertSaleEntry(amount, note, date, userId) {
+  const { data, error } = await supabase
+    .from("sale_entries")
+    .insert({ amount, note, date, user_id: userId })
+    .select()
+    .single();
+  if (error) throw error;
+  return { id: data.id, amount: data.amount, note: data.note, date: data.date };
+}
+
+export async function deleteSaleEntry(id) {
+  const { error } = await supabase.from("sale_entries").delete().eq("id", id);
+  if (error) throw error;
+}
