@@ -1,7 +1,16 @@
 import { formatCurrency, isOverdue, isToday } from "../data/store";
 import GoalCard from "./GoalCard";
 
-export default function Dashboard({ leads, onOpen, goal, saleEntries, onAddSale, onDeleteSale }) {
+export default function Dashboard({
+  leads,
+  onOpen,
+  goal,
+  saleEntries,
+  onAddSale,
+  onDeleteSale,
+  tasks,
+  onToggleTask,
+}) {
   const activeLeads = leads.filter((l) => l.stage !== "kazanildi" && l.stage !== "kaybedildi");
   const pipelineValue = activeLeads.reduce((s, l) => s + (l.value || 0), 0);
   const wonValue = leads
@@ -9,6 +18,9 @@ export default function Dashboard({ leads, onOpen, goal, saleEntries, onAddSale,
     .reduce((s, l) => s + (l.value || 0), 0);
   const overdueLeads = leads.filter((l) => isOverdue(l.nextActionDate));
   const todayLeads = leads.filter((l) => isToday(l.nextActionDate));
+  const todaysTasks = tasks
+    .filter((t) => !t.done && t.dueDate && (isToday(t.dueDate) || isOverdue(t.dueDate)))
+    .sort((a, b) => (a.dueDate < b.dueDate ? -1 : 1));
 
   return (
     <div>
@@ -16,6 +28,41 @@ export default function Dashboard({ leads, onOpen, goal, saleEntries, onAddSale,
       <p className="text-sm text-ink/45 mb-6">Bugün nereye odaklanman gerektiğine bak.</p>
 
       <GoalCard goal={goal} saleEntries={saleEntries} onAddSale={onAddSale} onDeleteSale={onDeleteSale} />
+
+      {todaysTasks.length > 0 && (
+        <div className="glass rounded-card p-4 mb-6">
+          <h3 className="font-semibold text-sm text-ink/80 mb-3">Bugünün Görevleri</h3>
+          <div className="flex flex-col gap-2">
+            {todaysTasks.map((t) => {
+              const overdue = isOverdue(t.dueDate);
+              return (
+                <label
+                  key={t.id}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-violet-50 transition-colors cursor-pointer"
+                >
+                  <span className="flex items-center gap-2.5">
+                    <input
+                      type="checkbox"
+                      onChange={() => onToggleTask(t.id, true)}
+                      className="w-4 h-4 accent-violet-600"
+                    />
+                    <span className="text-sm text-ink/80">{t.title}</span>
+                  </span>
+                  <span
+                    className={`text-[11px] font-mono px-1.5 py-0.5 rounded border shrink-0 ${
+                      overdue
+                        ? "bg-rose-50 text-rose-600 border-rose-200"
+                        : "bg-amber-50 text-amber-700 border-amber-200"
+                    }`}
+                  >
+                    {t.dueDate}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
         <StatCard label="Açık boru hattı" value={formatCurrency(pipelineValue)} sub={`${activeLeads.length} fırsat`} tone="violet" />

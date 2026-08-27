@@ -64,19 +64,23 @@ function getPreviousPeriod(start, end) {
   return { start: prevStart, end: prevEnd };
 }
 
-function countActivities(leads, start, end) {
+function countActivities(leads, activityLogs, start, end) {
   const within = (d) => d && d >= start && d <= end;
   const notes = leads.flatMap((l) => l.notes);
   return {
     newLeads: leads.filter((l) => within(l.createdAt?.slice(0, 10))).length,
-    call: notes.filter((n) => n.type === "call" && within(n.date)).length,
-    email: notes.filter((n) => n.type === "email" && within(n.date)).length,
+    call:
+      notes.filter((n) => n.type === "call" && within(n.date)).length +
+      activityLogs.filter((a) => a.type === "call" && within(a.date)).length,
+    email:
+      notes.filter((n) => n.type === "email" && within(n.date)).length +
+      activityLogs.filter((a) => a.type === "email" && within(a.date)).length,
     meeting: notes.filter((n) => n.type === "meeting" && within(n.date)).length,
     proposal: notes.filter((n) => n.type === "proposal" && within(n.date)).length,
   };
 }
 
-export default function Reports({ leads }) {
+export default function Reports({ leads, activityLogs }) {
   const [rangeMode, setRangeMode] = useState("thisWeek");
   const [customStart, setCustomStart] = useState(addDays(toISO(new Date()), -6));
   const [customEnd, setCustomEnd] = useState(toISO(new Date()));
@@ -87,10 +91,10 @@ export default function Reports({ leads }) {
   );
   const prevRange = useMemo(() => getPreviousPeriod(range.start, range.end), [range]);
 
-  const current = useMemo(() => countActivities(leads, range.start, range.end), [leads, range]);
+  const current = useMemo(() => countActivities(leads, activityLogs, range.start, range.end), [leads, activityLogs, range]);
   const previous = useMemo(
-    () => countActivities(leads, prevRange.start, prevRange.end),
-    [leads, prevRange]
+    () => countActivities(leads, activityLogs, prevRange.start, prevRange.end),
+    [leads, activityLogs, prevRange]
   );
 
   const comparisonData = [

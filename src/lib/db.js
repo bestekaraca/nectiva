@@ -179,3 +179,61 @@ export async function deleteSaleEntry(id) {
   const { error } = await supabase.from("sale_entries").delete().eq("id", id);
   if (error) throw error;
 }
+
+// --- Günlük aktivite kaydı (arama / mail) ----------------------------------
+
+export async function fetchActivityLogs() {
+  const { data, error } = await supabase
+    .from("activity_logs")
+    .select("*")
+    .order("date", { ascending: false })
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data.map((a) => ({ id: a.id, type: a.type, note: a.note, date: a.date }));
+}
+
+export async function insertActivityLog(type, note, date, userId) {
+  const { data, error } = await supabase
+    .from("activity_logs")
+    .insert({ type, note, date, user_id: userId })
+    .select()
+    .single();
+  if (error) throw error;
+  return { id: data.id, type: data.type, note: data.note, date: data.date };
+}
+
+export async function deleteActivityLog(id) {
+  const { error } = await supabase.from("activity_logs").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// --- Görev listesi ----------------------------------------------------------
+
+export async function fetchTasks() {
+  const { data, error } = await supabase
+    .from("tasks")
+    .select("*")
+    .order("due_date", { ascending: true, nullsFirst: false });
+  if (error) throw error;
+  return data.map((t) => ({ id: t.id, title: t.title, dueDate: t.due_date, done: t.done }));
+}
+
+export async function insertTask(title, dueDate, userId) {
+  const { data, error } = await supabase
+    .from("tasks")
+    .insert({ title, due_date: dueDate || null, user_id: userId })
+    .select()
+    .single();
+  if (error) throw error;
+  return { id: data.id, title: data.title, dueDate: data.due_date, done: data.done };
+}
+
+export async function updateTaskDone(id, done) {
+  const { error } = await supabase.from("tasks").update({ done }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteTask(id) {
+  const { error } = await supabase.from("tasks").delete().eq("id", id);
+  if (error) throw error;
+}

@@ -5,6 +5,7 @@ export default function Sidebar({ view, setView, onNewLead, todayCount, userEmai
     { id: "dashboard", label: "Panel" },
     { id: "pipeline", label: "Pipeline" },
     { id: "contacts", label: "Kişiler" },
+    { id: "daily", label: "Günlük Görevler" },
     { id: "reports", label: "Rapor" },
   ];
 

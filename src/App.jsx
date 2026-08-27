@@ -12,12 +12,20 @@ import {
   fetchSaleEntries,
   insertSaleEntry,
   deleteSaleEntry,
+  fetchActivityLogs,
+  insertActivityLog,
+  deleteActivityLog,
+  fetchTasks,
+  insertTask,
+  updateTaskDone,
+  deleteTask,
 } from "./lib/db";
 import { isToday } from "./data/store";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./components/Dashboard";
 import Pipeline from "./components/Pipeline";
 import Contacts from "./components/Contacts";
+import DailyTasks from "./components/DailyTasks";
 import LeadModal from "./components/LeadModal";
 import NewLeadModal from "./components/NewLeadModal";
 import Login from "./components/Login";
@@ -31,6 +39,8 @@ export default function App() {
   const [leads, setLeads] = useState([]);
   const [goal, setGoal] = useState(null);
   const [saleEntries, setSaleEntries] = useState([]);
+  const [activityLogs, setActivityLogs] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [loadingLeads, setLoadingLeads] = useState(false);
   const [loadError, setLoadError] = useState(null);
   const [view, setView] = useState("dashboard");
@@ -52,6 +62,8 @@ export default function App() {
       .finally(() => setLoadingLeads(false));
     fetchGoal().then(setGoal).catch((e) => setLoadError(e.message));
     fetchSaleEntries().then(setSaleEntries).catch((e) => setLoadError(e.message));
+    fetchActivityLogs().then(setActivityLogs).catch((e) => setLoadError(e.message));
+    fetchTasks().then(setTasks).catch((e) => setLoadError(e.message));
   }, [session]);
 
   if (session === undefined) {
@@ -129,6 +141,43 @@ export default function App() {
     }
   };
 
+  const handleAddActivity = async (type, note, date) => {
+    const entry = await insertActivityLog(type, note, date, session.user.id);
+    setActivityLogs((prev) => [entry, ...prev]);
+  };
+
+  const handleDeleteActivity = async (id) => {
+    setActivityLogs((prev) => prev.filter((a) => a.id !== id));
+    try {
+      await deleteActivityLog(id);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
+  const handleAddTask = async (title, dueDate) => {
+    const task = await insertTask(title, dueDate, session.user.id);
+    setTasks((prev) => [...prev, task].sort((a, b) => (a.dueDate || "9999") < (b.dueDate || "9999") ? -1 : 1));
+  };
+
+  const handleToggleTask = async (id, done) => {
+    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, done } : t)));
+    try {
+      await updateTaskDone(id, done);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
+  const handleDeleteTask = async (id) => {
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+    try {
+      await deleteTask(id);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
   const todayCount = leads.filter((l) => isToday(l.nextActionDate)).length;
 
   return (
@@ -160,6 +209,8 @@ export default function App() {
                 saleEntries={saleEntries}
                 onAddSale={handleAddSale}
                 onDeleteSale={handleDeleteSale}
+                tasks={tasks}
+                onToggleTask={handleToggleTask}
               />
             )}
             {view === "pipeline" && (
@@ -172,9 +223,22 @@ export default function App() {
             {view === "contacts" && (
               <Contacts leads={leads} onOpen={(l) => setActiveLeadId(l.id)} />
             )}
+            {view === "daily" && (
+              <DailyTasks
+                leads={leads}
+                onOpenLead={(l) => setActiveLeadId(l.id)}
+                activityLogs={activityLogs}
+                onAddActivity={handleAddActivity}
+                onDeleteActivity={handleDeleteActivity}
+                tasks={tasks}
+                onAddTask={handleAddTask}
+                onToggleTask={handleToggleTask}
+                onDeleteTask={handleDeleteTask}
+              />
+            )}
             {view === "reports" && (
               <Suspense fallback={<div className="text-sm text-ink/40">Yükleniyor...</div>}>
-                <Reports leads={leads} />
+                <Reports leads={leads} activityLogs={activityLogs} />
               </Suspense>
             )}
           </>
