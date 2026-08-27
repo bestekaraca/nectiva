@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { isOverdue, isToday, FOLLOWUP_STATUSES } from "../data/store";
+import { isOverdue, isToday } from "../data/store";
+import FollowUpRow from "./FollowUpRow";
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
@@ -8,6 +9,7 @@ export default function DailyTasks({
   onOpenLead,
   onSetFollowUp,
   onUpdateFollowUpStatus,
+  onAddNote,
   activityLogs,
   onAddActivity,
   onDeleteActivity,
@@ -166,48 +168,16 @@ export default function DailyTasks({
           <div className="text-sm text-ink/30">Bugün için bekleyen takip yok.</div>
         ) : (
           <div className="flex flex-col gap-2">
-            {followUps.map((l) => {
-              const overdue = isOverdue(l.nextActionDate);
-              const currentBadge =
-                FOLLOWUP_STATUSES.find((s) => s.id === l.followupStatus)?.badge ||
-                FOLLOWUP_STATUSES[2].badge;
-              return (
-                <div
-                  key={l.id}
-                  className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg border border-mist bg-white"
-                >
-                  <button
-                    onClick={() => onOpenLead(l)}
-                    className="text-left flex-1 min-w-0 hover:opacity-70 transition-opacity"
-                  >
-                    <div className="text-sm font-medium text-ink truncate">{l.company}</div>
-                    <div className="text-xs text-ink/45 truncate">{l.nextActionNote || "—"}</div>
-                  </button>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span
-                      className={`text-[11px] font-mono px-1.5 py-0.5 rounded border ${
-                        overdue
-                          ? "bg-rose-50 text-rose-600 border-rose-200"
-                          : "bg-amber-50 text-amber-700 border-amber-200"
-                      }`}
-                    >
-                      {l.nextActionDate}
-                    </span>
-                    <select
-                      value={l.followupStatus}
-                      onChange={(e) => onUpdateFollowUpStatus(l.id, e.target.value)}
-                      className={`text-xs font-semibold px-2.5 py-1 rounded-full border cursor-pointer outline-none appearance-none ${currentBadge}`}
-                    >
-                      {FOLLOWUP_STATUSES.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              );
-            })}
+            {followUps.map((l) => (
+              <FollowUpRow
+                key={l.id}
+                lead={l}
+                onOpenLead={onOpenLead}
+                onSetFollowUp={onSetFollowUp}
+                onUpdateFollowUpStatus={onUpdateFollowUpStatus}
+                onAddNote={onAddNote}
+              />
+            ))}
           </div>
         )}
       </Section>

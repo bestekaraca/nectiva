@@ -251,6 +251,7 @@ export default function App() {
                 onOpenLead={(l) => setActiveLeadId(l.id)}
                 onSetFollowUp={handleSetFollowUp}
                 onUpdateFollowUpStatus={handleUpdateFollowUpStatus}
+                onAddNote={handleAddNote}
                 activityLogs={activityLogs}
                 onAddActivity={handleAddActivity}
                 onDeleteActivity={handleDeleteActivity}
