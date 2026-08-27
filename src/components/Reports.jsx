@@ -10,6 +10,11 @@ import {
   ResponsiveContainer,
   Cell,
   LabelList,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
 } from "recharts";
 import { STAGES, PRODUCTS, formatCurrency } from "../data/store";
 
@@ -179,54 +184,84 @@ export default function Reports({ leads, activityLogs }) {
         <ActivityCard icon="📄" label="Teklif" count={current.proposal} prev={previous.proposal} accent="amber" />
       </div>
 
-      <Section title="Dönem Karşılaştırması" subtitle={`Önceki dönem (${prevRange.start} – ${prevRange.end}) ile karşılaştırma`}>
-        <ResponsiveContainer width="100%" height={280}>
-          <BarChart data={comparisonData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E9E5F6" vertical={false} />
-            <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#6B6478" }} axisLine={{ stroke: "#E9E5F6" }} />
-            <YAxis tick={{ fontSize: 12, fill: "#6B6478" }} allowDecimals={false} axisLine={false} />
-            <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid #E9E5F6", fontSize: 12 }} />
+      <Section title="Dönem Karşılaştırması" subtitle={`Önceki dönem (${prevRange.start} – ${prevRange.end}) ile karşılaştırma — radar grafik`}>
+        <ResponsiveContainer width="100%" height={340}>
+          <RadarChart data={comparisonData} outerRadius="72%">
+            <PolarGrid stroke="#E9E5F6" />
+            <PolarAngleAxis dataKey="name" tick={{ fontSize: 12, fill: "#6B6478" }} />
+            <PolarRadiusAxis tick={{ fontSize: 10, fill: "#B5AFC7" }} allowDecimals={false} axisLine={false} />
+            <Radar
+              name="Önceki Dönem"
+              dataKey="onceki"
+              stroke="#A78BFA"
+              fill="#A78BFA"
+              fillOpacity={0.28}
+              strokeWidth={2}
+            />
+            <Radar
+              name="Seçili Dönem"
+              dataKey="secili"
+              stroke="#7C3AED"
+              fill="#7C3AED"
+              fillOpacity={0.42}
+              strokeWidth={2}
+            />
             <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Bar dataKey="onceki" name="Önceki Dönem" fill="#DDD6FE" radius={[6, 6, 0, 0]} />
-            <Bar dataKey="secili" name="Seçili Dönem" fill="#7C3AED" radius={[6, 6, 0, 0]} />
-          </BarChart>
+            <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid #E9E5F6", fontSize: 12 }} />
+          </RadarChart>
         </ResponsiveContainer>
       </Section>
 
-      <Section title="Pipeline Dağılımı" subtitle={`Toplam ${leads.length} fırsat · ${formatCurrency(totalValue)}`}>
-        <ResponsiveContainer width="100%" height={280}>
-          <BarChart data={stageData} margin={{ top: 24, right: 10, left: -10, bottom: 0 }}>
+      <Section title="Pipeline Dağılımı" subtitle={`Toplam ${leads.length} fırsat · ${formatCurrency(totalValue)} — sütun grafik`}>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={stageData} margin={{ top: 28, right: 10, left: -10, bottom: 0 }} barCategoryGap={24}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E9E5F6" vertical={false} />
-            <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#6B6478" }} axisLine={{ stroke: "#E9E5F6" }} />
-            <YAxis tick={{ fontSize: 12, fill: "#6B6478" }} allowDecimals={false} axisLine={false} />
-            <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid #E9E5F6", fontSize: 12 }} />
-            <Bar dataKey="count" name="Fırsat Sayısı" radius={[6, 6, 0, 0]}>
+            <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#6B6478" }} axisLine={{ stroke: "#E9E5F6" }} tickLine={false} />
+            <YAxis tick={{ fontSize: 12, fill: "#6B6478" }} allowDecimals={false} axisLine={false} tickLine={false} />
+            <Tooltip
+              contentStyle={{ borderRadius: 10, border: "1px solid #E9E5F6", fontSize: 12 }}
+              formatter={(value, name, props) => [`${value} fırsat`, props.payload.name]}
+            />
+            <Bar dataKey="count" name="Fırsat Sayısı" radius={[8, 8, 0, 0]} maxBarSize={64}>
               {stageData.map((s, i) => (
                 <Cell key={i} fill={s.color} />
               ))}
-              <LabelList dataKey="count" position="top" style={{ fontSize: 12, fill: "#1E1B2E", fontWeight: 600 }} />
+              <LabelList
+                dataKey="count"
+                position="top"
+                style={{ fontSize: 13, fill: "#1E1B2E", fontWeight: 700 }}
+              />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
       </Section>
 
-      <Section title="Ürün Bazlı Analiz" subtitle="Her ürün için açık teklif sayısı ve yapılan sunum (toplantı) sayısı">
-        <ResponsiveContainer width="100%" height={320}>
-          <BarChart data={productData} margin={{ top: 10, right: 10, left: -10, bottom: 40 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E9E5F6" vertical={false} />
-            <XAxis
+      <Section title="Ürün Bazlı Analiz" subtitle="Her ürün için açık teklif sayısı ve yapılan sunum (toplantı) sayısı — yatay çubuk grafik">
+        <ResponsiveContainer width="100%" height={360}>
+          <BarChart
+            data={productData}
+            layout="vertical"
+            margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
+            barCategoryGap={14}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#E9E5F6" horizontal={false} />
+            <XAxis type="number" tick={{ fontSize: 12, fill: "#6B6478" }} allowDecimals={false} axisLine={false} />
+            <YAxis
+              type="category"
               dataKey="name"
-              tick={{ fontSize: 11, fill: "#6B6478" }}
+              tick={{ fontSize: 12, fill: "#3F3A4D", fontWeight: 500 }}
+              width={92}
               axisLine={{ stroke: "#E9E5F6" }}
-              angle={-25}
-              textAnchor="end"
-              interval={0}
+              tickLine={false}
             />
-            <YAxis tick={{ fontSize: 12, fill: "#6B6478" }} allowDecimals={false} axisLine={false} />
             <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid #E9E5F6", fontSize: 12 }} />
             <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Bar dataKey="teklif" name="Teklif" fill="#F59E0B" radius={[6, 6, 0, 0]} />
-            <Bar dataKey="sunum" name="Sunum" fill="#3B82F6" radius={[6, 6, 0, 0]} />
+            <Bar dataKey="teklif" name="Teklif" fill="#F59E0B" radius={[0, 6, 6, 0]} barSize={13}>
+              <LabelList dataKey="teklif" position="right" style={{ fontSize: 11, fill: "#92400E", fontWeight: 600 }} />
+            </Bar>
+            <Bar dataKey="sunum" name="Sunum" fill="#3B82F6" radius={[0, 6, 6, 0]} barSize={13}>
+              <LabelList dataKey="sunum" position="right" style={{ fontSize: 11, fill: "#1D4ED8", fontWeight: 600 }} />
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </Section>
