@@ -15,6 +15,7 @@ function rowToLead(row) {
     website: row.website || "",
     position: row.position || "",
     products: row.products || [],
+    followupStatus: row.followup_status || "takip_edilecek",
     tags: row.tags || [],
     value: row.value || 0,
     stage: row.stage || "yeni",
@@ -42,6 +43,7 @@ function leadToRow(lead, userId) {
     website: lead.website,
     position: lead.position,
     products: lead.products,
+    followup_status: lead.followupStatus,
     tags: lead.tags,
     value: lead.value,
     stage: lead.stage,
@@ -87,6 +89,11 @@ export async function updateLeadFollowUp(id, nextActionDate, nextActionNote) {
     .from("leads")
     .update({ next_action_date: nextActionDate, next_action_note: nextActionNote })
     .eq("id", id);
+  if (error) throw error;
+}
+
+export async function updateFollowUpStatus(id, status) {
+  const { error } = await supabase.from("leads").update({ followup_status: status }).eq("id", id);
   if (error) throw error;
 }
 

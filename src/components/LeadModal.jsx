@@ -6,6 +6,7 @@ import {
   PRODUCTS,
   PRODUCT_BADGE,
   ACTIVITY_TYPES,
+  FOLLOWUP_STATUSES,
   formatCurrency,
   totalPurchases,
 } from "../data/store";
@@ -229,6 +230,20 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                   />
                 </Field>
               </div>
+
+              <Field label="Takip durumu">
+                <select
+                  value={form.followupStatus}
+                  onChange={(e) => update("followupStatus", e.target.value)}
+                  className="input"
+                >
+                  {FOLLOWUP_STATUSES.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
 
               <div>
                 <div className="text-xs font-medium text-ink/45 mb-1.5">Ürünler</div>

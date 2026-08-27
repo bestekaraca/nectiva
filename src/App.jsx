@@ -6,6 +6,7 @@ import {
   updateLead,
   updateLeadStage,
   updateLeadFollowUp,
+  updateFollowUpStatus,
   deleteLead,
   insertNote,
   insertPurchase,
@@ -92,6 +93,15 @@ export default function App() {
     );
     try {
       await updateLeadFollowUp(leadId, date, note);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
+  const handleUpdateFollowUpStatus = async (leadId, status) => {
+    setLeads((prev) => prev.map((l) => (l.id === leadId ? { ...l, followupStatus: status } : l)));
+    try {
+      await updateFollowUpStatus(leadId, status);
     } catch (e) {
       setLoadError(e.message);
     }
@@ -240,6 +250,7 @@ export default function App() {
                 leads={leads}
                 onOpenLead={(l) => setActiveLeadId(l.id)}
                 onSetFollowUp={handleSetFollowUp}
+                onUpdateFollowUpStatus={handleUpdateFollowUpStatus}
                 activityLogs={activityLogs}
                 onAddActivity={handleAddActivity}
                 onDeleteActivity={handleDeleteActivity}

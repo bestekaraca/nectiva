@@ -17,6 +17,12 @@ export const ACTIVITY_TYPES = [
   { id: "proposal", label: "Teklif", icon: "📄" },
 ];
 
+export const FOLLOWUP_STATUSES = [
+  { id: "arandi", label: "Arandı", badge: "bg-emerald-100 text-emerald-700 border-emerald-300" },
+  { id: "takipte", label: "Takipte", badge: "bg-amber-100 text-amber-700 border-amber-300" },
+  { id: "takip_edilecek", label: "Takip Edilecek", badge: "bg-rose-100 text-rose-700 border-rose-300" },
+];
+
 export const SECTORS = [
   "Perakende",
   "Üretim",
@@ -90,6 +96,7 @@ function normalizeLead(lead) {
     products: [],
     tags: [],
     purchases: [],
+    followupStatus: "takip_edilecek",
     ...lead,
   };
 }
