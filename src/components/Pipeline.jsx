@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { STAGES, formatCurrency } from "../data/store";
+import { exportToExcel } from "../lib/exportExcel";
 import LeadCard from "./LeadCard";
 import StageFlowBar from "./StageFlowBar";
 
 export default function Pipeline({ leads, onMoveStage, onOpen }) {
   const [dragOverStage, setDragOverStage] = useState(null);
   const [query, setQuery] = useState("");
+  const [exporting, setExporting] = useState(false);
 
   const filtered = leads.filter((l) =>
     `${l.company} ${l.contactName}`.toLowerCase().includes(query.toLowerCase())
@@ -22,17 +24,58 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
     setDragOverStage(null);
   };
 
+  const stageLabel = (id) => STAGES.find((s) => s.id === id)?.label || id;
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      await exportToExcel({
+        filename: `nectiva-pipeline-${new Date().toISOString().slice(0, 10)}.xlsx`,
+        reportTitle: "Nectiva — Pipeline Raporu",
+        rows: filtered,
+        columns: [
+          { header: "Firma", value: (r) => r.company, width: 24 },
+          { header: "İlgili Kişi", value: (r) => r.contactName, width: 20 },
+          { header: "Pozisyon", value: (r) => r.position, width: 20 },
+          { header: "Telefon", value: (r) => r.phone, width: 16 },
+          { header: "E-posta", value: (r) => r.email, width: 24 },
+          { header: "Sektör", value: (r) => r.sector, width: 16 },
+          { header: "Kaynak", value: (r) => r.source, width: 16 },
+          { header: "Ürünler", value: (r) => r.products.join(", "), width: 22 },
+          { header: "Aşama", value: (r) => stageLabel(r.stage), width: 16 },
+          { header: "Değer (₺)", value: (r) => r.value, width: 14 },
+          { header: "Sonraki Eylem Tarihi", value: (r) => r.nextActionDate || "", width: 18 },
+          { header: "Sonraki Eylem Notu", value: (r) => r.nextActionNote, width: 30 },
+          { header: "Etiketler", value: (r) => r.tags.join(", "), width: 22 },
+          { header: "Oluşturulma Tarihi", value: (r) => r.createdAt?.slice(0, 10) || "", width: 16 },
+        ],
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div>
-      <div className="flex items-center justify-between gap-4 mb-1">
+      <div className="flex items-center justify-between gap-3 mb-1 flex-wrap">
         <h1 className="font-display font-semibold text-2xl text-ink">Pipeline</h1>
-        <input
-          type="text"
-          placeholder="Firma veya kişi ara..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="w-56 input"
-        />
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Firma veya kişi ara..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-56 input"
+          />
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border border-mist bg-white text-ink/70 hover:border-violet-300 hover:text-violet-700 transition-colors disabled:opacity-50 shrink-0"
+          >
+            <DownloadIcon />
+            {exporting ? "Hazırlanıyor..." : "Excel'e Aktar"}
+          </button>
+        </div>
       </div>
       <p className="text-sm text-ink/40 mb-5">Kartları sürükleyerek aşama değiştirebilirsin.</p>
 
@@ -82,5 +125,13 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
         })}
       </div>
     </div>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }

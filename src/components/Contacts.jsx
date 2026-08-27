@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { PRODUCTS, PRODUCT_BADGE, PRODUCT_DOT } from "../data/store";
+import { exportToExcel } from "../lib/exportExcel";
 
 export default function Contacts({ leads, onOpen }) {
   const [productFilter, setProductFilter] = useState(null);
   const [query, setQuery] = useState("");
+  const [exporting, setExporting] = useState(false);
 
   const filtered = leads.filter((l) => {
     const matchesProduct = !productFilter || l.products.includes(productFilter);
@@ -15,17 +17,49 @@ export default function Contacts({ leads, onOpen }) {
 
   const uniqueCompanies = new Set(leads.map((l) => l.company).filter(Boolean)).size;
 
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      await exportToExcel({
+        filename: `nectiva-kisiler-${new Date().toISOString().slice(0, 10)}.xlsx`,
+        reportTitle: "Nectiva — Kişiler Raporu",
+        rows: filtered,
+        columns: [
+          { header: "Ad Soyad", value: (r) => r.contactName, width: 22 },
+          { header: "Pozisyon", value: (r) => r.position, width: 20 },
+          { header: "Firma", value: (r) => r.company, width: 24 },
+          { header: "Telefon", value: (r) => r.phone, width: 16 },
+          { header: "E-posta", value: (r) => r.email, width: 24 },
+          { header: "Sektör", value: (r) => r.sector, width: 16 },
+          { header: "Ürünler", value: (r) => r.products.join(", "), width: 26 },
+        ],
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div>
-      <div className="flex items-center justify-between gap-4 mb-1">
+      <div className="flex items-center justify-between gap-3 mb-1 flex-wrap">
         <h1 className="font-display font-semibold text-2xl text-ink">Kişiler</h1>
-        <input
-          type="text"
-          placeholder="İsim, firma veya pozisyon ara..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="w-64 input"
-        />
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="İsim, firma veya pozisyon ara..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-64 input"
+          />
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border border-mist bg-white text-ink/70 hover:border-violet-300 hover:text-violet-700 transition-colors disabled:opacity-50 shrink-0"
+          >
+            <DownloadIcon />
+            {exporting ? "Hazırlanıyor..." : "Excel'e Aktar"}
+          </button>
+        </div>
       </div>
       <p className="text-sm text-ink/40 mb-1">Tüm müşteri kişilerin, ürüne göre filtrelenebilir.</p>
       <p className="text-sm text-ink/60 font-medium mb-5">
@@ -108,6 +142,14 @@ export default function Contacts({ leads, onOpen }) {
         </div>
       </div>
     </div>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
 
