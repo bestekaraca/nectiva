@@ -75,7 +75,9 @@ function countActivities(leads, activityLogs, start, end) {
     email:
       notes.filter((n) => n.type === "email" && within(n.date)).length +
       activityLogs.filter((a) => a.type === "email" && within(a.date)).length,
-    meeting: notes.filter((n) => n.type === "meeting" && within(n.date)).length,
+    meeting:
+      notes.filter((n) => n.type === "meeting" && within(n.date)).length +
+      activityLogs.filter((a) => a.type === "meeting" && within(a.date)).length,
     proposal: notes.filter((n) => n.type === "proposal" && within(n.date)).length,
   };
 }

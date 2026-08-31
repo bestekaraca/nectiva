@@ -39,6 +39,7 @@ export default function DailyTasks({
 
   const todaysCalls = activityLogs.filter((a) => a.type === "call" && a.date === todayStr()).length;
   const todaysEmails = activityLogs.filter((a) => a.type === "email" && a.date === todayStr()).length;
+  const todaysMeetings = activityLogs.filter((a) => a.type === "meeting" && a.date === todayStr()).length;
   const todaysLogs = activityLogs.filter((a) => a.date === todayStr());
 
   const handleLogActivity = async () => {
@@ -81,9 +82,10 @@ export default function DailyTasks({
 
       {/* Hızlı aktivite girişi */}
       <Section title="Hızlı Aktivite Girişi" subtitle="Bugün yaptığın aramaları ve mailleri buradan kaydet">
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="grid grid-cols-3 gap-3 mb-4">
           <StatBox icon="📞" label="Bugünkü Aramalar" count={todaysCalls} accent="blue" />
           <StatBox icon="✉️" label="Bugünkü Mailler" count={todaysEmails} accent="violet" />
+          <StatBox icon="🤝" label="Bugünkü Toplantılar" count={todaysMeetings} accent="emerald" />
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -103,6 +105,14 @@ export default function DailyTasks({
               }`}
             >
               ✉️ Mail
+            </button>
+            <button
+              onClick={() => setActivityType("meeting")}
+              className={`text-xs font-medium px-3 py-1.5 rounded-md transition-all ${
+                activityType === "meeting" ? "bg-white shadow-sm text-ink" : "text-ink/45"
+              }`}
+            >
+              🤝 Toplantı
             </button>
           </div>
           <input
@@ -128,7 +138,13 @@ export default function DailyTasks({
                 className="flex items-center justify-between bg-white border border-mist rounded-lg px-3 py-2"
               >
                 <span className="text-sm text-ink/75">
-                  {a.type === "call" ? "📞" : "✉️"} {a.note || (a.type === "call" ? "Arama yapıldı" : "Mail gönderildi")}
+                  {a.type === "call" ? "📞" : a.type === "email" ? "✉️" : "🤝"}{" "}
+                  {a.note ||
+                    (a.type === "call"
+                      ? "Arama yapıldı"
+                      : a.type === "email"
+                      ? "Mail gönderildi"
+                      : "Toplantı yapıldı")}
                 </span>
                 <button
                   onClick={() => onDeleteActivity(a.id)}
@@ -345,6 +361,7 @@ function StatBox({ icon, label, count, accent }) {
     blue: "border-l-blue-500",
     violet: "border-l-violet-500",
     amber: "border-l-amber-500",
+    emerald: "border-l-emerald-500",
   }[accent];
   return (
     <div className={`bg-white border border-mist ${border} border-l-[3px] rounded-lg p-3`}>
