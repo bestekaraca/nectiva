@@ -1,6 +1,19 @@
 import { formatCurrency, isOverdue, isToday } from "../data/store";
 import GoalCard from "./GoalCard";
 
+function mondayOf(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? 6 : day - 1;
+  d.setDate(d.getDate() - diff);
+  return d.toISOString().slice(0, 10);
+}
+function addDays(dateStr, n) {
+  const d = new Date(dateStr + "T00:00:00");
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
 export default function Dashboard({
   leads,
   onOpen,
@@ -18,8 +31,10 @@ export default function Dashboard({
     .reduce((s, l) => s + (l.value || 0), 0);
   const overdueLeads = leads.filter((l) => isOverdue(l.nextActionDate) && l.followupStatus !== "arandi");
   const todayLeads = leads.filter((l) => isToday(l.nextActionDate) && l.followupStatus !== "arandi");
-  const todaysTasks = tasks
-    .filter((t) => !t.done && t.dueDate && (isToday(t.dueDate) || isOverdue(t.dueDate)))
+
+  const weekEnd = addDays(mondayOf(new Date()), 6);
+  const weeklyTasks = tasks
+    .filter((t) => !t.done && t.dueDate && t.dueDate <= weekEnd)
     .sort((a, b) => (a.dueDate < b.dueDate ? -1 : 1));
 
   return (
@@ -29,11 +44,11 @@ export default function Dashboard({
 
       <GoalCard goal={goal} saleEntries={saleEntries} onAddSale={onAddSale} onDeleteSale={onDeleteSale} />
 
-      {todaysTasks.length > 0 && (
+      {weeklyTasks.length > 0 && (
         <div className="glass rounded-card p-4 mb-6">
-          <h3 className="font-semibold text-sm text-ink/80 mb-3">Bugünün Görevleri</h3>
+          <h3 className="font-semibold text-sm text-ink/80 mb-3">Haftalık Görevler</h3>
           <div className="flex flex-col gap-2">
-            {todaysTasks.map((t) => {
+            {weeklyTasks.map((t) => {
               const overdue = isOverdue(t.dueDate);
               return (
                 <label
