@@ -84,6 +84,7 @@ export const PRODUCTS = [
   "EU SETS",
   "The SOLV.AI",
   "Dexperie",
+  "E-İrsaliye",
 ];
 
 // Her ürün için sabit renk sınıfları (Tailwind'in derleme zamanında
@@ -97,6 +98,7 @@ export const PRODUCT_BADGE = {
   "EU SETS": "bg-teal-100 text-teal-700 border-teal-200",
   "The SOLV.AI": "bg-cyan-100 text-cyan-700 border-cyan-200",
   Dexperie: "bg-orange-100 text-orange-700 border-orange-200",
+  "E-İrsaliye": "bg-pink-100 text-pink-700 border-pink-200",
 };
 
 export const PRODUCT_DOT = {
@@ -108,6 +110,7 @@ export const PRODUCT_DOT = {
   "EU SETS": "bg-teal-500",
   "The SOLV.AI": "bg-cyan-500",
   Dexperie: "bg-orange-500",
+  "E-İrsaliye": "bg-pink-500",
 };
 
 function uid() {
