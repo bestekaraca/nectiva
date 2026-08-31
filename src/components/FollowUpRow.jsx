@@ -32,11 +32,23 @@ export default function FollowUpRow({ lead, onOpenLead, onSetFollowUp, onUpdateF
     }
   };
 
+  const handleStatusChange = async (newStatus) => {
+    const label = FOLLOWUP_STATUSES.find((s) => s.id === newStatus)?.label || newStatus;
+    await onUpdateFollowUpStatus(lead.id, newStatus);
+    // Durum degisikligi de bir temas say - "son temas" bu yuzden guncellenir.
+    await onAddNote(lead.id, `Durum güncellendi: ${label}`, "note");
+  };
+
   const handleReschedule = async () => {
     if (!rescheduleDate || busy) return;
     setBusy(true);
     try {
       await onSetFollowUp(lead.id, rescheduleDate, rescheduleNote.trim());
+      await onAddNote(
+        lead.id,
+        `Takip yeniden planlandı → ${rescheduleDate}${rescheduleNote.trim() ? `: ${rescheduleNote.trim()}` : ""}`,
+        "note"
+      );
     } finally {
       setBusy(false);
     }
@@ -72,7 +84,7 @@ export default function FollowUpRow({ lead, onOpenLead, onSetFollowUp, onUpdateF
           </span>
           <select
             value={lead.followupStatus}
-            onChange={(e) => onUpdateFollowUpStatus(lead.id, e.target.value)}
+            onChange={(e) => handleStatusChange(e.target.value)}
             className={`text-xs font-semibold px-2.5 py-1 rounded-full border cursor-pointer outline-none appearance-none ${currentBadge}`}
           >
             {FOLLOWUP_STATUSES.map((s) => (
