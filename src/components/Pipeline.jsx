@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { STAGES, formatCurrency } from "../data/store";
+import { STAGES, TEMPERATURES, formatCurrency } from "../data/store";
 import { exportToExcel } from "../lib/exportExcel";
 import LeadCard from "./LeadCard";
 import StageFlowBar from "./StageFlowBar";
@@ -8,9 +8,12 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
   const [dragOverStage, setDragOverStage] = useState(null);
   const [query, setQuery] = useState("");
   const [exporting, setExporting] = useState(false);
+  const [tempFilter, setTempFilter] = useState(null);
 
-  const filtered = leads.filter((l) =>
-    `${l.company} ${l.contactName}`.toLowerCase().includes(query.toLowerCase())
+  const filtered = leads.filter(
+    (l) =>
+      `${l.company} ${l.contactName}`.toLowerCase().includes(query.toLowerCase()) &&
+      (!tempFilter || l.temperature === tempFilter)
   );
 
   const handleDragStart = (e, leadId) => {
@@ -80,6 +83,33 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
       <p className="text-sm text-ink/40 mb-5">Kartları sürükleyerek aşama değiştirebilirsin.</p>
 
       <StageFlowBar leads={leads} />
+
+      <div className="flex flex-wrap gap-1.5 mb-4">
+        <button
+          onClick={() => setTempFilter(null)}
+          className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
+            tempFilter === null
+              ? "bg-ink text-white border-ink"
+              : "bg-white text-ink/55 border-mist hover:border-ink/25"
+          }`}
+        >
+          Tümü
+        </button>
+        {TEMPERATURES.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setTempFilter(t.id)}
+            className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
+              tempFilter === t.id
+                ? "bg-ink text-white border-ink"
+                : "bg-white text-ink/55 border-mist hover:border-ink/25"
+            }`}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${t.dot}`} />
+            {t.label}
+          </button>
+        ))}
+      </div>
 
       <div className="flex gap-4 overflow-x-auto pb-4 -mx-1 px-1">
         {STAGES.map((stage) => {

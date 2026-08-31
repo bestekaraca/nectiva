@@ -1,4 +1,4 @@
-import { formatCurrency, isOverdue, isToday } from "../data/store";
+import { formatCurrency, isOverdue, isToday, TEMPERATURES } from "../data/store";
 
 const stripeColor = {
   blue: "before:bg-blue-500",
@@ -12,6 +12,7 @@ const stripeColor = {
 export default function LeadCard({ lead, stageColor, onOpen, onDragStart }) {
   const overdue = isOverdue(lead.nextActionDate);
   const today = isToday(lead.nextActionDate);
+  const tempInfo = TEMPERATURES.find((t) => t.id === lead.temperature);
 
   return (
     <div
@@ -20,7 +21,10 @@ export default function LeadCard({ lead, stageColor, onOpen, onDragStart }) {
       onClick={() => onOpen(lead)}
       className={`relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:rounded-l-card ${stripeColor[stageColor]} glass rounded-card pl-3.5 pr-3 py-3 cursor-pointer hover:shadow-glow-sm hover:-translate-y-0.5 transition-all`}
     >
-      <div className="font-semibold text-sm text-ink leading-tight">{lead.company}</div>
+      <div className="flex items-center gap-1.5">
+        {tempInfo && <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${tempInfo.dot}`} title={tempInfo.label} />}
+        <div className="font-semibold text-sm text-ink leading-tight">{lead.company}</div>
+      </div>
       <div className="text-xs text-ink/50 mt-0.5">
         {lead.contactName}
         {lead.sector && <span className="text-ink/30"> · {lead.sector}</span>}

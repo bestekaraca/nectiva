@@ -7,6 +7,7 @@ import {
   PRODUCT_BADGE,
   ACTIVITY_TYPES,
   FOLLOWUP_STATUSES,
+  TEMPERATURES,
   formatCurrency,
   totalPurchases,
 } from "../data/store";
@@ -165,6 +166,18 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                     <option value="">Seçilmedi</option>
                     {SECTORS.map((s) => (
                       <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </Field>
+                <Field label="Sıcaklık">
+                  <select
+                    value={form.temperature}
+                    onChange={(e) => update("temperature", e.target.value)}
+                    className="input"
+                  >
+                    <option value="">Seçilmedi</option>
+                    {TEMPERATURES.map((t) => (
+                      <option key={t.id} value={t.id}>{t.label}</option>
                     ))}
                   </select>
                 </Field>

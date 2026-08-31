@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createLead, SECTORS, SOURCES } from "../data/store";
+import { createLead, SECTORS, SOURCES, TEMPERATURES } from "../data/store";
 
 export default function NewLeadModal({ onClose, onCreate }) {
   const [company, setCompany] = useState("");
@@ -8,6 +8,7 @@ export default function NewLeadModal({ onClose, onCreate }) {
   const [value, setValue] = useState("");
   const [sector, setSector] = useState("");
   const [source, setSource] = useState("");
+  const [temperature, setTemperature] = useState("");
 
   const handleCreate = () => {
     if (!company.trim()) return;
@@ -19,6 +20,7 @@ export default function NewLeadModal({ onClose, onCreate }) {
         value: Number(value) || 0,
         sector,
         source,
+        temperature,
       })
     );
     onClose();
@@ -75,6 +77,12 @@ export default function NewLeadModal({ onClose, onCreate }) {
               ))}
             </select>
           </div>
+          <select value={temperature} onChange={(e) => setTemperature(e.target.value)} className="input">
+            <option value="">Sıcaklık seç</option>
+            {TEMPERATURES.map((t) => (
+              <option key={t.id} value={t.id}>{t.label}</option>
+            ))}
+          </select>
         </div>
         <div className="flex justify-end gap-2 mt-5">
           <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-ink/50 hover:text-ink">

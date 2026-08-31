@@ -17,6 +17,12 @@ export const ACTIVITY_TYPES = [
   { id: "proposal", label: "Teklif", icon: "📄" },
 ];
 
+export const TEMPERATURES = [
+  { id: "Sıcak", label: "Sıcak", badge: "bg-rose-100 text-rose-700 border-rose-300", dot: "bg-rose-500" },
+  { id: "Ilık", label: "Ilık", badge: "bg-amber-100 text-amber-700 border-amber-300", dot: "bg-amber-500" },
+  { id: "Soğuk", label: "Soğuk", badge: "bg-blue-100 text-blue-700 border-blue-300", dot: "bg-blue-500" },
+];
+
 export const FOLLOWUP_STATUSES = [
   { id: "arandi", label: "Arandı", badge: "bg-emerald-100 text-emerald-700 border-emerald-300" },
   { id: "takipte", label: "Takipte", badge: "bg-amber-100 text-amber-700 border-amber-300" },
@@ -121,6 +127,7 @@ function normalizeLead(lead) {
     tags: [],
     purchases: [],
     followupStatus: "takip_edilecek",
+    temperature: "",
     ...lead,
   };
 }
