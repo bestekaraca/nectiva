@@ -28,7 +28,9 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
   };
 
   const stageLabel = (id) => STAGES.find((s) => s.id === id)?.label || id;
-  const totalActiveCustomers = leads.filter((l) => l.stage !== "kaybedildi").length;
+  const totalActiveCustomers = leads.filter((l) => l.stage !== "kaybedildi" && l.stage !== "yeni").length;
+  const yeniCount = leads.filter((l) => l.stage === "yeni").length;
+  const totalAll = leads.length;
 
   const handleExport = async () => {
     setExporting(true);
@@ -82,10 +84,18 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
         </div>
       </div>
       <p className="text-sm text-ink/40 mb-1">Kartları sürükleyerek aşama değiştirebilirsin.</p>
-      <p className="text-sm text-ink/60 mb-5">
-        Toplam <span className="font-bold text-xl text-violet-700">{totalActiveCustomers}</span> müşteri
-        <span className="text-ink/35"> (Kaybedilen hariç)</span>
-      </p>
+      <div className="mb-5">
+        <p className="text-sm text-ink/60">
+          Toplam <span className="font-bold text-xl text-violet-700">{totalActiveCustomers}</span> müşteri
+          <span className="text-ink/35"> (Yeni ve Kaybedilen hariç)</span>
+        </p>
+        <p className="text-sm text-ink/60 mt-0.5">
+          Yeni: <span className="font-semibold text-blue-600">{yeniCount}</span>
+        </p>
+        <p className="text-sm text-ink/60 mt-0.5">
+          Toplam <span className="font-semibold text-ink/80">{totalAll}</span> kişi var
+        </p>
+      </div>
 
       <StageFlowBar leads={leads} />
 
