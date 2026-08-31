@@ -85,7 +85,7 @@ export default function DailyTasks({
         <div className="grid grid-cols-3 gap-3 mb-4">
           <StatBox icon="📞" label="Bugünkü Aramalar" count={todaysCalls} accent="blue" />
           <StatBox icon="✉️" label="Bugünkü Mailler" count={todaysEmails} accent="violet" />
-          <StatBox icon="🤝" label="Bugünkü Toplantılar" count={todaysMeetings} accent="emerald" />
+          <StatBox icon="🤝" label="Alınan Toplantılar" count={todaysMeetings} accent="emerald" />
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
