@@ -28,6 +28,7 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
   };
 
   const stageLabel = (id) => STAGES.find((s) => s.id === id)?.label || id;
+  const totalActiveCustomers = leads.filter((l) => l.stage !== "kaybedildi").length;
 
   const handleExport = async () => {
     setExporting(true);
@@ -80,7 +81,11 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
           </button>
         </div>
       </div>
-      <p className="text-sm text-ink/40 mb-5">Kartları sürükleyerek aşama değiştirebilirsin.</p>
+      <p className="text-sm text-ink/40 mb-1">Kartları sürükleyerek aşama değiştirebilirsin.</p>
+      <p className="text-sm text-ink/60 mb-5">
+        Toplam <span className="font-bold text-xl text-violet-700">{totalActiveCustomers}</span> müşteri
+        <span className="text-ink/35"> (Kaybedilen hariç)</span>
+      </p>
 
       <StageFlowBar leads={leads} />
 
