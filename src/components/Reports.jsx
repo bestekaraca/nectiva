@@ -118,6 +118,7 @@ export default function Reports({ leads, activityLogs }) {
     return {
       name: p,
       teklif: withProduct.filter((l) => l.stage === "teklif").length,
+      muzakere: withProduct.filter((l) => l.stage === "muzakere").length,
       sunum: withProduct.reduce(
         (sum, l) => sum + l.notes.filter((n) => n.type === "meeting").length,
         0
@@ -247,8 +248,8 @@ export default function Reports({ leads, activityLogs }) {
         </ResponsiveContainer>
       </Section>
 
-      <Section title="Ürün Bazlı Analiz" subtitle="Her ürün için açık teklif sayısı ve yapılan sunum (toplantı) sayısı — yatay çubuk grafik">
-        <ResponsiveContainer width="100%" height={360}>
+      <Section title="Ürün Bazlı Analiz" subtitle="Her ürün için açık teklif, müzakere ve yapılan sunum (toplantı) sayısı — yatay çubuk grafik">
+        <ResponsiveContainer width="100%" height={380}>
           <BarChart
             data={productData}
             layout="vertical"
@@ -267,10 +268,13 @@ export default function Reports({ leads, activityLogs }) {
             />
             <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid #E9E5F6", fontSize: 12 }} />
             <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Bar dataKey="teklif" name="Teklif" fill="#F59E0B" radius={[0, 6, 6, 0]} barSize={13}>
+            <Bar dataKey="teklif" name="Teklif" fill="#F59E0B" radius={[0, 6, 6, 0]} barSize={11}>
               <LabelList dataKey="teklif" position="right" style={{ fontSize: 11, fill: "#92400E", fontWeight: 600 }} />
             </Bar>
-            <Bar dataKey="sunum" name="Sunum" fill="#3B82F6" radius={[0, 6, 6, 0]} barSize={13}>
+            <Bar dataKey="muzakere" name="Müzakere" fill="#D946EF" radius={[0, 6, 6, 0]} barSize={11}>
+              <LabelList dataKey="muzakere" position="right" style={{ fontSize: 11, fill: "#A21CAF", fontWeight: 600 }} />
+            </Bar>
+            <Bar dataKey="sunum" name="Sunum" fill="#3B82F6" radius={[0, 6, 6, 0]} barSize={11}>
               <LabelList dataKey="sunum" position="right" style={{ fontSize: 11, fill: "#1D4ED8", fontWeight: 600 }} />
             </Bar>
           </BarChart>
