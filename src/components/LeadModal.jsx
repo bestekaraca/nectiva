@@ -135,7 +135,7 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                     placeholder="Örn: Satın Alma Müdürü"
                   />
                 </Field>
-                <Field label="Değer (₺)">
+                <Field label="Değer (€)">
                   <input
                     type="number"
                     value={form.value}
@@ -226,7 +226,7 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                     placeholder="3"
                   />
                 </Field>
-                <Field label="Toplam Sözleşme Bedeli (₺)">
+                <Field label="Toplam Sözleşme Bedeli (€)">
                   <input
                     type="number"
                     value={form.totalContractValue}
@@ -234,7 +234,7 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                     className="input font-mono"
                   />
                 </Field>
-                <Field label="Yıllık Kazanç (₺)">
+                <Field label="Yıllık Kazanç (€)">
                   <input
                     type="number"
                     value={form.annualValue}
@@ -366,7 +366,7 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                   value={purchaseAmount}
                   onChange={(e) => setPurchaseAmount(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleAddPurchase()}
-                  placeholder="₺"
+                  placeholder="€"
                   className="input w-24 font-mono"
                 />
                 <button

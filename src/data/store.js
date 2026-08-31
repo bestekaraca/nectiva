@@ -315,7 +315,7 @@ export function totalPurchases(lead) {
 export function formatCurrency(n) {
   return new Intl.NumberFormat("tr-TR", {
     style: "currency",
-    currency: "TRY",
+    currency: "EUR",
     maximumFractionDigits: 0,
   }).format(n || 0);
 }

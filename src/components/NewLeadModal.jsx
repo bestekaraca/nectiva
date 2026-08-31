@@ -63,7 +63,7 @@ export default function NewLeadModal({ onClose, onCreate }) {
             />
             <input
               type="number"
-              placeholder="Tahmini değer (₺)"
+              placeholder="Tahmini değer (€)"
               value={value}
               onChange={(e) => setValue(e.target.value)}
               className="input font-mono"
@@ -101,14 +101,14 @@ export default function NewLeadModal({ onClose, onCreate }) {
               type="number"
               value={totalContractValue}
               onChange={(e) => setTotalContractValue(e.target.value)}
-              placeholder="Toplam bedel (₺)"
+              placeholder="Toplam bedel (€)"
               className="input font-mono"
             />
             <input
               type="number"
               value={annualValue}
               onChange={(e) => setAnnualValue(e.target.value)}
-              placeholder="Yıllık (₺)"
+              placeholder="Yıllık (€)"
               className="input font-mono"
             />
           </div>

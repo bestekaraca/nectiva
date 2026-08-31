@@ -49,7 +49,7 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
           { header: "Kaynak", value: (r) => r.source, width: 16 },
           { header: "Ürünler", value: (r) => r.products.join(", "), width: 22 },
           { header: "Aşama", value: (r) => stageLabel(r.stage), width: 16 },
-          { header: "Değer (₺)", value: (r) => r.value, width: 14 },
+          { header: "Değer (€)", value: (r) => r.value, width: 14 },
           { header: "Sonraki Eylem Tarihi", value: (r) => r.nextActionDate || "", width: 18 },
           { header: "Sonraki Eylem Notu", value: (r) => r.nextActionNote, width: 30 },
           { header: "Etiketler", value: (r) => r.tags.join(", "), width: 22 },
