@@ -2,6 +2,7 @@ import { useState } from "react";
 import { isOverdue, isToday } from "../data/store";
 import FollowUpRow from "./FollowUpRow";
 import CompletedFollowUpsModal from "./CompletedFollowUpsModal";
+import ActivityDetailModal from "./ActivityDetailModal";
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
@@ -25,6 +26,7 @@ export default function DailyTasks({
   const [taskDue, setTaskDue] = useState(todayStr());
   const [showDone, setShowDone] = useState(false);
   const [showCompletedFollowUps, setShowCompletedFollowUps] = useState(false);
+  const [activityPopup, setActivityPopup] = useState(null); // null | 'call' | 'email' | 'meeting'
 
   const [followUpLeadId, setFollowUpLeadId] = useState("");
   const [followUpDate, setFollowUpDate] = useState(todayStr());
@@ -83,10 +85,11 @@ export default function DailyTasks({
       {/* Hızlı aktivite girişi */}
       <Section title="Hızlı Aktivite Girişi" subtitle="Bugün yaptığın aramaları ve mailleri buradan kaydet">
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <StatBox icon="📞" label="Bugünkü Aramalar" count={todaysCalls} accent="blue" />
-          <StatBox icon="✉️" label="Bugünkü Mailler" count={todaysEmails} accent="violet" />
-          <StatBox icon="🤝" label="Alınan Toplantılar" count={todaysMeetings} accent="emerald" />
+          <StatBox icon="📞" label="Bugünkü Aramalar" count={todaysCalls} accent="blue" onClick={() => setActivityPopup("call")} />
+          <StatBox icon="✉️" label="Bugünkü Mailler" count={todaysEmails} accent="violet" onClick={() => setActivityPopup("email")} />
+          <StatBox icon="🤝" label="Alınan Toplantılar" count={todaysMeetings} accent="emerald" onClick={() => setActivityPopup("meeting")} />
         </div>
+        <p className="text-[11px] text-ink/30 mb-3">Detayları görmek için kutulardan birine tıkla.</p>
 
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex gap-1 bg-ink/5 rounded-lg p-1">
@@ -129,33 +132,6 @@ export default function DailyTasks({
             Ekle
           </button>
         </div>
-
-        {todaysLogs.length > 0 && (
-          <div className="flex flex-col gap-1.5 mt-4">
-            {todaysLogs.map((a) => (
-              <div
-                key={a.id}
-                className="flex items-center justify-between bg-white border border-mist rounded-lg px-3 py-2"
-              >
-                <span className="text-sm text-ink/75">
-                  {a.type === "call" ? "📞" : a.type === "email" ? "✉️" : "🤝"}{" "}
-                  {a.note ||
-                    (a.type === "call"
-                      ? "Arama yapıldı"
-                      : a.type === "email"
-                      ? "Mail gönderildi"
-                      : "Toplantı yapıldı")}
-                </span>
-                <button
-                  onClick={() => onDeleteActivity(a.id)}
-                  className="text-ink/25 hover:text-rose-500 text-sm leading-none"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
       </Section>
 
       {/* Takip listesi */}
@@ -340,6 +316,18 @@ export default function DailyTasks({
           onReopen={handleReopenFollowUp}
         />
       )}
+
+      {activityPopup && (
+        <ActivityDetailModal
+          title={
+            activityPopup === "call" ? "Bugünkü Aramalar" : activityPopup === "email" ? "Bugünkü Mailler" : "Alınan Toplantılar"
+          }
+          icon={activityPopup === "call" ? "📞" : activityPopup === "email" ? "✉️" : "🤝"}
+          entries={activityLogs.filter((a) => a.type === activityPopup && a.date === todayStr())}
+          onClose={() => setActivityPopup(null)}
+          onDelete={onDeleteActivity}
+        />
+      )}
     </div>
   );
 }
@@ -356,7 +344,7 @@ function Section({ title, subtitle, children }) {
   );
 }
 
-function StatBox({ icon, label, count, accent }) {
+function StatBox({ icon, label, count, accent, onClick }) {
   const border = {
     blue: "border-l-blue-500",
     violet: "border-l-violet-500",
@@ -364,10 +352,13 @@ function StatBox({ icon, label, count, accent }) {
     emerald: "border-l-emerald-500",
   }[accent];
   return (
-    <div className={`bg-white border border-mist ${border} border-l-[3px] rounded-lg p-3`}>
+    <button
+      onClick={onClick}
+      className={`text-left bg-white border border-mist ${border} border-l-[3px] rounded-lg p-3 hover:shadow-md transition-shadow`}
+    >
       <div className="text-base leading-none mb-1">{icon}</div>
       <div className="font-display font-bold text-xl text-ink">{count}</div>
       <div className="text-xs text-ink/45 mt-0.5">{label}</div>
-    </div>
+    </button>
   );
 }
