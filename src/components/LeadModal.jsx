@@ -216,6 +216,34 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                 </Field>
               </div>
 
+              <div className="grid grid-cols-3 gap-3">
+                <Field label="Sözleşme Yılı">
+                  <input
+                    type="number"
+                    value={form.contractYears}
+                    onChange={(e) => update("contractYears", Number(e.target.value))}
+                    className="input font-mono"
+                    placeholder="3"
+                  />
+                </Field>
+                <Field label="Toplam Sözleşme Bedeli (₺)">
+                  <input
+                    type="number"
+                    value={form.totalContractValue}
+                    onChange={(e) => update("totalContractValue", Number(e.target.value))}
+                    className="input font-mono"
+                  />
+                </Field>
+                <Field label="Yıllık Kazanç (₺)">
+                  <input
+                    type="number"
+                    value={form.annualValue}
+                    onChange={(e) => update("annualValue", Number(e.target.value))}
+                    className="input font-mono"
+                  />
+                </Field>
+              </div>
+
               <Field label="Adres">
                 <textarea
                   value={form.address}

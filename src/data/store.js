@@ -131,6 +131,9 @@ function normalizeLead(lead) {
     purchases: [],
     followupStatus: "takip_edilecek",
     temperature: "",
+    contractYears: 0,
+    totalContractValue: 0,
+    annualValue: 0,
     ...lead,
   };
 }

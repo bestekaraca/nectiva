@@ -9,6 +9,9 @@ export default function NewLeadModal({ onClose, onCreate }) {
   const [sector, setSector] = useState("");
   const [source, setSource] = useState("");
   const [temperature, setTemperature] = useState("");
+  const [contractYears, setContractYears] = useState("");
+  const [totalContractValue, setTotalContractValue] = useState("");
+  const [annualValue, setAnnualValue] = useState("");
 
   const handleCreate = () => {
     if (!company.trim()) return;
@@ -21,6 +24,9 @@ export default function NewLeadModal({ onClose, onCreate }) {
         sector,
         source,
         temperature,
+        contractYears: Number(contractYears) || 0,
+        totalContractValue: Number(totalContractValue) || 0,
+        annualValue: Number(annualValue) || 0,
       })
     );
     onClose();
@@ -83,6 +89,29 @@ export default function NewLeadModal({ onClose, onCreate }) {
               <option key={t.id} value={t.id}>{t.label}</option>
             ))}
           </select>
+          <div className="grid grid-cols-3 gap-2">
+            <input
+              type="number"
+              value={contractYears}
+              onChange={(e) => setContractYears(e.target.value)}
+              placeholder="Sözleşme yılı"
+              className="input font-mono"
+            />
+            <input
+              type="number"
+              value={totalContractValue}
+              onChange={(e) => setTotalContractValue(e.target.value)}
+              placeholder="Toplam bedel (₺)"
+              className="input font-mono"
+            />
+            <input
+              type="number"
+              value={annualValue}
+              onChange={(e) => setAnnualValue(e.target.value)}
+              placeholder="Yıllık (₺)"
+              className="input font-mono"
+            />
+          </div>
         </div>
         <div className="flex justify-end gap-2 mt-5">
           <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-ink/50 hover:text-ink">
