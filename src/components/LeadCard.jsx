@@ -13,6 +13,7 @@ export default function LeadCard({ lead, stageColor, onOpen, onDragStart }) {
   const overdue = isOverdue(lead.nextActionDate);
   const today = isToday(lead.nextActionDate);
   const tempInfo = TEMPERATURES.find((t) => t.id === lead.temperature);
+  const meetingCount = lead.notes.filter((n) => n.type === "meeting").length;
 
   return (
     <div
@@ -33,19 +34,29 @@ export default function LeadCard({ lead, stageColor, onOpen, onDragStart }) {
         <span className="font-mono text-sm font-medium text-ink/80">
           {formatCurrency(lead.value)}
         </span>
-        {lead.nextActionDate && (
-          <span
-            className={`text-[11px] font-mono px-1.5 py-0.5 rounded border ${
-              overdue
-                ? "bg-rose-50 text-rose-600 border-rose-200"
-                : today
-                ? "bg-amber-50 text-amber-700 border-amber-200"
-                : "bg-mist/60 text-ink/40 border-mist"
-            }`}
-          >
-            {lead.nextActionDate}
-          </span>
-        )}
+        <div className="flex items-center gap-1.5">
+          {meetingCount > 0 && (
+            <span
+              className="text-[11px] font-medium px-1.5 py-0.5 rounded border bg-emerald-50 text-emerald-700 border-emerald-200"
+              title={`${meetingCount} toplantı yapıldı`}
+            >
+              🤝 {meetingCount}
+            </span>
+          )}
+          {lead.nextActionDate && (
+            <span
+              className={`text-[11px] font-mono px-1.5 py-0.5 rounded border ${
+                overdue
+                  ? "bg-rose-50 text-rose-600 border-rose-200"
+                  : today
+                  ? "bg-amber-50 text-amber-700 border-amber-200"
+                  : "bg-mist/60 text-ink/40 border-mist"
+              }`}
+            >
+              {lead.nextActionDate}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

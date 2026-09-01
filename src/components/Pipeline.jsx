@@ -9,11 +9,13 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
   const [query, setQuery] = useState("");
   const [exporting, setExporting] = useState(false);
   const [tempFilter, setTempFilter] = useState(null);
+  const [onlyMeetings, setOnlyMeetings] = useState(false);
 
   const filtered = leads.filter(
     (l) =>
       `${l.company} ${l.contactName}`.toLowerCase().includes(query.toLowerCase()) &&
-      (!tempFilter || l.temperature === tempFilter)
+      (!tempFilter || l.temperature === tempFilter) &&
+      (!onlyMeetings || l.notes.some((n) => n.type === "meeting"))
   );
 
   const handleDragStart = (e, leadId) => {
@@ -124,6 +126,16 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
             {t.label}
           </button>
         ))}
+        <button
+          onClick={() => setOnlyMeetings((v) => !v)}
+          className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
+            onlyMeetings
+              ? "bg-emerald-600 text-white border-emerald-600"
+              : "bg-white text-ink/55 border-mist hover:border-emerald-300"
+          }`}
+        >
+          🤝 Toplantı Yapılanlar
+        </button>
       </div>
 
       <div className="flex gap-4 overflow-x-auto pb-4 -mx-1 px-1">
