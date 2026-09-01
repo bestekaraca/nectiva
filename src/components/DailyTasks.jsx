@@ -3,6 +3,7 @@ import { isOverdue, isToday } from "../data/store";
 import FollowUpRow from "./FollowUpRow";
 import CompletedFollowUpsModal from "./CompletedFollowUpsModal";
 import ActivityDetailModal from "./ActivityDetailModal";
+import ActivityHistoryModal from "./ActivityHistoryModal";
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
@@ -27,6 +28,7 @@ export default function DailyTasks({
   const [showDone, setShowDone] = useState(false);
   const [showCompletedFollowUps, setShowCompletedFollowUps] = useState(false);
   const [activityPopup, setActivityPopup] = useState(null); // null | 'call' | 'email' | 'meeting'
+  const [showActivityHistory, setShowActivityHistory] = useState(false);
 
   const [followUpLeadId, setFollowUpLeadId] = useState("");
   const [followUpDate, setFollowUpDate] = useState(todayStr());
@@ -89,7 +91,12 @@ export default function DailyTasks({
           <StatBox icon="✉️" label="Bugünkü Mailler" count={todaysEmails} accent="violet" onClick={() => setActivityPopup("email")} />
           <StatBox icon="🤝" label="Alınan Toplantılar" count={todaysMeetings} accent="emerald" onClick={() => setActivityPopup("meeting")} />
         </div>
-        <p className="text-[11px] text-ink/30 mb-3">Detayları görmek için kutulardan birine tıkla.</p>
+        <p className="text-[11px] text-ink/30 mb-3">
+          Detayları görmek için kutulardan birine tıkla ·{" "}
+          <button onClick={() => setShowActivityHistory(true)} className="text-violet-600 hover:text-violet-700 font-medium">
+            📋 tüm geçmişi gör ({activityLogs.length} kayıt)
+          </button>
+        </p>
 
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex gap-1 bg-ink/5 rounded-lg p-1">
@@ -325,6 +332,14 @@ export default function DailyTasks({
           icon={activityPopup === "call" ? "📞" : activityPopup === "email" ? "✉️" : "🤝"}
           entries={activityLogs.filter((a) => a.type === activityPopup && a.date === todayStr())}
           onClose={() => setActivityPopup(null)}
+          onDelete={onDeleteActivity}
+        />
+      )}
+
+      {showActivityHistory && (
+        <ActivityHistoryModal
+          activityLogs={activityLogs}
+          onClose={() => setShowActivityHistory(false)}
           onDelete={onDeleteActivity}
         />
       )}
