@@ -341,6 +341,38 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                   </button>
                 </div>
               </div>
+
+              <div>
+                <div className="text-xs font-medium text-ink/45 mb-1.5">
+                  Firma Geçmişi {lead.notes.length > 0 && `(${lead.notes.length})`}
+                </div>
+                <div className="flex flex-col gap-1.5 max-h-40 overflow-y-auto">
+                  {lead.notes.length === 0 && (
+                    <span className="text-xs text-ink/25">Henüz kayıt yok.</span>
+                  )}
+                  {lead.notes.slice(0, 5).map((n) => (
+                    <div key={n.id} className="bg-white border border-mist rounded-lg px-3 py-2">
+                      <div className="flex items-center gap-2 text-[11px] font-mono text-ink/35 mb-0.5">
+                        <span>{n.date}</span>
+                        <span className="text-ink/20">·</span>
+                        <span>
+                          {ACTIVITY_TYPES.find((t) => t.id === n.type)?.icon}{" "}
+                          {ACTIVITY_TYPES.find((t) => t.id === n.type)?.label || "Not"}
+                        </span>
+                      </div>
+                      <div className="text-sm text-ink/80">{n.text}</div>
+                    </div>
+                  ))}
+                  {lead.notes.length > 5 && (
+                    <button
+                      onClick={() => setTab("notlar")}
+                      className="text-xs text-violet-600 hover:text-violet-700 font-medium text-left"
+                    >
+                      Tümünü gör (Notlar sekmesi) →
+                    </button>
+                  )}
+                </div>
+              </div>
             </>
           )}
 

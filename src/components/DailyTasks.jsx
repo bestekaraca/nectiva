@@ -30,6 +30,7 @@ export default function DailyTasks({
   const [showCompletedFollowUps, setShowCompletedFollowUps] = useState(false);
   const [activityPopup, setActivityPopup] = useState(null); // null | 'call' | 'email' | 'meeting'
   const [showActivityHistory, setShowActivityHistory] = useState(false);
+  const [showCompanyHistory, setShowCompanyHistory] = useState(false);
 
   const [followUpLeadId, setFollowUpLeadId] = useState("");
   const [followUpDate, setFollowUpDate] = useState(todayStr());
@@ -119,7 +120,10 @@ export default function DailyTasks({
         <div className="flex flex-wrap items-center gap-2">
           <select
             value={activityLeadId}
-            onChange={(e) => setActivityLeadId(e.target.value)}
+            onChange={(e) => {
+              setActivityLeadId(e.target.value);
+              if (e.target.value) setShowCompanyHistory(true);
+            }}
             className="input !w-56"
           >
             <option value="">Firma seç (opsiyonel)</option>
@@ -129,6 +133,14 @@ export default function DailyTasks({
               </option>
             ))}
           </select>
+          {activityLeadId && (
+            <button
+              onClick={() => setShowCompanyHistory(true)}
+              className="text-xs font-medium text-violet-600 hover:text-violet-700"
+            >
+              Geçmişi gör
+            </button>
+          )}
           <div className="flex gap-1 bg-ink/5 rounded-lg p-1">
             <button
               onClick={() => setActivityType("call")}
@@ -169,32 +181,6 @@ export default function DailyTasks({
             Ekle
           </button>
         </div>
-
-        {selectedLead && (
-          <div className="mt-4 bg-violet-50/60 border border-violet-200 rounded-lg p-3">
-            <div className="text-xs font-semibold text-violet-800 mb-2">
-              {selectedLead.company} — Geçmiş Aktiviteler ({selectedLead.notes.length})
-            </div>
-            <div className="flex flex-col gap-1.5 max-h-56 overflow-y-auto">
-              {selectedLead.notes.length === 0 && (
-                <div className="text-xs text-ink/30">Bu firma için henüz kayıt yok.</div>
-              )}
-              {selectedLead.notes.map((n) => (
-                <div key={n.id} className="bg-white border border-mist rounded-lg px-3 py-2">
-                  <div className="flex items-center gap-2 text-[11px] font-mono text-ink/35 mb-0.5">
-                    <span>{n.date}</span>
-                    <span className="text-ink/20">·</span>
-                    <span>
-                      {ACTIVITY_TYPES.find((t) => t.id === n.type)?.icon}{" "}
-                      {ACTIVITY_TYPES.find((t) => t.id === n.type)?.label || "Not"}
-                    </span>
-                  </div>
-                  <div className="text-sm text-ink/80">{n.text}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </Section>
 
       {/* Takip listesi */}
@@ -403,6 +389,46 @@ export default function DailyTasks({
           onClose={() => setShowActivityHistory(false)}
           onDelete={onDeleteActivity}
         />
+      )}
+
+      {showCompanyHistory && selectedLead && (
+        <div
+          className="fixed inset-0 bg-ink/25 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          onClick={() => setShowCompanyHistory(false)}
+        >
+          <div
+            className="glass rounded-3xl w-full max-w-md max-h-[75vh] overflow-hidden shadow-glow-lg flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-5 border-b border-mist flex items-center justify-between">
+              <div>
+                <h2 className="font-display font-semibold text-lg text-ink">{selectedLead.company}</h2>
+                <p className="text-xs text-ink/40 mt-0.5">Geçmiş aktiviteler · {selectedLead.notes.length} kayıt</p>
+              </div>
+              <button onClick={() => setShowCompanyHistory(false)} className="text-ink/40 hover:text-ink text-xl leading-none">
+                ×
+              </button>
+            </div>
+            <div className="overflow-y-auto p-5 flex flex-col gap-2">
+              {selectedLead.notes.length === 0 && (
+                <div className="text-sm text-ink/30 text-center py-8">Bu firma için henüz kayıt yok.</div>
+              )}
+              {selectedLead.notes.map((n) => (
+                <div key={n.id} className="bg-white border border-mist rounded-lg px-3.5 py-2.5">
+                  <div className="flex items-center gap-2 text-[11px] font-mono text-ink/35 mb-0.5">
+                    <span>{n.date}</span>
+                    <span className="text-ink/20">·</span>
+                    <span>
+                      {ACTIVITY_TYPES.find((t) => t.id === n.type)?.icon}{" "}
+                      {ACTIVITY_TYPES.find((t) => t.id === n.type)?.label || "Not"}
+                    </span>
+                  </div>
+                  <div className="text-sm text-ink/80">{n.text}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
