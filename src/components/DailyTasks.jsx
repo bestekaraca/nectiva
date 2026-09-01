@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { isOverdue, isToday } from "../data/store";
+import { isOverdue, isToday, ACTIVITY_TYPES } from "../data/store";
 import FollowUpRow from "./FollowUpRow";
 import CompletedFollowUpsModal from "./CompletedFollowUpsModal";
 import ActivityDetailModal from "./ActivityDetailModal";
@@ -23,6 +23,7 @@ export default function DailyTasks({
 }) {
   const [activityNote, setActivityNote] = useState("");
   const [activityType, setActivityType] = useState("call");
+  const [activityLeadId, setActivityLeadId] = useState("");
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDue, setTaskDue] = useState(todayStr());
   const [showDone, setShowDone] = useState(false);
@@ -41,13 +42,30 @@ export default function DailyTasks({
     setFollowUpNote("");
   };
 
-  const todaysCalls = activityLogs.filter((a) => a.type === "call" && a.date === todayStr()).length;
-  const todaysEmails = activityLogs.filter((a) => a.type === "email" && a.date === todayStr()).length;
-  const todaysMeetings = activityLogs.filter((a) => a.type === "meeting" && a.date === todayStr()).length;
+  const allNotesToday = leads.flatMap((l) => l.notes.map((n) => ({ ...n, company: l.company })))
+    .filter((n) => n.date === todayStr());
+
+  const todaysCalls =
+    activityLogs.filter((a) => a.type === "call" && a.date === todayStr()).length +
+    allNotesToday.filter((n) => n.type === "call").length;
+  const todaysEmails =
+    activityLogs.filter((a) => a.type === "email" && a.date === todayStr()).length +
+    allNotesToday.filter((n) => n.type === "email").length;
+  const todaysMeetings =
+    activityLogs.filter((a) => a.type === "meeting" && a.date === todayStr()).length +
+    allNotesToday.filter((n) => n.type === "meeting").length;
   const todaysLogs = activityLogs.filter((a) => a.date === todayStr());
 
+  const selectedLead = leads.find((l) => l.id === activityLeadId);
+
   const handleLogActivity = async () => {
-    await onAddActivity(activityType, activityNote.trim(), todayStr());
+    if (activityLeadId) {
+      const fallback =
+        activityType === "call" ? "Arama yapıldı" : activityType === "email" ? "Mail gönderildi" : "Toplantı yapıldı";
+      await onAddNote(activityLeadId, activityNote.trim() || fallback, activityType);
+    } else {
+      await onAddActivity(activityType, activityNote.trim(), todayStr());
+    }
     setActivityNote("");
   };
 
@@ -99,6 +117,18 @@ export default function DailyTasks({
         </p>
 
         <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={activityLeadId}
+            onChange={(e) => setActivityLeadId(e.target.value)}
+            className="input !w-56"
+          >
+            <option value="">Firma seç (opsiyonel)</option>
+            {leads.map((l) => (
+              <option key={l.id} value={l.id}>
+                {l.company}
+              </option>
+            ))}
+          </select>
           <div className="flex gap-1 bg-ink/5 rounded-lg p-1">
             <button
               onClick={() => setActivityType("call")}
@@ -139,6 +169,32 @@ export default function DailyTasks({
             Ekle
           </button>
         </div>
+
+        {selectedLead && (
+          <div className="mt-4 bg-violet-50/60 border border-violet-200 rounded-lg p-3">
+            <div className="text-xs font-semibold text-violet-800 mb-2">
+              {selectedLead.company} — Geçmiş Aktiviteler ({selectedLead.notes.length})
+            </div>
+            <div className="flex flex-col gap-1.5 max-h-56 overflow-y-auto">
+              {selectedLead.notes.length === 0 && (
+                <div className="text-xs text-ink/30">Bu firma için henüz kayıt yok.</div>
+              )}
+              {selectedLead.notes.map((n) => (
+                <div key={n.id} className="bg-white border border-mist rounded-lg px-3 py-2">
+                  <div className="flex items-center gap-2 text-[11px] font-mono text-ink/35 mb-0.5">
+                    <span>{n.date}</span>
+                    <span className="text-ink/20">·</span>
+                    <span>
+                      {ACTIVITY_TYPES.find((t) => t.id === n.type)?.icon}{" "}
+                      {ACTIVITY_TYPES.find((t) => t.id === n.type)?.label || "Not"}
+                    </span>
+                  </div>
+                  <div className="text-sm text-ink/80">{n.text}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </Section>
 
       {/* Takip listesi */}
@@ -330,7 +386,12 @@ export default function DailyTasks({
             activityPopup === "call" ? "Bugünkü Aramalar" : activityPopup === "email" ? "Bugünkü Mailler" : "Alınan Toplantılar"
           }
           icon={activityPopup === "call" ? "📞" : activityPopup === "email" ? "✉️" : "🤝"}
-          entries={activityLogs.filter((a) => a.type === activityPopup && a.date === todayStr())}
+          entries={[
+            ...activityLogs.filter((a) => a.type === activityPopup && a.date === todayStr()),
+            ...allNotesToday
+              .filter((n) => n.type === activityPopup)
+              .map((n) => ({ id: n.id, note: `${n.company}: ${n.text}` })),
+          ]}
           onClose={() => setActivityPopup(null)}
           onDelete={onDeleteActivity}
         />
