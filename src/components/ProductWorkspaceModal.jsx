@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CONTENT_TYPES, CONTENT_STATUSES, CAMPAIGN_CHANNELS } from "../data/store";
+import { CONTENT_TYPES, CONTENT_STATUSES, CAMPAIGN_CHANNELS, PRODUCTS } from "../data/store";
 
 export default function ProductWorkspaceModal({
   product,
@@ -14,6 +14,7 @@ export default function ProductWorkspaceModal({
   onAddTask,
   onToggleTask,
   onDeleteTask,
+  onUpdateTaskProduct,
   onClose,
 }) {
   const label = product || "Genel (ürünsüz)";
@@ -62,6 +63,8 @@ export default function ProductWorkspaceModal({
             onAdd={(title, dueDate) => onAddTask(title, dueDate, "", product)}
             onToggle={onToggleTask}
             onDelete={onDeleteTask}
+            onMove={onUpdateTaskProduct}
+            currentProduct={product}
           />
         </div>
       </div>
@@ -244,7 +247,7 @@ function ProductCampaignBlock({ items, onAdd, onDelete }) {
   );
 }
 
-function ProductTaskBlock({ items, onAdd, onToggle, onDelete }) {
+function ProductTaskBlock({ items, onAdd, onToggle, onDelete, onMove, currentProduct }) {
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [showDone, setShowDone] = useState(false);
@@ -291,6 +294,21 @@ function ProductTaskBlock({ items, onAdd, onToggle, onDelete }) {
                 <span className="text-[11px] font-mono px-1.5 py-0.5 rounded border bg-mist/60 text-ink/40 border-mist">
                   {t.dueDate}
                 </span>
+              )}
+              {onMove && (
+                <select
+                  value={currentProduct}
+                  onChange={(e) => onMove(t.id, e.target.value)}
+                  className="text-[11px] border border-mist rounded px-1 py-0.5 text-ink/50 outline-none cursor-pointer"
+                  title="Başka bir ürüne taşı"
+                >
+                  <option value="">Genel</option>
+                  {PRODUCTS.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </select>
               )}
               <button onClick={() => onDelete(t.id)} className="text-ink/25 hover:text-rose-500 text-sm">
                 ×

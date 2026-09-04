@@ -21,6 +21,7 @@ import {
   insertTask,
   updateTaskDone,
   updateTaskDescription,
+  updateTaskProduct,
   deleteTask,
   fetchMarketingContent,
   insertMarketingContent,
@@ -221,6 +222,15 @@ export default function App() {
     );
     try {
       await updateTaskDescription(id, description);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
+  const handleUpdateTaskProduct = async (id, product) => {
+    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, product } : t)));
+    try {
+      await updateTaskProduct(id, product);
     } catch (e) {
       setLoadError(e.message);
     }
@@ -436,6 +446,7 @@ export default function App() {
                 onAddMarketNote={handleAddMarketNote}
                 onDeleteMarketNote={handleDeleteMarketNote}
                 onOpenLinkedInStrategy={() => setView("linkedin_strategy")}
+                onUpdateTaskProduct={handleUpdateTaskProduct}
               />
             )}
             {view === "linkedin_strategy" && (

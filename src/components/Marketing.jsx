@@ -26,6 +26,7 @@ export default function Marketing({
   onAddMarketNote,
   onDeleteMarketNote,
   onOpenLinkedInStrategy,
+  onUpdateTaskProduct,
 }) {
   const [activeProduct, setActiveProduct] = useState(null); // null kapali, "" = Genel, urun adi
 
@@ -128,6 +129,7 @@ export default function Marketing({
           onAddTask={onAddMarketingTask}
           onToggleTask={onToggleTask}
           onDeleteTask={onDeleteTask}
+          onUpdateTaskProduct={onUpdateTaskProduct}
           onClose={() => setActiveProduct(null)}
         />
       )}
