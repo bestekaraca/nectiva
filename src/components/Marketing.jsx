@@ -365,14 +365,15 @@ function CampaignSection({ campaigns, onAdd, onDelete }) {
 }
 
 function MailMarketingSection({ leads, entries, onAdd, onDelete }) {
-  const [leadId, setLeadId] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [campaign, setCampaign] = useState("");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [expanded, setExpanded] = useState(false);
 
   const handleAdd = async () => {
-    if (!leadId) return;
-    await onAdd(leadId, campaign.trim(), date);
+    if (!companyName.trim()) return;
+    await onAdd(companyName.trim(), campaign.trim(), date);
+    setCompanyName("");
     setCampaign("");
   };
 
@@ -384,15 +385,20 @@ function MailMarketingSection({ leads, entries, onAdd, onDelete }) {
 
   return (
     <Section title="Mail Marketing Takibi" subtitle="Hangi firmaya kaç kere mail marketing yapıldığını kaydet">
+      <datalist id="mail-marketing-companies">
+        {leads.map((l) => (
+          <option key={l.id} value={l.company} />
+        ))}
+      </datalist>
       <div className="flex flex-wrap gap-2 mb-4">
-        <select value={leadId} onChange={(e) => setLeadId(e.target.value)} className="input flex-1 min-w-[180px]">
-          <option value="">Firma seç...</option>
-          {leads.map((l) => (
-            <option key={l.id} value={l.id}>
-              {l.company}
-            </option>
-          ))}
-        </select>
+        <input
+          list="mail-marketing-companies"
+          value={companyName}
+          onChange={(e) => setCompanyName(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+          placeholder="Firma adı yaz..."
+          className="input flex-1 min-w-[180px]"
+        />
         <input
           value={campaign}
           onChange={(e) => setCampaign(e.target.value)}
@@ -403,12 +409,15 @@ function MailMarketingSection({ leads, entries, onAdd, onDelete }) {
         <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="input font-mono !w-auto" />
         <button
           onClick={handleAdd}
-          disabled={!leadId}
+          disabled={!companyName.trim()}
           className="px-4 py-2 bg-gradient-to-r from-violet-600 to-blue-500 text-white text-sm font-medium rounded-lg hover:shadow-glow-sm disabled:opacity-50 shrink-0"
         >
           Ekle
         </button>
       </div>
+      <p className="text-[11px] text-ink/30 mb-3">
+        Pipeline'da kayıtlı bir firma adı yazarsan, o firmanın not geçmişine de otomatik "Mail" olarak işlenir.
+      </p>
 
       {summaryList.length === 0 ? (
         <div className="text-sm text-ink/30">Henüz mail marketing kaydı yok.</div>

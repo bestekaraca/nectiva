@@ -274,9 +274,15 @@ export default function App() {
     }
   };
 
-  const handleAddMarketingEmail = async (leadId, campaign, date) => {
-    const item = await insertMarketingEmail(leadId, campaign, date, session.user.id);
+  const handleAddMarketingEmail = async (companyName, campaign, date) => {
+    const matched = leads.find(
+      (l) => l.company.trim().toLowerCase() === companyName.trim().toLowerCase()
+    );
+    const item = await insertMarketingEmail(companyName, matched?.id || null, campaign, date, session.user.id);
     setMarketingEmails((prev) => [item, ...prev]);
+    if (matched) {
+      await handleAddNote(matched.id, `Mail marketing gönderildi${campaign ? `: ${campaign}` : ""}`, "email");
+    }
   };
   const handleDeleteMarketingEmail = async (id) => {
     setMarketingEmails((prev) => prev.filter((e) => e.id !== id));

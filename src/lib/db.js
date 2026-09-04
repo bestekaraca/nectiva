@@ -404,23 +404,23 @@ export async function fetchMarketingEmails() {
   return data.map((e) => ({
     id: e.id,
     leadId: e.lead_id,
-    company: e.leads?.company || "—",
+    company: e.leads?.company || e.company_text || "—",
     campaign: e.campaign,
     date: e.date,
   }));
 }
 
-export async function insertMarketingEmail(leadId, campaign, date, userId) {
+export async function insertMarketingEmail(companyText, leadId, campaign, date, userId) {
   const { data, error } = await supabase
     .from("marketing_emails")
-    .insert({ lead_id: leadId, campaign, date, user_id: userId })
+    .insert({ lead_id: leadId || null, company_text: companyText, campaign, date, user_id: userId })
     .select("*, leads(company)")
     .single();
   if (error) throw error;
   return {
     id: data.id,
     leadId: data.lead_id,
-    company: data.leads?.company || "—",
+    company: data.leads?.company || data.company_text || "—",
     campaign: data.campaign,
     date: data.date,
   };
