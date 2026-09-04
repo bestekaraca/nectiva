@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createLead, SECTORS, SOURCES, TEMPERATURES } from "../data/store";
+import { createLead, SOURCES, TEMPERATURES } from "../data/store";
 
 export default function NewLeadModal({ onClose, onCreate }) {
   const [company, setCompany] = useState("");
@@ -79,12 +79,12 @@ export default function NewLeadModal({ onClose, onCreate }) {
             className="input font-mono"
           />
           <div className="grid grid-cols-2 gap-2">
-            <select value={sector} onChange={(e) => setSector(e.target.value)} className="input">
-              <option value="">Sektör</option>
-              {SECTORS.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
+            <input
+              value={sector}
+              onChange={(e) => setSector(e.target.value)}
+              placeholder="Sektör"
+              className="input"
+            />
             <select value={source} onChange={(e) => setSource(e.target.value)} className="input">
               <option value="">Kaynak</option>
               {SOURCES.map((s) => (

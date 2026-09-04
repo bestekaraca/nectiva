@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import {
   STAGES,
-  SECTORS,
   SOURCES,
   PRODUCTS,
   PRODUCT_BADGE,
@@ -158,16 +157,12 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                   />
                 </Field>
                 <Field label="Sektör">
-                  <select
+                  <input
                     value={form.sector}
                     onChange={(e) => update("sector", e.target.value)}
                     className="input"
-                  >
-                    <option value="">Seçilmedi</option>
-                    {SECTORS.map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
+                    placeholder="Örn: Otomotiv"
+                  />
                 </Field>
                 <Field label="Sıcaklık">
                   <select
