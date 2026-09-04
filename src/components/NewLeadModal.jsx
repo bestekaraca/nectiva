@@ -5,6 +5,7 @@ export default function NewLeadModal({ onClose, onCreate }) {
   const [company, setCompany] = useState("");
   const [contactName, setContactName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [value, setValue] = useState("");
   const [sector, setSector] = useState("");
   const [source, setSource] = useState("");
@@ -20,6 +21,7 @@ export default function NewLeadModal({ onClose, onCreate }) {
         company: company.trim(),
         contactName: contactName.trim(),
         phone: phone.trim(),
+        email: email.trim(),
         value: Number(value) || 0,
         sector,
         source,
@@ -62,13 +64,20 @@ export default function NewLeadModal({ onClose, onCreate }) {
               className="input"
             />
             <input
-              type="number"
-              placeholder="Tahmini değer (€)"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              className="input font-mono"
+              type="email"
+              placeholder="E-posta"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input"
             />
           </div>
+          <input
+            type="number"
+            placeholder="Tahmini değer (€)"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            className="input font-mono"
+          />
           <div className="grid grid-cols-2 gap-2">
             <select value={sector} onChange={(e) => setSector(e.target.value)} className="input">
               <option value="">Sektör</option>

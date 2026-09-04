@@ -69,7 +69,7 @@ export const SECTORS = [
 export const SOURCES = [
   "Referans",
   "Web sitesi",
-  "Sosyal medya",
+  "LinkedIn",
   "Soğuk arama",
   "Fuar / Etkinlik",
   "Diğer",
