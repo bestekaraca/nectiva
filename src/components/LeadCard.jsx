@@ -14,6 +14,8 @@ export default function LeadCard({ lead, stageColor, onOpen, onDragStart }) {
   const today = isToday(lead.nextActionDate);
   const tempInfo = TEMPERATURES.find((t) => t.id === lead.temperature);
   const meetingCount = lead.notes.filter((n) => n.type === "meeting").length;
+  const callCount = lead.notes.filter((n) => n.type === "call").length;
+  const emailCount = lead.notes.filter((n) => n.type === "email").length;
 
   return (
     <div
@@ -35,6 +37,22 @@ export default function LeadCard({ lead, stageColor, onOpen, onDragStart }) {
           {formatCurrency(lead.value)}
         </span>
         <div className="flex items-center gap-1.5">
+          {callCount > 0 && (
+            <span
+              className="text-[11px] font-medium px-1.5 py-0.5 rounded border bg-blue-50 text-blue-700 border-blue-200"
+              title={`${callCount} arama yapıldı`}
+            >
+              📞 {callCount}
+            </span>
+          )}
+          {emailCount > 0 && (
+            <span
+              className="text-[11px] font-medium px-1.5 py-0.5 rounded border bg-violet-50 text-violet-700 border-violet-200"
+              title={`${emailCount} mail atıldı`}
+            >
+              ✉️ {emailCount}
+            </span>
+          )}
           {meetingCount > 0 && (
             <span
               className="text-[11px] font-medium px-1.5 py-0.5 rounded border bg-emerald-50 text-emerald-700 border-emerald-200"
