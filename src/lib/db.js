@@ -270,6 +270,11 @@ export async function updateTaskDone(id, done) {
   if (error) throw error;
 }
 
+export async function updateTaskDescription(id, description) {
+  const { error } = await supabase.from("tasks").update({ description }).eq("id", id);
+  if (error) throw error;
+}
+
 export async function deleteTask(id) {
   const { error } = await supabase.from("tasks").delete().eq("id", id);
   if (error) throw error;

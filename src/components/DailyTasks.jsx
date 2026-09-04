@@ -18,6 +18,7 @@ export default function DailyTasks({
   onDeleteActivity,
   tasks,
   onAddTask,
+  onUpdateTaskDescription,
   onToggleTask,
   onDeleteTask,
 }) {
@@ -27,6 +28,8 @@ export default function DailyTasks({
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDue, setTaskDue] = useState(todayStr());
   const [taskDescription, setTaskDescription] = useState("");
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editingText, setEditingText] = useState("");
   const [showDone, setShowDone] = useState(false);
   const [showCompletedFollowUps, setShowCompletedFollowUps] = useState(false);
   const [activityPopup, setActivityPopup] = useState(null); // null | 'call' | 'email' | 'meeting'
@@ -310,8 +313,48 @@ export default function DailyTasks({
                   />
                   <span>
                     <span className="text-sm text-ink/80 block">{t.title}</span>
-                    {t.description && (
-                      <span className="text-xs text-ink/40 block mt-0.5">{t.description}</span>
+                    {editingTaskId === t.id ? (
+                      <input
+                        autoFocus
+                        value={editingText}
+                        onChange={(e) => setEditingText(e.target.value)}
+                        onClick={(e) => e.preventDefault()}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            onUpdateTaskDescription(t.id, editingText.trim());
+                            setEditingTaskId(null);
+                          }
+                          if (e.key === "Escape") setEditingTaskId(null);
+                        }}
+                        onBlur={() => {
+                          onUpdateTaskDescription(t.id, editingText.trim());
+                          setEditingTaskId(null);
+                        }}
+                        placeholder="Açıklama..."
+                        className="text-xs mt-0.5 w-full border-b border-violet-300 outline-none bg-transparent"
+                      />
+                    ) : t.description ? (
+                      <span
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setEditingTaskId(t.id);
+                          setEditingText(t.description);
+                        }}
+                        className="text-xs text-ink/40 block mt-0.5 hover:text-violet-600 cursor-text"
+                      >
+                        {t.description}
+                      </span>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setEditingTaskId(t.id);
+                          setEditingText("");
+                        }}
+                        className="text-xs text-violet-400 hover:text-violet-600 block mt-0.5"
+                      >
+                        + Açıklama ekle
+                      </button>
                     )}
                   </span>
                 </label>

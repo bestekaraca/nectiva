@@ -20,6 +20,7 @@ import {
   fetchTasks,
   insertTask,
   updateTaskDone,
+  updateTaskDescription,
   deleteTask,
   fetchMarketingContent,
   insertMarketingContent,
@@ -211,6 +212,15 @@ export default function App() {
     setTasks((prev) => [...prev, task].sort((a, b) => (a.dueDate || "9999") < (b.dueDate || "9999") ? -1 : 1));
   };
 
+  const handleUpdateTaskDescription = async (id, description) => {
+    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, description } : t)));
+    try {
+      await updateTaskDescription(id, description);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
   const handleToggleTask = async (id, done) => {
     setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, done } : t)));
     try {
@@ -389,6 +399,7 @@ export default function App() {
                 onDeleteActivity={handleDeleteActivity}
                 tasks={tasks}
                 onAddTask={handleAddTask}
+                onUpdateTaskDescription={handleUpdateTaskDescription}
                 onToggleTask={handleToggleTask}
                 onDeleteTask={handleDeleteTask}
               />
