@@ -343,6 +343,9 @@ export default function DailyTasks({
                         className="text-xs text-ink/40 block mt-0.5 hover:text-violet-600 cursor-text"
                       >
                         {t.description}
+                        {t.descriptionDate && (
+                          <span className="text-ink/25 font-mono"> · {t.descriptionDate}</span>
+                        )}
                       </span>
                     ) : (
                       <button

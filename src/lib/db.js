@@ -242,6 +242,7 @@ export async function fetchTasks() {
     id: t.id,
     title: t.title,
     description: t.description || "",
+    descriptionDate: t.description_date,
     dueDate: t.due_date,
     done: t.done,
     category: t.category || "genel",
@@ -251,7 +252,14 @@ export async function fetchTasks() {
 export async function insertTask(title, dueDate, userId, category = "genel", description = "") {
   const { data, error } = await supabase
     .from("tasks")
-    .insert({ title, due_date: dueDate || null, user_id: userId, category, description })
+    .insert({
+      title,
+      due_date: dueDate || null,
+      user_id: userId,
+      category,
+      description,
+      description_date: description ? new Date().toISOString().slice(0, 10) : null,
+    })
     .select()
     .single();
   if (error) throw error;
@@ -259,6 +267,7 @@ export async function insertTask(title, dueDate, userId, category = "genel", des
     id: data.id,
     title: data.title,
     description: data.description || "",
+    descriptionDate: data.description_date,
     dueDate: data.due_date,
     done: data.done,
     category: data.category,
@@ -271,7 +280,13 @@ export async function updateTaskDone(id, done) {
 }
 
 export async function updateTaskDescription(id, description) {
-  const { error } = await supabase.from("tasks").update({ description }).eq("id", id);
+  const { error } = await supabase
+    .from("tasks")
+    .update({
+      description,
+      description_date: description ? new Date().toISOString().slice(0, 10) : null,
+    })
+    .eq("id", id);
   if (error) throw error;
 }
 

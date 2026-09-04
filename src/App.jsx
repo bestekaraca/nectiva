@@ -213,7 +213,12 @@ export default function App() {
   };
 
   const handleUpdateTaskDescription = async (id, description) => {
-    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, description } : t)));
+    const today = new Date().toISOString().slice(0, 10);
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === id ? { ...t, description, descriptionDate: description ? today : null } : t
+      )
+    );
     try {
       await updateTaskDescription(id, description);
     } catch (e) {
