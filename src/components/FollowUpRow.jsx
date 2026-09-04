@@ -14,10 +14,13 @@ export default function FollowUpRow({ lead, onOpenLead, onSetFollowUp, onUpdateF
   const [busy, setBusy] = useState(false);
   const [rescheduleDate, setRescheduleDate] = useState(lead.nextActionDate || "");
   const [rescheduleNote, setRescheduleNote] = useState(lead.nextActionNote || "");
+  const [pendingStatus, setPendingStatus] = useState(null);
+  const [statusNoteText, setStatusNoteText] = useState("");
 
   const overdue = isOverdue(lead.nextActionDate);
   const currentBadge =
-    FOLLOWUP_STATUSES.find((s) => s.id === lead.followupStatus)?.badge || FOLLOWUP_STATUSES[2].badge;
+    FOLLOWUP_STATUSES.find((s) => s.id === (pendingStatus || lead.followupStatus))?.badge ||
+    FOLLOWUP_STATUSES[2].badge;
   const lastNote = lead.notes[0];
   const sinceLast = lastNote ? daysAgo(lastNote.date) : null;
 
@@ -32,11 +35,24 @@ export default function FollowUpRow({ lead, onOpenLead, onSetFollowUp, onUpdateF
     }
   };
 
-  const handleStatusChange = async (newStatus) => {
-    const label = FOLLOWUP_STATUSES.find((s) => s.id === newStatus)?.label || newStatus;
-    await onUpdateFollowUpStatus(lead.id, newStatus);
-    // Durum degisikligi de bir temas say - "son temas" bu yuzden guncellenir.
-    await onAddNote(lead.id, `Durum güncellendi: ${label}`, "note");
+  const handleStatusChange = (newStatus) => {
+    setPendingStatus(newStatus);
+    setStatusNoteText("");
+  };
+
+  const handleConfirmStatus = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const label = FOLLOWUP_STATUSES.find((s) => s.id === pendingStatus)?.label || pendingStatus;
+      const noteType = pendingStatus === "arandi" ? "call" : "note";
+      await onUpdateFollowUpStatus(lead.id, pendingStatus);
+      await onAddNote(lead.id, statusNoteText.trim() || `Durum güncellendi: ${label}`, noteType);
+      setPendingStatus(null);
+      setStatusNoteText("");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const handleReschedule = async () => {
@@ -83,7 +99,7 @@ export default function FollowUpRow({ lead, onOpenLead, onSetFollowUp, onUpdateF
             {lead.nextActionDate}
           </span>
           <select
-            value={lead.followupStatus}
+            value={pendingStatus || lead.followupStatus}
             onChange={(e) => handleStatusChange(e.target.value)}
             className={`text-xs font-semibold px-2.5 py-1 rounded-full border cursor-pointer outline-none appearance-none ${currentBadge}`}
           >
@@ -102,6 +118,35 @@ export default function FollowUpRow({ lead, onOpenLead, onSetFollowUp, onUpdateF
           </button>
         </div>
       </div>
+
+      {pendingStatus && (
+        <div className="border-t border-violet-200 bg-violet-50/60 px-3 py-2.5 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium text-violet-800 shrink-0">
+            {FOLLOWUP_STATUSES.find((s) => s.id === pendingStatus)?.label} — ne oldu?
+          </span>
+          <input
+            autoFocus
+            value={statusNoteText}
+            onChange={(e) => setStatusNoteText(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleConfirmStatus()}
+            placeholder="Örn: Aradım ama açmadı"
+            className="input flex-1 min-w-[160px] text-xs"
+          />
+          <button
+            onClick={handleConfirmStatus}
+            disabled={busy}
+            className="px-3 py-1.5 bg-violet-600 text-white text-xs font-medium rounded-lg hover:bg-violet-700 disabled:opacity-50 shrink-0"
+          >
+            Kaydet
+          </button>
+          <button
+            onClick={() => setPendingStatus(null)}
+            className="text-xs text-ink/40 hover:text-ink shrink-0"
+          >
+            Vazgeç
+          </button>
+        </div>
+      )}
 
       {expanded && (
         <div className="border-t border-mist bg-paper/60 px-3 py-3 flex flex-col gap-3">

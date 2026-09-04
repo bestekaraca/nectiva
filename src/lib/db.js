@@ -241,20 +241,28 @@ export async function fetchTasks() {
   return data.map((t) => ({
     id: t.id,
     title: t.title,
+    description: t.description || "",
     dueDate: t.due_date,
     done: t.done,
     category: t.category || "genel",
   }));
 }
 
-export async function insertTask(title, dueDate, userId, category = "genel") {
+export async function insertTask(title, dueDate, userId, category = "genel", description = "") {
   const { data, error } = await supabase
     .from("tasks")
-    .insert({ title, due_date: dueDate || null, user_id: userId, category })
+    .insert({ title, due_date: dueDate || null, user_id: userId, category, description })
     .select()
     .single();
   if (error) throw error;
-  return { id: data.id, title: data.title, dueDate: data.due_date, done: data.done, category: data.category };
+  return {
+    id: data.id,
+    title: data.title,
+    description: data.description || "",
+    dueDate: data.due_date,
+    done: data.done,
+    category: data.category,
+  };
 }
 
 export async function updateTaskDone(id, done) {

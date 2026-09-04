@@ -206,8 +206,8 @@ export default function App() {
     }
   };
 
-  const handleAddTask = async (title, dueDate) => {
-    const task = await insertTask(title, dueDate, session.user.id);
+  const handleAddTask = async (title, dueDate, description = "") => {
+    const task = await insertTask(title, dueDate, session.user.id, "genel", description);
     setTasks((prev) => [...prev, task].sort((a, b) => (a.dueDate || "9999") < (b.dueDate || "9999") ? -1 : 1));
   };
 
@@ -277,8 +277,8 @@ export default function App() {
     }
   };
 
-  const handleAddMarketingTask = async (title, dueDate) => {
-    const task = await insertTask(title, dueDate, session.user.id, "marketing");
+  const handleAddMarketingTask = async (title, dueDate, description = "") => {
+    const task = await insertTask(title, dueDate, session.user.id, "marketing", description);
     setTasks((prev) => [...prev, task]);
   };
 

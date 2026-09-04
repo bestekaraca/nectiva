@@ -26,6 +26,7 @@ export default function DailyTasks({
   const [activityLeadId, setActivityLeadId] = useState("");
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDue, setTaskDue] = useState(todayStr());
+  const [taskDescription, setTaskDescription] = useState("");
   const [showDone, setShowDone] = useState(false);
   const [showCompletedFollowUps, setShowCompletedFollowUps] = useState(false);
   const [activityPopup, setActivityPopup] = useState(null); // null | 'call' | 'email' | 'meeting'
@@ -94,7 +95,8 @@ export default function DailyTasks({
 
   const handleAddTask = async () => {
     if (!taskTitle.trim()) return;
-    await onAddTask(taskTitle.trim(), taskDue || null);
+    await onAddTask(taskTitle.trim(), taskDue || null, taskDescription.trim());
+    setTaskDescription("");
     setTaskTitle("");
   };
 
@@ -258,7 +260,7 @@ export default function DailyTasks({
           <StatBox icon="🕓" label="Açık" count={openTasks.length} accent="amber" />
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 mb-2">
           <input
             value={taskTitle}
             onChange={(e) => setTaskTitle(e.target.value)}
@@ -279,6 +281,13 @@ export default function DailyTasks({
             Ekle
           </button>
         </div>
+        <input
+          value={taskDescription}
+          onChange={(e) => setTaskDescription(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleAddTask()}
+          placeholder="Açıklama (opsiyonel, örn: hangi bölümler dahil olacak)"
+          className="input mb-4"
+        />
 
         <div className="flex flex-col gap-2">
           {openTasks.length === 0 && (
@@ -292,14 +301,19 @@ export default function DailyTasks({
                 key={t.id}
                 className="flex items-center justify-between bg-white border border-mist rounded-lg px-3 py-2.5"
               >
-                <label className="flex items-center gap-2.5 cursor-pointer flex-1">
+                <label className="flex items-start gap-2.5 cursor-pointer flex-1">
                   <input
                     type="checkbox"
                     checked={false}
                     onChange={() => onToggleTask(t.id, true)}
-                    className="w-4 h-4 accent-violet-600"
+                    className="w-4 h-4 accent-violet-600 mt-0.5"
                   />
-                  <span className="text-sm text-ink/80">{t.title}</span>
+                  <span>
+                    <span className="text-sm text-ink/80 block">{t.title}</span>
+                    {t.description && (
+                      <span className="text-xs text-ink/40 block mt-0.5">{t.description}</span>
+                    )}
+                  </span>
                 </label>
                 <div className="flex items-center gap-2 shrink-0">
                   {t.dueDate && (
