@@ -246,10 +246,11 @@ export async function fetchTasks() {
     dueDate: t.due_date,
     done: t.done,
     category: t.category || "genel",
+    product: t.product || "",
   }));
 }
 
-export async function insertTask(title, dueDate, userId, category = "genel", description = "") {
+export async function insertTask(title, dueDate, userId, category = "genel", description = "", product = "") {
   const { data, error } = await supabase
     .from("tasks")
     .insert({
@@ -259,6 +260,7 @@ export async function insertTask(title, dueDate, userId, category = "genel", des
       category,
       description,
       description_date: description ? new Date().toISOString().slice(0, 10) : null,
+      product,
     })
     .select()
     .single();
@@ -271,6 +273,7 @@ export async function insertTask(title, dueDate, userId, category = "genel", des
     dueDate: data.due_date,
     done: data.done,
     category: data.category,
+    product: data.product || "",
   };
 }
 

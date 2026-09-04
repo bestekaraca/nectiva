@@ -298,8 +298,8 @@ export default function App() {
     }
   };
 
-  const handleAddMarketingTask = async (title, dueDate, description = "") => {
-    const task = await insertTask(title, dueDate, session.user.id, "marketing", description);
+  const handleAddMarketingTask = async (title, dueDate, description = "", product = "") => {
+    const task = await insertTask(title, dueDate, session.user.id, "marketing", description, product);
     setTasks((prev) => [...prev, task]);
   };
 
