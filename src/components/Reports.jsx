@@ -12,7 +12,6 @@ import {
   LabelList,
 } from "recharts";
 import { STAGES, PRODUCTS, formatCurrency } from "../data/store";
-import MonthlyTargetsPanel from "./MonthlyTargetsPanel";
 
 const STAGE_HEX = {
   blue: "#3B82F6",
@@ -83,7 +82,7 @@ function countActivities(leads, activityLogs, start, end) {
   };
 }
 
-export default function Reports({ leads, activityLogs, monthlyTargets, onSaveMonthlyTarget }) {
+export default function Reports({ leads, activityLogs }) {
   const [rangeMode, setRangeMode] = useState("thisWeek");
   const [customStart, setCustomStart] = useState(addDays(toISO(new Date()), -6));
   const [customEnd, setCustomEnd] = useState(toISO(new Date()));
@@ -280,18 +279,6 @@ export default function Reports({ leads, activityLogs, monthlyTargets, onSaveMon
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-      </Section>
-
-      <Section
-        title="Aylık Hedefler"
-        subtitle="Herhangi bir ay ve ürün için arama/mail/toplantı hedefi gir, gerçekleşenle karşılaştır"
-      >
-        <MonthlyTargetsPanel
-          leads={leads}
-          activityLogs={activityLogs}
-          targets={monthlyTargets}
-          onSaveTarget={onSaveMonthlyTarget}
-        />
       </Section>
     </div>
   );

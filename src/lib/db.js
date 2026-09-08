@@ -562,3 +562,24 @@ export async function upsertMonthlyTarget(
     targetMeetings: data.target_meetings || 0,
   };
 }
+
+// --- Aylik strateji notu ------------------------------------------------------
+
+export async function fetchMonthlyPlanNotes() {
+  const { data, error } = await supabase.from("monthly_plan_notes").select("*");
+  if (error) throw error;
+  return data.map((r) => ({ id: r.id, month: r.month, note: r.note || "" }));
+}
+
+export async function upsertMonthlyPlanNote(month, note, userId) {
+  const { data, error } = await supabase
+    .from("monthly_plan_notes")
+    .upsert(
+      { user_id: userId, month, note, updated_at: new Date().toISOString() },
+      { onConflict: "user_id,month" }
+    )
+    .select()
+    .single();
+  if (error) throw error;
+  return { id: data.id, month: data.month, note: data.note || "" };
+}

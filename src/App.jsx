@@ -42,6 +42,8 @@ import {
   deleteStrategyRow,
   fetchMonthlyTargets,
   upsertMonthlyTarget,
+  fetchMonthlyPlanNotes,
+  upsertMonthlyPlanNote,
 } from "./lib/db";
 import { isToday } from "./data/store";
 import Sidebar from "./components/Sidebar";
@@ -50,6 +52,7 @@ import Pipeline from "./components/Pipeline";
 import Contacts from "./components/Contacts";
 import DailyTasks from "./components/DailyTasks";
 import Marketing from "./components/Marketing";
+import MonthlyPlanning from "./components/MonthlyPlanning";
 const LinkedInStrategy = lazy(() => import("./components/LinkedInStrategy"));
 import LeadModal from "./components/LeadModal";
 import NewLeadModal from "./components/NewLeadModal";
@@ -72,6 +75,7 @@ export default function App() {
   const [marketNotes, setMarketNotes] = useState([]);
   const [strategyData, setStrategyData] = useState({});
   const [monthlyTargets, setMonthlyTargets] = useState([]);
+  const [monthlyPlanNotes, setMonthlyPlanNotes] = useState([]);
   const [loadingLeads, setLoadingLeads] = useState(false);
   const [loadError, setLoadError] = useState(null);
   const [view, setView] = useState("dashboard");
@@ -101,6 +105,7 @@ export default function App() {
     fetchMarketNotes().then(setMarketNotes).catch((e) => setLoadError(e.message));
     fetchStrategyRows().then(setStrategyData).catch((e) => setLoadError(e.message));
     fetchMonthlyTargets().then(setMonthlyTargets).catch((e) => setLoadError(e.message));
+    fetchMonthlyPlanNotes().then(setMonthlyPlanNotes).catch((e) => setLoadError(e.message));
   }, [session]);
 
   if (session === undefined) {
@@ -378,6 +383,19 @@ export default function App() {
     });
   };
 
+  const handleSavePlanNote = async (month, note) => {
+    const saved = await upsertMonthlyPlanNote(month, note, session.user.id);
+    setMonthlyPlanNotes((prev) => {
+      const idx = prev.findIndex((n) => n.month === saved.month);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = saved;
+        return next;
+      }
+      return [...prev, saved];
+    });
+  };
+
   const todayCount = leads.filter(
     (l) => isToday(l.nextActionDate) && l.followupStatus !== "arandi"
   ).length;
@@ -442,6 +460,26 @@ export default function App() {
                 onDeleteTask={handleDeleteTask}
               />
             )}
+            {view === "monthly" && (
+              <MonthlyPlanning
+                leads={leads}
+                activityLogs={activityLogs}
+                tasks={tasks}
+                onAddTask={handleAddTask}
+                onToggleTask={handleToggleTask}
+                onDeleteTask={handleDeleteTask}
+                goal={goal}
+                saleEntries={saleEntries}
+                content={marketingContent}
+                campaigns={campaigns}
+                onAddContent={handleAddContent}
+                onUpdateContentStatus={handleUpdateContentStatus}
+                monthlyTargets={monthlyTargets}
+                onSaveMonthlyTarget={handleSaveMonthlyTarget}
+                monthlyPlanNotes={monthlyPlanNotes}
+                onSavePlanNote={handleSavePlanNote}
+              />
+            )}
             {view === "marketing" && (
               <Marketing
                 leads={leads}
@@ -479,12 +517,7 @@ export default function App() {
             )}
             {view === "reports" && (
               <Suspense fallback={<div className="text-sm text-ink/40">Yükleniyor...</div>}>
-                <Reports
-                  leads={leads}
-                  activityLogs={activityLogs}
-                  monthlyTargets={monthlyTargets}
-                  onSaveMonthlyTarget={handleSaveMonthlyTarget}
-                />
+                <Reports leads={leads} activityLogs={activityLogs} />
               </Suspense>
             )}
           </>
