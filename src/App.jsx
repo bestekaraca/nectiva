@@ -44,6 +44,10 @@ import {
   upsertMonthlyTarget,
   fetchMonthlyPlanNotes,
   upsertMonthlyPlanNote,
+  fetchScorecardItems,
+  insertScorecardItem,
+  updateScorecardActual,
+  deleteScorecardItem,
 } from "./lib/db";
 import { isToday } from "./data/store";
 import Sidebar from "./components/Sidebar";
@@ -76,6 +80,7 @@ export default function App() {
   const [strategyData, setStrategyData] = useState({});
   const [monthlyTargets, setMonthlyTargets] = useState([]);
   const [monthlyPlanNotes, setMonthlyPlanNotes] = useState([]);
+  const [scorecardItems, setScorecardItems] = useState([]);
   const [loadingLeads, setLoadingLeads] = useState(false);
   const [loadError, setLoadError] = useState(null);
   const [view, setView] = useState("dashboard");
@@ -106,6 +111,7 @@ export default function App() {
     fetchStrategyRows().then(setStrategyData).catch((e) => setLoadError(e.message));
     fetchMonthlyTargets().then(setMonthlyTargets).catch((e) => setLoadError(e.message));
     fetchMonthlyPlanNotes().then(setMonthlyPlanNotes).catch((e) => setLoadError(e.message));
+    fetchScorecardItems().then(setScorecardItems).catch((e) => setLoadError(e.message));
   }, [session]);
 
   if (session === undefined) {
@@ -396,6 +402,29 @@ export default function App() {
     });
   };
 
+  const handleAddScorecardItem = async (payload) => {
+    const item = await insertScorecardItem(payload, session.user.id);
+    setScorecardItems((prev) => [...prev, item]);
+  };
+
+  const handleUpdateScorecardActual = async (id, value) => {
+    setScorecardItems((prev) => prev.map((s) => (s.id === id ? { ...s, actualValue: value } : s)));
+    try {
+      await updateScorecardActual(id, value);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
+  const handleDeleteScorecardItem = async (id) => {
+    setScorecardItems((prev) => prev.filter((s) => s.id !== id));
+    try {
+      await deleteScorecardItem(id);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
   const todayCount = leads.filter(
     (l) => isToday(l.nextActionDate) && l.followupStatus !== "arandi"
   ).length;
@@ -478,6 +507,10 @@ export default function App() {
                 onSaveMonthlyTarget={handleSaveMonthlyTarget}
                 monthlyPlanNotes={monthlyPlanNotes}
                 onSavePlanNote={handleSavePlanNote}
+                scorecardItems={scorecardItems}
+                onAddScorecardItem={handleAddScorecardItem}
+                onUpdateScorecardActual={handleUpdateScorecardActual}
+                onDeleteScorecardItem={handleDeleteScorecardItem}
               />
             )}
             {view === "marketing" && (

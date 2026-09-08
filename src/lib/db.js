@@ -583,3 +583,51 @@ export async function upsertMonthlyPlanNote(month, note, userId) {
   if (error) throw error;
   return { id: data.id, month: data.month, note: data.note || "" };
 }
+
+// --- Kampanya hedef tablosu (ay bazli, elle girilen gerceklesen) -----------
+
+export async function fetchScorecardItems() {
+  const { data, error } = await supabase
+    .from("monthly_scorecard_items")
+    .select("*")
+    .order("sort_order", { ascending: true });
+  if (error) throw error;
+  return data.map((r) => ({
+    id: r.id,
+    month: r.month,
+    label: r.label,
+    targetText: r.target_text || "",
+    actualValue: r.actual_value || 0,
+    sortOrder: r.sort_order || 0,
+  }));
+}
+
+export async function insertScorecardItem({ month, label, targetText, sortOrder }, userId) {
+  const { data, error } = await supabase
+    .from("monthly_scorecard_items")
+    .insert({ user_id: userId, month, label, target_text: targetText, sort_order: sortOrder || 0 })
+    .select()
+    .single();
+  if (error) throw error;
+  return {
+    id: data.id,
+    month: data.month,
+    label: data.label,
+    targetText: data.target_text || "",
+    actualValue: data.actual_value || 0,
+    sortOrder: data.sort_order || 0,
+  };
+}
+
+export async function updateScorecardActual(id, actualValue) {
+  const { error } = await supabase
+    .from("monthly_scorecard_items")
+    .update({ actual_value: actualValue })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteScorecardItem(id) {
+  const { error } = await supabase.from("monthly_scorecard_items").delete().eq("id", id);
+  if (error) throw error;
+}

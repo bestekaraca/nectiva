@@ -37,6 +37,10 @@ export default function MonthlyPlanning({
   onSaveMonthlyTarget,
   monthlyPlanNotes,
   onSavePlanNote,
+  scorecardItems,
+  onAddScorecardItem,
+  onUpdateScorecardActual,
+  onDeleteScorecardItem,
 }) {
   const [cursor, setCursor] = useState(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const year = cursor.getFullYear();
@@ -86,6 +90,24 @@ export default function MonthlyPlanning({
     } finally {
       setNoteSaving(false);
     }
+  };
+
+  // --- Kampanya hedef tablosu ---
+  const [scLabel, setScLabel] = useState("");
+  const [scTarget, setScTarget] = useState("");
+  const monthScorecard = scorecardItems
+    .filter((s) => s.month === key)
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+  const handleAddScorecard = async () => {
+    if (!scLabel.trim()) return;
+    await onAddScorecardItem({
+      month: key,
+      label: scLabel.trim(),
+      targetText: scTarget.trim(),
+      sortOrder: monthScorecard.length + 1,
+    });
+    setScLabel("");
+    setScTarget("");
   };
 
   return (
@@ -219,6 +241,59 @@ export default function MonthlyPlanning({
         >
           {noteSaving ? "Kaydediliyor..." : "Notu Kaydet"}
         </button>
+      </Section>
+
+      {/* Kampanya Hedef Tablosu */}
+      <Section
+        title="Kampanya Hedef Tablosu"
+        subtitle="Serbest metrikler — hedefi sen belirle, gerçekleşeni sen gir (örn. arama, mail, nitelikli fırsat, teklif)"
+      >
+        <div className="flex flex-wrap gap-2 mb-4">
+          <input
+            value={scLabel}
+            onChange={(e) => setScLabel(e.target.value)}
+            placeholder="Metrik adı (örn: Nitelikli RedFlag Fırsatı)"
+            className="input flex-1 min-w-[200px]"
+          />
+          <input
+            value={scTarget}
+            onChange={(e) => setScTarget(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleAddScorecard()}
+            placeholder="Hedef (örn: 4-5, En az 2, 120)"
+            className="input !w-40"
+          />
+          <button
+            onClick={handleAddScorecard}
+            className="px-4 py-2 bg-gradient-to-r from-violet-600 to-blue-500 text-white text-sm font-medium rounded-lg hover:shadow-glow-sm shrink-0"
+          >
+            Ekle
+          </button>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          {monthScorecard.length === 0 && (
+            <div className="text-sm text-ink/30">Bu ay için hedef metriği yok.</div>
+          )}
+          {monthScorecard.map((s) => (
+            <div key={s.id} className="flex items-center justify-between gap-3 bg-white border border-mist rounded-lg px-3 py-2">
+              <span className="text-sm text-ink/80 flex-1 min-w-0 truncate">{s.label}</span>
+              <span className="text-xs font-mono text-ink/40 shrink-0">Hedef: {s.targetText}</span>
+              <input
+                type="number"
+                defaultValue={s.actualValue}
+                onBlur={(e) => onUpdateScorecardActual(s.id, Number(e.target.value) || 0)}
+                className="input font-mono !w-20 text-center shrink-0"
+                title="Gerçekleşen"
+              />
+              <button
+                onClick={() => onDeleteScorecardItem(s.id)}
+                className="text-ink/25 hover:text-rose-500 text-sm shrink-0"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
       </Section>
 
       {/* Aylık Hedefler (arama/mail/toplantı) */}
