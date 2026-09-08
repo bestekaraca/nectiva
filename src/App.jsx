@@ -462,7 +462,7 @@ export default function App() {
             )}
             {view === "reports" && (
               <Suspense fallback={<div className="text-sm text-ink/40">Yükleniyor...</div>}>
-                <Reports leads={leads} activityLogs={activityLogs} />
+                <Reports leads={leads} activityLogs={activityLogs} tasks={tasks} onToggleTask={handleToggleTask} />
               </Suspense>
             )}
           </>

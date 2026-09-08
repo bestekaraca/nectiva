@@ -12,6 +12,7 @@ import {
   LabelList,
 } from "recharts";
 import { STAGES, PRODUCTS, formatCurrency } from "../data/store";
+import MonthlyTaskReport from "./MonthlyTaskReport";
 
 const STAGE_HEX = {
   blue: "#3B82F6",
@@ -82,7 +83,7 @@ function countActivities(leads, activityLogs, start, end) {
   };
 }
 
-export default function Reports({ leads, activityLogs }) {
+export default function Reports({ leads, activityLogs, tasks, onToggleTask }) {
   const [rangeMode, setRangeMode] = useState("thisWeek");
   const [customStart, setCustomStart] = useState(addDays(toISO(new Date()), -6));
   const [customEnd, setCustomEnd] = useState(toISO(new Date()));
@@ -279,6 +280,13 @@ export default function Reports({ leads, activityLogs }) {
             </Bar>
           </BarChart>
         </ResponsiveContainer>
+      </Section>
+
+      <Section
+        title="Aylık Görev Raporu"
+        subtitle="Bu ay içinde koyduğun görevleri, gelecek aylar için de önceden planlayabilirsin — hangi ayı seçersen o ayın başarı oranını görürsün"
+      >
+        <MonthlyTaskReport tasks={tasks} onToggleTask={onToggleTask} />
       </Section>
     </div>
   );
