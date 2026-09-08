@@ -517,3 +517,48 @@ export async function deleteStrategyRow(id) {
   const { error } = await supabase.from("linkedin_strategy_rows").delete().eq("id", id);
   if (error) throw error;
 }
+
+// --- Aylik hedefler (ay + urun bazli arama/mail/toplanti hedefleri) --------
+
+export async function fetchMonthlyTargets() {
+  const { data, error } = await supabase.from("monthly_targets").select("*");
+  if (error) throw error;
+  return data.map((r) => ({
+    id: r.id,
+    month: r.month,
+    product: r.product || "",
+    targetCalls: r.target_calls || 0,
+    targetEmails: r.target_emails || 0,
+    targetMeetings: r.target_meetings || 0,
+  }));
+}
+
+export async function upsertMonthlyTarget(
+  { month, product, targetCalls, targetEmails, targetMeetings },
+  userId
+) {
+  const { data, error } = await supabase
+    .from("monthly_targets")
+    .upsert(
+      {
+        user_id: userId,
+        month,
+        product: product || "",
+        target_calls: targetCalls,
+        target_emails: targetEmails,
+        target_meetings: targetMeetings,
+      },
+      { onConflict: "user_id,month,product" }
+    )
+    .select()
+    .single();
+  if (error) throw error;
+  return {
+    id: data.id,
+    month: data.month,
+    product: data.product || "",
+    targetCalls: data.target_calls || 0,
+    targetEmails: data.target_emails || 0,
+    targetMeetings: data.target_meetings || 0,
+  };
+}

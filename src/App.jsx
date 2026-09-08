@@ -40,6 +40,8 @@ import {
   insertStrategyRow,
   updateStrategyRow,
   deleteStrategyRow,
+  fetchMonthlyTargets,
+  upsertMonthlyTarget,
 } from "./lib/db";
 import { isToday } from "./data/store";
 import Sidebar from "./components/Sidebar";
@@ -69,6 +71,7 @@ export default function App() {
   const [marketingEmails, setMarketingEmails] = useState([]);
   const [marketNotes, setMarketNotes] = useState([]);
   const [strategyData, setStrategyData] = useState({});
+  const [monthlyTargets, setMonthlyTargets] = useState([]);
   const [loadingLeads, setLoadingLeads] = useState(false);
   const [loadError, setLoadError] = useState(null);
   const [view, setView] = useState("dashboard");
@@ -97,6 +100,7 @@ export default function App() {
     fetchMarketingEmails().then(setMarketingEmails).catch((e) => setLoadError(e.message));
     fetchMarketNotes().then(setMarketNotes).catch((e) => setLoadError(e.message));
     fetchStrategyRows().then(setStrategyData).catch((e) => setLoadError(e.message));
+    fetchMonthlyTargets().then(setMonthlyTargets).catch((e) => setLoadError(e.message));
   }, [session]);
 
   if (session === undefined) {
@@ -361,6 +365,19 @@ export default function App() {
     }
   };
 
+  const handleSaveMonthlyTarget = async (payload) => {
+    const saved = await upsertMonthlyTarget(payload, session.user.id);
+    setMonthlyTargets((prev) => {
+      const idx = prev.findIndex((t) => t.month === saved.month && t.product === saved.product);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = saved;
+        return next;
+      }
+      return [...prev, saved];
+    });
+  };
+
   const todayCount = leads.filter(
     (l) => isToday(l.nextActionDate) && l.followupStatus !== "arandi"
   ).length;
@@ -462,7 +479,12 @@ export default function App() {
             )}
             {view === "reports" && (
               <Suspense fallback={<div className="text-sm text-ink/40">Yükleniyor...</div>}>
-                <Reports leads={leads} activityLogs={activityLogs} tasks={tasks} onToggleTask={handleToggleTask} />
+                <Reports
+                  leads={leads}
+                  activityLogs={activityLogs}
+                  monthlyTargets={monthlyTargets}
+                  onSaveMonthlyTarget={handleSaveMonthlyTarget}
+                />
               </Suspense>
             )}
           </>

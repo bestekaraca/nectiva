@@ -12,7 +12,7 @@ import {
   LabelList,
 } from "recharts";
 import { STAGES, PRODUCTS, formatCurrency } from "../data/store";
-import MonthlyTaskReport from "./MonthlyTaskReport";
+import MonthlyTargetsPanel from "./MonthlyTargetsPanel";
 
 const STAGE_HEX = {
   blue: "#3B82F6",
@@ -83,7 +83,7 @@ function countActivities(leads, activityLogs, start, end) {
   };
 }
 
-export default function Reports({ leads, activityLogs, tasks, onToggleTask }) {
+export default function Reports({ leads, activityLogs, monthlyTargets, onSaveMonthlyTarget }) {
   const [rangeMode, setRangeMode] = useState("thisWeek");
   const [customStart, setCustomStart] = useState(addDays(toISO(new Date()), -6));
   const [customEnd, setCustomEnd] = useState(toISO(new Date()));
@@ -283,10 +283,15 @@ export default function Reports({ leads, activityLogs, tasks, onToggleTask }) {
       </Section>
 
       <Section
-        title="Aylık Görev Raporu"
-        subtitle="Bu ay içinde koyduğun görevleri, gelecek aylar için de önceden planlayabilirsin — hangi ayı seçersen o ayın başarı oranını görürsün"
+        title="Aylık Hedefler"
+        subtitle="Herhangi bir ay ve ürün için arama/mail/toplantı hedefi gir, gerçekleşenle karşılaştır"
       >
-        <MonthlyTaskReport tasks={tasks} onToggleTask={onToggleTask} />
+        <MonthlyTargetsPanel
+          leads={leads}
+          activityLogs={activityLogs}
+          targets={monthlyTargets}
+          onSaveTarget={onSaveMonthlyTarget}
+        />
       </Section>
     </div>
   );
