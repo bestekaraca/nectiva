@@ -41,6 +41,8 @@ export default function MonthlyPlanning({
   onAddScorecardItem,
   onUpdateScorecardActual,
   onDeleteScorecardItem,
+  onDeleteNote,
+  onDeleteActivity,
 }) {
   const [cursor, setCursor] = useState(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const year = cursor.getFullYear();
@@ -303,6 +305,8 @@ export default function MonthlyPlanning({
           activityLogs={activityLogs}
           targets={monthlyTargets}
           onSaveTarget={onSaveMonthlyTarget}
+          onDeleteNote={onDeleteNote}
+          onDeleteActivity={onDeleteActivity}
         />
       </Section>
 

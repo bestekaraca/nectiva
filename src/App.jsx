@@ -9,6 +9,7 @@ import {
   updateFollowUpStatus,
   deleteLead,
   insertNote,
+  deleteNote,
   insertPurchase,
   fetchGoal,
   fetchSaleEntries,
@@ -186,6 +187,17 @@ export default function App() {
     setLeads((prev) =>
       prev.map((l) => (l.id === leadId ? { ...l, notes: [note, ...l.notes] } : l))
     );
+  };
+
+  const handleDeleteNote = async (leadId, noteId) => {
+    setLeads((prev) =>
+      prev.map((l) => (l.id === leadId ? { ...l, notes: l.notes.filter((n) => n.id !== noteId) } : l))
+    );
+    try {
+      await deleteNote(noteId);
+    } catch (e) {
+      setLoadError(e.message);
+    }
   };
 
   const handleAddPurchase = async (leadId, description, amount) => {
@@ -511,6 +523,8 @@ export default function App() {
                 onAddScorecardItem={handleAddScorecardItem}
                 onUpdateScorecardActual={handleUpdateScorecardActual}
                 onDeleteScorecardItem={handleDeleteScorecardItem}
+                onDeleteNote={handleDeleteNote}
+                onDeleteActivity={handleDeleteActivity}
               />
             )}
             {view === "marketing" && (
