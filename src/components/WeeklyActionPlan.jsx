@@ -45,6 +45,16 @@ function suggestAction(lead, base) {
 export default function WeeklyActionPlan({ leads, onAddTask, onOpenLead }) {
   const [dismissed, setDismissed] = useState(new Set());
   const [addedFor, setAddedFor] = useState(new Set());
+  const [expanded, setExpanded] = useState(new Set());
+
+  const toggleExpand = (stageId) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(stageId)) next.delete(stageId);
+      else next.add(stageId);
+      return next;
+    });
+  };
 
   const groups = useMemo(() => {
     return STAGE_CONFIG.map((cfg) => {
@@ -75,63 +85,82 @@ export default function WeeklyActionPlan({ leads, onAddTask, onOpenLead }) {
       </p>
 
       <div className="flex flex-col gap-5">
-        {groups.map((g) => (
-          <div key={g.id}>
-            <div className="text-xs font-semibold text-ink/55 uppercase tracking-wide mb-2">
-              {g.label} ({g.items.length})
-            </div>
-            {g.items.length === 0 ? (
-              <div className="text-xs text-ink/25">Bu aşamada fırsat yok.</div>
-            ) : (
-              <div className="flex flex-col gap-1.5">
-                {g.items.map((item, i) => {
-                  const key = `${g.id}-${item.lead.id}`;
-                  if (dismissed.has(key)) return null;
-                  return (
-                    <div key={key} className="bg-white border border-mist rounded-lg px-3.5 py-2.5">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2 mb-0.5">
-                            {item.urgent && (
-                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-300 shrink-0">
-                                Öncelikli
-                              </span>
-                            )}
-                            <span className="text-sm font-medium text-ink/85 truncate">{item.lead.company}</span>
+        {groups.map((g) => {
+          const isOpen = expanded.has(g.id);
+          const urgentCount = g.items.filter((i) => i.urgent).length;
+          return (
+            <div key={g.id}>
+              <button
+                onClick={() => toggleExpand(g.id)}
+                className="w-full flex items-center justify-between gap-2 mb-2 group"
+              >
+                <span className="text-xs font-semibold text-ink/55 uppercase tracking-wide flex items-center gap-2">
+                  <span className={`transition-transform ${isOpen ? "rotate-90" : ""}`}>›</span>
+                  {g.label} ({g.items.length})
+                  {urgentCount > 0 && (
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-300">
+                      {urgentCount} öncelikli
+                    </span>
+                  )}
+                </span>
+                <span className="text-[11px] text-ink/25 group-hover:text-ink/40">
+                  {isOpen ? "gizle" : "göster"}
+                </span>
+              </button>
+              {isOpen &&
+                (g.items.length === 0 ? (
+                  <div className="text-xs text-ink/25">Bu aşamada fırsat yok.</div>
+                ) : (
+                  <div className="flex flex-col gap-1.5">
+                    {g.items.map((item) => {
+                      const key = `${g.id}-${item.lead.id}`;
+                      if (dismissed.has(key)) return null;
+                      return (
+                        <div key={key} className="bg-white border border-mist rounded-lg px-3.5 py-2.5">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2 mb-0.5">
+                                {item.urgent && (
+                                  <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-300 shrink-0">
+                                    Öncelikli
+                                  </span>
+                                )}
+                                <span className="text-sm font-medium text-ink/85 truncate">{item.lead.company}</span>
+                              </div>
+                              <div className="text-xs text-ink/65 mb-0.5">{item.action}</div>
+                              <div className="text-[11px] text-ink/35 truncate">{item.context}</div>
+                            </div>
+                            <button
+                              onClick={() => setDismissed((prev) => new Set(prev).add(key))}
+                              className="text-ink/25 hover:text-rose-500 text-sm shrink-0"
+                              title="Gizle"
+                            >
+                              ×
+                            </button>
                           </div>
-                          <div className="text-xs text-ink/65 mb-0.5">{item.action}</div>
-                          <div className="text-[11px] text-ink/35 truncate">{item.context}</div>
+                          <div className="flex items-center gap-2 mt-2">
+                            <button
+                              onClick={() => onOpenLead(item.lead)}
+                              className="text-xs font-medium px-2.5 py-1 rounded-lg border border-mist bg-white text-ink/60 hover:border-violet-300 hover:text-violet-700"
+                            >
+                              Firmayı Aç
+                            </button>
+                            <button
+                              onClick={() => handleAddTask(key, item)}
+                              disabled={addedFor.has(key)}
+                              className="text-xs font-medium px-2.5 py-1 rounded-lg bg-gradient-to-r from-violet-600 to-blue-500 text-white hover:shadow-glow-sm disabled:opacity-50"
+                            >
+                              {addedFor.has(key) ? "✓ Görev eklendi" : "Görev Olarak Ekle"}
+                            </button>
+                          </div>
                         </div>
-                        <button
-                          onClick={() => setDismissed((prev) => new Set(prev).add(key))}
-                          className="text-ink/25 hover:text-rose-500 text-sm shrink-0"
-                          title="Gizle"
-                        >
-                          ×
-                        </button>
-                      </div>
-                      <div className="flex items-center gap-2 mt-2">
-                        <button
-                          onClick={() => onOpenLead(item.lead)}
-                          className="text-xs font-medium px-2.5 py-1 rounded-lg border border-mist bg-white text-ink/60 hover:border-violet-300 hover:text-violet-700"
-                        >
-                          Firmayı Aç
-                        </button>
-                        <button
-                          onClick={() => handleAddTask(key, item)}
-                          disabled={addedFor.has(key)}
-                          className="text-xs font-medium px-2.5 py-1 rounded-lg bg-gradient-to-r from-violet-600 to-blue-500 text-white hover:shadow-glow-sm disabled:opacity-50"
-                        >
-                          {addedFor.has(key) ? "✓ Görev eklendi" : "Görev Olarak Ekle"}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        ))}
+                      );
+                    })}
+                  </div>
+                ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
