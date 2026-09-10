@@ -472,6 +472,7 @@ export default function App() {
                 onDeleteSale={handleDeleteSale}
                 tasks={tasks}
                 onToggleTask={handleToggleTask}
+                onAddTask={handleAddTask}
               />
             )}
             {view === "pipeline" && (

@@ -1,5 +1,6 @@
 import { formatCurrency, isOverdue, isToday } from "../data/store";
 import GoalCard from "./GoalCard";
+import WeeklyActionPlan from "./WeeklyActionPlan";
 
 function mondayOf(date) {
   const d = new Date(date);
@@ -23,6 +24,7 @@ export default function Dashboard({
   onDeleteSale,
   tasks,
   onToggleTask,
+  onAddTask,
 }) {
   const activeLeads = leads.filter((l) => l.stage !== "kazanildi" && l.stage !== "kaybedildi");
   const pipelineValue = activeLeads.reduce((s, l) => s + (l.value || 0), 0);
@@ -43,6 +45,8 @@ export default function Dashboard({
       <p className="text-sm text-ink/45 mb-6">Bugün nereye odaklanman gerektiğine bak.</p>
 
       <GoalCard goal={goal} saleEntries={saleEntries} onAddSale={onAddSale} onDeleteSale={onDeleteSale} />
+
+      <WeeklyActionPlan leads={leads} onAddTask={onAddTask} onOpenLead={onOpen} />
 
       {weeklyTasks.length > 0 && (
         <div className="glass rounded-card p-4 mb-6">
