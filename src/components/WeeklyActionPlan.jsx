@@ -32,6 +32,20 @@ function buildActionPlan(leads) {
     const hasProposalNote = lead.notes.some((n) => n.type === "proposal");
     const isHighValue = (lead.value || 0) >= highValueThreshold && highValueThreshold > 0;
 
+    // 0. Hiç not/kayit yok — yasina bakilmaksizin en kritik kor noktasi
+    if (lead.notes.length === 0) {
+      items.push({
+        lead,
+        priority: "Yüksek",
+        score: 95 + (lead.value || 0) / 1000,
+        action: `${lead.company} hakkında hiç kayıt yok — ilk teması kur ve not gir`,
+        reason: lead.nextActionNote
+          ? `Bilinen bir plan var ("${lead.nextActionNote}") ama hiç not/aktivite girilmemiş`
+          : "Fırsat sistemde duruyor ama hiç arama/mail/toplantı kaydı yok",
+      });
+      return;
+    }
+
     // 1. Gecikmiş takip — en yüksek öncelik
     if (overdue) {
       items.push({
@@ -94,7 +108,13 @@ function buildActionPlan(leads) {
     }
   });
 
-  return items.sort((a, b) => b.score - a.score).slice(0, 8);
+  return items.sort((a, b) => b.score - a.score).slice(0, 12);
+}
+
+function countNoContact(leads) {
+  return leads.filter(
+    (l) => l.stage !== "kazanildi" && l.stage !== "kaybedildi" && l.notes.length === 0
+  ).length;
 }
 
 export default function WeeklyActionPlan({ leads, onAddTask, onOpenLead }) {
@@ -102,6 +122,7 @@ export default function WeeklyActionPlan({ leads, onAddTask, onOpenLead }) {
   const [addedFor, setAddedFor] = useState(new Set());
 
   const plan = useMemo(() => buildActionPlan(leads), [leads]);
+  const noContactCount = useMemo(() => countNoContact(leads), [leads]);
   const visible = plan.filter((_, i) => !dismissed.has(i));
 
   const handleAddTask = async (item, idx) => {
@@ -118,7 +139,12 @@ export default function WeeklyActionPlan({ leads, onAddTask, onOpenLead }) {
         <span className="text-xs text-ink/35">{visible.length} öneri</span>
       </div>
       <p className="text-xs text-ink/40 mb-3">
-        Notların, aşamaların ve son temas tarihlerin taranarak otomatik oluşturuldu — satışı ileri taşıyacak en kritik adımlar.
+        Pipeline'daki tüm aktif fırsatlar tarandı{" "}
+        {noContactCount > 0 && (
+          <span className="text-rose-500 font-medium">
+            · {noContactCount} firmada hiç kayıt/not yok
+          </span>
+        )}
       </p>
 
       <div className="flex flex-col gap-2">
