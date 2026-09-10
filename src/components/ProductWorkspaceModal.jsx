@@ -326,7 +326,16 @@ function ProductTaskBlock({ items, onAdd, onToggle, onDelete, onMove, currentPro
             <div className="flex flex-col gap-1.5 mt-2">
               {done.map((t) => (
                 <div key={t.id} className="flex items-center justify-between bg-mist/40 rounded-lg px-3 py-2">
-                  <span className="text-sm text-ink/40 line-through">{t.title}</span>
+                  <label className="flex items-center gap-2.5 cursor-pointer flex-1">
+                    <input
+                      type="checkbox"
+                      checked={true}
+                      onChange={() => onToggle(t.id, false)}
+                      className="w-4 h-4 accent-violet-600"
+                      title="Geri al (tamamlanmadı olarak işaretle)"
+                    />
+                    <span className="text-sm text-ink/40 line-through">{t.title}</span>
+                  </label>
                   <button onClick={() => onDelete(t.id)} className="text-ink/25 hover:text-rose-500 text-sm">
                     ×
                   </button>
