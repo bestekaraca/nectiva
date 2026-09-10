@@ -24,7 +24,7 @@ export default function ActivityDetailModal({ title, icon, entries, onClose, onD
           {entries.map((e) => (
             <div key={e.id} className="flex items-start justify-between gap-3 bg-white border border-mist rounded-lg px-3.5 py-2.5">
               <span className="text-sm text-ink/75">{e.note || "—"}</span>
-              <button onClick={() => onDelete(e.id)} className="text-ink/25 hover:text-rose-500 text-sm shrink-0">
+              <button onClick={() => onDelete(e)} className="text-ink/25 hover:text-rose-500 text-sm shrink-0">
                 ×
               </button>
             </div>

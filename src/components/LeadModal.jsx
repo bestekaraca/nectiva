@@ -11,7 +11,7 @@ import {
   totalPurchases,
 } from "../data/store";
 
-export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, onAddPurchase }) {
+export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, onDeleteNote, onAddPurchase }) {
   const [form, setForm] = useState({ ...lead });
   const [noteText, setNoteText] = useState("");
   const [noteType, setNoteType] = useState("note");
@@ -468,16 +468,24 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                   <div className="text-xs text-ink/30">Henüz not yok.</div>
                 )}
                 {lead.notes.map((n) => (
-                  <div key={n.id} className="bg-white border border-mist rounded-lg px-3 py-2">
-                    <div className="flex items-center gap-2 text-xs font-mono text-ink/35 mb-0.5">
-                      <span>{n.date}</span>
-                      <span className="text-ink/20">·</span>
-                      <span>
-                        {ACTIVITY_TYPES.find((t) => t.id === n.type)?.icon}{" "}
-                        {ACTIVITY_TYPES.find((t) => t.id === n.type)?.label || "Not"}
-                      </span>
+                  <div key={n.id} className="bg-white border border-mist rounded-lg px-3 py-2 flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 text-xs font-mono text-ink/35 mb-0.5">
+                        <span>{n.date}</span>
+                        <span className="text-ink/20">·</span>
+                        <span>
+                          {ACTIVITY_TYPES.find((t) => t.id === n.type)?.icon}{" "}
+                          {ACTIVITY_TYPES.find((t) => t.id === n.type)?.label || "Not"}
+                        </span>
+                      </div>
+                      <div className="text-sm text-ink/80">{n.text}</div>
                     </div>
-                    <div className="text-sm text-ink/80">{n.text}</div>
+                    <button
+                      onClick={() => onDeleteNote(lead.id, n.id)}
+                      className="text-ink/25 hover:text-rose-500 text-sm shrink-0"
+                    >
+                      ×
+                    </button>
                   </div>
                 ))}
               </div>

@@ -13,6 +13,7 @@ export default function DailyTasks({
   onSetFollowUp,
   onUpdateFollowUpStatus,
   onAddNote,
+  onDeleteNote,
   activityLogs,
   onAddActivity,
   onDeleteActivity,
@@ -47,7 +48,7 @@ export default function DailyTasks({
     setFollowUpNote("");
   };
 
-  const allNotesToday = leads.flatMap((l) => l.notes.map((n) => ({ ...n, company: l.company })))
+  const allNotesToday = leads.flatMap((l) => l.notes.map((n) => ({ ...n, company: l.company, leadId: l.id, source: "note" })))
     .filter((n) => n.date === todayStr());
 
   const todaysCalls =
@@ -433,13 +434,17 @@ export default function DailyTasks({
           }
           icon={activityPopup === "call" ? "📞" : activityPopup === "email" ? "✉️" : "🤝"}
           entries={[
-            ...activityLogs.filter((a) => a.type === activityPopup && a.date === todayStr()),
+            ...activityLogs
+              .filter((a) => a.type === activityPopup && a.date === todayStr())
+              .map((a) => ({ ...a, source: "log" })),
             ...allNotesToday
               .filter((n) => n.type === activityPopup)
-              .map((n) => ({ id: n.id, note: `${n.company}: ${n.text}` })),
+              .map((n) => ({ ...n, note: `${n.company}: ${n.text}` })),
           ]}
           onClose={() => setActivityPopup(null)}
-          onDelete={onDeleteActivity}
+          onDelete={(entry) =>
+            entry.source === "note" ? onDeleteNote(entry.leadId, entry.id) : onDeleteActivity(entry.id)
+          }
         />
       )}
 
@@ -474,16 +479,24 @@ export default function DailyTasks({
                 <div className="text-sm text-ink/30 text-center py-8">Bu firma için henüz kayıt yok.</div>
               )}
               {selectedLead.notes.map((n) => (
-                <div key={n.id} className="bg-white border border-mist rounded-lg px-3.5 py-2.5">
-                  <div className="flex items-center gap-2 text-[11px] font-mono text-ink/35 mb-0.5">
-                    <span>{n.date}</span>
-                    <span className="text-ink/20">·</span>
-                    <span>
-                      {ACTIVITY_TYPES.find((t) => t.id === n.type)?.icon}{" "}
-                      {ACTIVITY_TYPES.find((t) => t.id === n.type)?.label || "Not"}
-                    </span>
+                <div key={n.id} className="bg-white border border-mist rounded-lg px-3.5 py-2.5 flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 text-[11px] font-mono text-ink/35 mb-0.5">
+                      <span>{n.date}</span>
+                      <span className="text-ink/20">·</span>
+                      <span>
+                        {ACTIVITY_TYPES.find((t) => t.id === n.type)?.icon}{" "}
+                        {ACTIVITY_TYPES.find((t) => t.id === n.type)?.label || "Not"}
+                      </span>
+                    </div>
+                    <div className="text-sm text-ink/80">{n.text}</div>
                   </div>
-                  <div className="text-sm text-ink/80">{n.text}</div>
+                  <button
+                    onClick={() => onDeleteNote(selectedLead.id, n.id)}
+                    className="text-ink/25 hover:text-rose-500 text-sm shrink-0"
+                  >
+                    ×
+                  </button>
                 </div>
               ))}
             </div>

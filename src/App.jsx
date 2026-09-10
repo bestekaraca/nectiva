@@ -491,6 +491,7 @@ export default function App() {
                 onSetFollowUp={handleSetFollowUp}
                 onUpdateFollowUpStatus={handleUpdateFollowUpStatus}
                 onAddNote={handleAddNote}
+                onDeleteNote={handleDeleteNote}
                 activityLogs={activityLogs}
                 onAddActivity={handleAddActivity}
                 onDeleteActivity={handleDeleteActivity}
@@ -586,6 +587,7 @@ export default function App() {
           onSave={handleSaveLead}
           onDelete={handleDeleteLead}
           onAddNote={handleAddNote}
+          onDeleteNote={handleDeleteNote}
           onAddPurchase={handleAddPurchase}
         />
       )}
