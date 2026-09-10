@@ -473,6 +473,7 @@ export default function App() {
                 tasks={tasks}
                 onToggleTask={handleToggleTask}
                 onAddTask={handleAddTask}
+                onAddNote={handleAddNote}
               />
             )}
             {view === "pipeline" && (

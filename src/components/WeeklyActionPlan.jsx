@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { isOverdue } from "../data/store";
+import { isOverdue, ACTIVITY_TYPES } from "../data/store";
 
 function daysAgo(dateStr) {
   if (!dateStr) return null;
@@ -34,15 +34,10 @@ function suggestAction(lead, base) {
   let context = `Son temas: ${lastNote.date} (${TYPE_LABEL[lastNote.type] || "Not"}) — "${lastNote.text}"`;
   if (overdue) context = `Gecikmiş takip var (${lead.nextActionDate}) · ${context}`;
 
-  return {
-    action: base,
-    context,
-    urgent: overdue || sinceLast >= 5,
-    sinceLast,
-  };
+  return { action: base, context, urgent: overdue || sinceLast >= 5, sinceLast };
 }
 
-export default function WeeklyActionPlan({ leads, onAddTask, onOpenLead }) {
+export default function WeeklyActionPlan({ leads, onAddTask, onOpenLead, onAddNote }) {
   const [dismissed, setDismissed] = useState(new Set());
   const [addedFor, setAddedFor] = useState(new Set());
   const [expanded, setExpanded] = useState(new Set());
@@ -116,44 +111,16 @@ export default function WeeklyActionPlan({ leads, onAddTask, onOpenLead }) {
                       const key = `${g.id}-${item.lead.id}`;
                       if (dismissed.has(key)) return null;
                       return (
-                        <div key={key} className="bg-white border border-mist rounded-lg px-3.5 py-2.5">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-2 mb-0.5">
-                                {item.urgent && (
-                                  <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-300 shrink-0">
-                                    Öncelikli
-                                  </span>
-                                )}
-                                <span className="text-sm font-medium text-ink/85 truncate">{item.lead.company}</span>
-                              </div>
-                              <div className="text-xs text-ink/65 mb-0.5">{item.action}</div>
-                              <div className="text-[11px] text-ink/35 truncate">{item.context}</div>
-                            </div>
-                            <button
-                              onClick={() => setDismissed((prev) => new Set(prev).add(key))}
-                              className="text-ink/25 hover:text-rose-500 text-sm shrink-0"
-                              title="Gizle"
-                            >
-                              ×
-                            </button>
-                          </div>
-                          <div className="flex items-center gap-2 mt-2">
-                            <button
-                              onClick={() => onOpenLead(item.lead)}
-                              className="text-xs font-medium px-2.5 py-1 rounded-lg border border-mist bg-white text-ink/60 hover:border-violet-300 hover:text-violet-700"
-                            >
-                              Firmayı Aç
-                            </button>
-                            <button
-                              onClick={() => handleAddTask(key, item)}
-                              disabled={addedFor.has(key)}
-                              className="text-xs font-medium px-2.5 py-1 rounded-lg bg-gradient-to-r from-violet-600 to-blue-500 text-white hover:shadow-glow-sm disabled:opacity-50"
-                            >
-                              {addedFor.has(key) ? "✓ Görev eklendi" : "Görev Olarak Ekle"}
-                            </button>
-                          </div>
-                        </div>
+                        <ActionItemCard
+                          key={key}
+                          itemKey={key}
+                          item={item}
+                          onDismiss={() => setDismissed((prev) => new Set(prev).add(key))}
+                          onOpenLead={() => onOpenLead(item.lead)}
+                          onAddTask={() => handleAddTask(key, item)}
+                          taskAdded={addedFor.has(key)}
+                          onAddNote={onAddNote}
+                        />
                       );
                     })}
                   </div>
@@ -162,6 +129,105 @@ export default function WeeklyActionPlan({ leads, onAddTask, onOpenLead }) {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function ActionItemCard({ item, onDismiss, onOpenLead, onAddTask, taskAdded, onAddNote }) {
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [noteText, setNoteText] = useState("");
+  const [noteType, setNoteType] = useState("note");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const handleSaveNote = async () => {
+    if (!noteText.trim() || saving) return;
+    setSaving(true);
+    try {
+      await onAddNote(item.lead.id, noteText.trim(), noteType);
+      setNoteText("");
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="bg-white border border-mist rounded-lg px-3.5 py-2.5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 mb-0.5">
+            {item.urgent && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-300 shrink-0">
+                Öncelikli
+              </span>
+            )}
+            <span className="text-sm font-medium text-ink/85 truncate">{item.lead.company}</span>
+          </div>
+          <div className="text-xs text-ink/65 mb-0.5">{item.action}</div>
+          <div className="text-[11px] text-ink/35 truncate">{item.context}</div>
+        </div>
+        <button onClick={onDismiss} className="text-ink/25 hover:text-rose-500 text-sm shrink-0" title="Gizle">
+          ×
+        </button>
+      </div>
+
+      <div className="flex items-center gap-2 mt-2 flex-wrap">
+        <button
+          onClick={onOpenLead}
+          className="text-xs font-medium px-2.5 py-1 rounded-lg border border-mist bg-white text-ink/60 hover:border-violet-300 hover:text-violet-700"
+        >
+          Firmayı Aç
+        </button>
+        <button
+          onClick={onAddTask}
+          disabled={taskAdded}
+          className="text-xs font-medium px-2.5 py-1 rounded-lg bg-gradient-to-r from-violet-600 to-blue-500 text-white hover:shadow-glow-sm disabled:opacity-50"
+        >
+          {taskAdded ? "✓ Görev eklendi" : "Görev Olarak Ekle"}
+        </button>
+        <button
+          onClick={() => setNoteOpen((v) => !v)}
+          className="text-xs font-medium text-violet-600 hover:text-violet-700 ml-auto"
+        >
+          {noteOpen ? "Not alanını kapat" : saved ? "✓ Not kaydedildi" : "+ Ne yaptığımı not et"}
+        </button>
+      </div>
+
+      {noteOpen && (
+        <div className="mt-2.5 pt-2.5 border-t border-mist">
+          <div className="flex flex-wrap gap-1 mb-1.5">
+            {ACTIVITY_TYPES.filter((t) => t.id !== "proposal").map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setNoteType(t.id)}
+                className={`text-[11px] font-medium px-2 py-0.5 rounded-full border ${
+                  noteType === t.id ? "bg-violet-600 text-white border-violet-600" : "bg-white text-ink/50 border-mist"
+                }`}
+              >
+                {t.icon} {t.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-1.5">
+            <input
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSaveNote()}
+              placeholder="Örn: Önerilen aksiyonu yapamadım ama mail attım, cevap bekliyorum"
+              className="input flex-1 text-xs"
+            />
+            <button
+              onClick={handleSaveNote}
+              disabled={saving}
+              className="px-3 py-1.5 bg-ink text-white text-xs font-medium rounded-lg disabled:opacity-50 shrink-0"
+            >
+              Kaydet
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
