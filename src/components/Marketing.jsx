@@ -5,6 +5,7 @@ import {
 } from "../data/store";
 import ContentCalendar from "./ContentCalendar";
 import ProductWorkspaceModal from "./ProductWorkspaceModal";
+import BulkMailModal from "./BulkMailModal";
 
 export default function Marketing({
   leads,
@@ -171,6 +172,7 @@ function MailMarketingSection({ leads, entries, onAdd, onDelete }) {
   const [campaign, setCampaign] = useState("");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [expanded, setExpanded] = useState(false);
+  const [showBulk, setShowBulk] = useState(false);
 
   const handleAdd = async () => {
     if (!companyName.trim()) return;
@@ -187,6 +189,20 @@ function MailMarketingSection({ leads, entries, onAdd, onDelete }) {
 
   return (
     <Section title="Mail Marketing Takibi" subtitle="Hangi firmaya kaç kere mail marketing yapıldığını kaydet">
+      <button
+        onClick={() => setShowBulk(true)}
+        className="mb-4 flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-[#0078D4] to-violet-600 text-white text-sm font-medium rounded-lg hover:shadow-glow-sm"
+      >
+        📤 Toplu Mail Gönder
+      </button>
+      {showBulk && (
+        <BulkMailModal
+          leads={leads}
+          marketingEmails={entries}
+          onAddMarketingEmail={onAdd}
+          onClose={() => setShowBulk(false)}
+        />
+      )}
       <datalist id="mail-marketing-companies">
         {leads.map((l) => (
           <option key={l.id} value={l.company} />

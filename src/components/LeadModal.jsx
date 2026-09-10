@@ -10,11 +10,9 @@ import {
   formatCurrency,
   totalPurchases,
 } from "../data/store";
-import ComposeMailModal from "./ComposeMailModal";
 
 export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, onDeleteNote, onAddPurchase }) {
   const [form, setForm] = useState({ ...lead });
-  const [showCompose, setShowCompose] = useState(false);
   const [noteText, setNoteText] = useState("");
   const [noteType, setNoteType] = useState("note");
   const [tagText, setTagText] = useState("");
@@ -152,23 +150,11 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                   />
                 </Field>
                 <Field label="E-posta">
-                  <div className="flex gap-1.5">
-                    <input
-                      value={form.email}
-                      onChange={(e) => update("email", e.target.value)}
-                      className="input"
-                    />
-                    {form.email && (
-                      <button
-                        type="button"
-                        onClick={() => setShowCompose(true)}
-                        className="shrink-0 px-2.5 rounded-lg border border-mist bg-white text-ink/50 hover:border-blue-300 hover:text-blue-700 text-xs"
-                        title="Mail yaz"
-                      >
-                        ✉️
-                      </button>
-                    )}
-                  </div>
+                  <input
+                    value={form.email}
+                    onChange={(e) => update("email", e.target.value)}
+                    className="input"
+                  />
                 </Field>
                 <Field label="Sektör">
                   <input
@@ -530,10 +516,6 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
           </div>
         </div>
       </div>
-
-      {showCompose && (
-        <ComposeMailModal lead={lead} onClose={() => setShowCompose(false)} onAddNote={onAddNote} />
-      )}
     </div>
   );
 }
