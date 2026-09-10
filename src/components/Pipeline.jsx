@@ -8,14 +8,14 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
   const [dragOverStage, setDragOverStage] = useState(null);
   const [query, setQuery] = useState("");
   const [exporting, setExporting] = useState(false);
-  const [tempFilter, setTempFilter] = useState(null);
-  const [onlyMeetings, setOnlyMeetings] = useState(false);
+  const [tempFilter, setTempFilter] = useState("");
+  const [activityFilter, setActivityFilter] = useState("");
 
   const filtered = leads.filter(
     (l) =>
       `${l.company} ${l.contactName}`.toLowerCase().includes(query.toLowerCase()) &&
       (!tempFilter || l.temperature === tempFilter) &&
-      (!onlyMeetings || l.notes.some((n) => n.type === "meeting"))
+      (!activityFilter || l.notes.some((n) => n.type === activityFilter))
   );
 
   const handleDragStart = (e, leadId) => {
@@ -101,41 +101,40 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
 
       <StageFlowBar leads={leads} />
 
-      <div className="flex flex-wrap gap-1.5 mb-4">
-        <button
-          onClick={() => setTempFilter(null)}
-          className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
-            tempFilter === null
-              ? "bg-ink text-white border-ink"
-              : "bg-white text-ink/55 border-mist hover:border-ink/25"
-          }`}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <select
+          value={tempFilter}
+          onChange={(e) => setTempFilter(e.target.value)}
+          className="input !w-auto text-sm"
         >
-          Tümü
-        </button>
-        {TEMPERATURES.map((t) => (
+          <option value="">Sıcaklık: Tümü</option>
+          {TEMPERATURES.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.label}
+            </option>
+          ))}
+        </select>
+        <select
+          value={activityFilter}
+          onChange={(e) => setActivityFilter(e.target.value)}
+          className="input !w-auto text-sm"
+        >
+          <option value="">Aktivite: Tümü</option>
+          <option value="meeting">🤝 Toplantı Yapılanlar</option>
+          <option value="call">📞 Arama Yapılanlar</option>
+          <option value="email">✉️ Mail Atılanlar</option>
+        </select>
+        {(tempFilter || activityFilter) && (
           <button
-            key={t.id}
-            onClick={() => setTempFilter(t.id)}
-            className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
-              tempFilter === t.id
-                ? "bg-ink text-white border-ink"
-                : "bg-white text-ink/55 border-mist hover:border-ink/25"
-            }`}
+            onClick={() => {
+              setTempFilter("");
+              setActivityFilter("");
+            }}
+            className="text-xs text-ink/40 hover:text-rose-500 font-medium"
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${t.dot}`} />
-            {t.label}
+            Filtreleri temizle
           </button>
-        ))}
-        <button
-          onClick={() => setOnlyMeetings((v) => !v)}
-          className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
-            onlyMeetings
-              ? "bg-emerald-600 text-white border-emerald-600"
-              : "bg-white text-ink/55 border-mist hover:border-emerald-300"
-          }`}
-        >
-          🤝 Toplantı Yapılanlar
-        </button>
+        )}
       </div>
 
       <div className="flex gap-4 overflow-x-auto pb-4 -mx-1 px-1">
