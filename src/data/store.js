@@ -156,6 +156,7 @@ function normalizeLead(lead) {
     contractYears: 0,
     totalContractValue: 0,
     annualValue: 0,
+    contacts: [],
     ...lead,
   };
 }

@@ -13,6 +13,31 @@ import {
 
 export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, onDeleteNote, onAddPurchase }) {
   const [form, setForm] = useState({ ...lead });
+  const [newContactName, setNewContactName] = useState("");
+  const [newContactPosition, setNewContactPosition] = useState("");
+  const [newContactEmail, setNewContactEmail] = useState("");
+  const [newContactPhone, setNewContactPhone] = useState("");
+
+  const handleAddContact = () => {
+    if (!newContactName.trim()) return;
+    update("contacts", [
+      ...(form.contacts || []),
+      {
+        name: newContactName.trim(),
+        position: newContactPosition.trim(),
+        email: newContactEmail.trim(),
+        phone: newContactPhone.trim(),
+      },
+    ]);
+    setNewContactName("");
+    setNewContactPosition("");
+    setNewContactEmail("");
+    setNewContactPhone("");
+  };
+
+  const handleRemoveContact = (idx) => {
+    update("contacts", form.contacts.filter((_, i) => i !== idx));
+  };
   const [noteText, setNoteText] = useState("");
   const [noteType, setNoteType] = useState("note");
   const [tagText, setTagText] = useState("");
@@ -134,6 +159,73 @@ export default function LeadModal({ lead, onClose, onSave, onDelete, onAddNote, 
                     placeholder="Örn: Satın Alma Müdürü"
                   />
                 </Field>
+
+                <div className="col-span-2">
+                  <div className="text-xs font-medium text-ink/45 mb-1.5">
+                    Diğer Kişiler {form.contacts?.length > 0 && `(${form.contacts.length})`}
+                  </div>
+                  {form.contacts?.length > 0 && (
+                    <div className="flex flex-col gap-1.5 mb-2">
+                      {form.contacts.map((c, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center justify-between gap-2 bg-white border border-mist rounded-lg px-3 py-2"
+                        >
+                          <div className="min-w-0">
+                            <span className="text-sm text-ink/80 font-medium">{c.name}</span>
+                            {c.position && <span className="text-xs text-ink/40"> · {c.position}</span>}
+                            {(c.email || c.phone) && (
+                              <div className="text-xs text-ink/35 font-mono truncate">
+                                {c.email} {c.phone && `· ${c.phone}`}
+                              </div>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => handleRemoveContact(i)}
+                            className="text-ink/25 hover:text-rose-500 text-sm shrink-0"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <input
+                      value={newContactName}
+                      onChange={(e) => setNewContactName(e.target.value)}
+                      placeholder="Ad Soyad"
+                      className="input text-sm"
+                    />
+                    <input
+                      value={newContactPosition}
+                      onChange={(e) => setNewContactPosition(e.target.value)}
+                      placeholder="Pozisyon"
+                      className="input text-sm"
+                    />
+                    <input
+                      value={newContactEmail}
+                      onChange={(e) => setNewContactEmail(e.target.value)}
+                      placeholder="E-posta"
+                      className="input text-sm"
+                    />
+                    <div className="flex gap-1.5">
+                      <input
+                        value={newContactPhone}
+                        onChange={(e) => setNewContactPhone(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleAddContact()}
+                        placeholder="Telefon"
+                        className="input text-sm flex-1"
+                      />
+                      <button
+                        onClick={handleAddContact}
+                        className="shrink-0 px-3 bg-violet-600 text-white text-sm rounded-lg hover:bg-violet-700"
+                      >
+                        Ekle
+                      </button>
+                    </div>
+                  </div>
+                </div>
                 <Field label="Değer (€)">
                   <input
                     type="number"
