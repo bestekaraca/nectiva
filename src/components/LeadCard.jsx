@@ -3,6 +3,7 @@ import { formatCurrency, isOverdue, isToday, TEMPERATURES } from "../data/store"
 const stripeColor = {
   blue: "before:bg-blue-500",
   violet: "before:bg-violet-500",
+  slate: "before:bg-slate-400",
   amber: "before:bg-amber-400",
   fuchsia: "before:bg-fuchsia-500",
   teal: "before:bg-emerald-500",

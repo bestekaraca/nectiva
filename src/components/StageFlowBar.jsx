@@ -3,6 +3,7 @@ import { STAGES } from "../data/store";
 const colorMap = {
   blue: "bg-blue-500",
   violet: "bg-violet-500",
+  slate: "bg-slate-400",
   amber: "bg-amber-400",
   fuchsia: "bg-fuchsia-500",
   teal: "bg-emerald-500",
@@ -12,6 +13,7 @@ const colorMap = {
 const dotMap = {
   blue: "bg-blue-500",
   violet: "bg-violet-500",
+  slate: "bg-slate-400",
   amber: "bg-amber-400",
   fuchsia: "bg-fuchsia-500",
   teal: "bg-emerald-500",
