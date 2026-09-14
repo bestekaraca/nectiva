@@ -14,13 +14,10 @@ export default function LeadCard({ lead, stageColor, onOpen, onDragStart }) {
   const overdue = isOverdue(lead.nextActionDate);
   const today = isToday(lead.nextActionDate);
   const tempInfo = TEMPERATURES.find((t) => t.id === lead.temperature);
-  const meetingNotes = lead.notes.filter((n) => n.type === "meeting");
-  const FUTURE_HINT = /yapılacak|planlan|alınacak|görüşülecek/i;
-  const doneMeetingNotes = meetingNotes.filter((n) => !FUTURE_HINT.test(n.text || ""));
-  const plannedMeetingNotes = meetingNotes.filter((n) => FUTURE_HINT.test(n.text || ""));
-  const meetingCount = doneMeetingNotes.length;
+  const meetingCount = lead.notes.filter((n) => n.type === "meeting").length;
+  const plannedMeetingCount = lead.notes.filter((n) => n.type === "meeting_planned").length;
   const plannedMeeting =
-    plannedMeetingNotes.length > 0 ||
+    plannedMeetingCount > 0 ||
     (lead.nextActionDate && (lead.nextActionNote || "").toLowerCase().includes("toplant"));
   const callCount = lead.notes.filter((n) => n.type === "call").length;
   const emailCount = lead.notes.filter((n) => n.type === "email").length;
@@ -74,7 +71,7 @@ export default function LeadCard({ lead, stageColor, onOpen, onDragStart }) {
               className="text-[11px] font-medium px-1.5 py-0.5 rounded border bg-sky-50 text-sky-700 border-sky-200"
               title="Toplantı planlandı (yapılacak)"
             >
-              🗓️
+              🗓️{plannedMeetingCount > 1 ? ` ${plannedMeetingCount}` : ""}
             </span>
           )}
           {lead.nextActionDate && (

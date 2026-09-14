@@ -15,6 +15,7 @@ export const ACTIVITY_TYPES = [
   { id: "call", label: "Arama", icon: "📞" },
   { id: "email", label: "Mail", icon: "✉️" },
   { id: "meeting", label: "Toplantı", icon: "🤝" },
+  { id: "meeting_planned", label: "Toplantı Planlandı", icon: "🗓️" },
   { id: "proposal", label: "Teklif", icon: "📄" },
 ];
 
