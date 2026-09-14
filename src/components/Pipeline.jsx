@@ -36,6 +36,28 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
   const yeniCount = leads.filter((l) => l.stage === "yeni").length;
   const totalAll = leads.length;
 
+  const mondayOf = (date) => {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = day === 0 ? 6 : day - 1;
+    d.setDate(d.getDate() - diff);
+    return d.toISOString().slice(0, 10);
+  };
+  const weekStart = mondayOf(new Date());
+  const weekEnd = (() => {
+    const d = new Date(weekStart + "T00:00:00");
+    d.setDate(d.getDate() + 7);
+    return d.toISOString().slice(0, 10);
+  })();
+  const inWeek = (dateStr) => dateStr && dateStr >= weekStart && dateStr < weekEnd;
+  const allNotesThisWeek = leads.flatMap((l) => l.notes).filter((n) => inWeek(n.date));
+  const weeklyStats = {
+    call: allNotesThisWeek.filter((n) => n.type === "call").length,
+    email: allNotesThisWeek.filter((n) => n.type === "email").length,
+    meeting: allNotesThisWeek.filter((n) => n.type === "meeting").length,
+    meeting_planned: allNotesThisWeek.filter((n) => n.type === "meeting_planned").length,
+  };
+
   const handleExport = async () => {
     setExporting(true);
     try {
@@ -102,6 +124,14 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
       </div>
 
       <StageFlowBar leads={leads} />
+
+      <div className="flex flex-wrap items-center gap-3 mb-4 p-3 bg-white border border-mist rounded-xl">
+        <span className="text-xs font-semibold text-ink/50 shrink-0">Bu Hafta:</span>
+        <span className="text-xs font-medium text-blue-700">📞 {weeklyStats.call} Arama</span>
+        <span className="text-xs font-medium text-violet-700">✉️ {weeklyStats.email} Mail</span>
+        <span className="text-xs font-medium text-emerald-700">🤝 {weeklyStats.meeting} Toplantı Yapıldı</span>
+        <span className="text-xs font-medium text-sky-700">🗓️ {weeklyStats.meeting_planned} Toplantı Alındı</span>
+      </div>
 
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <select
