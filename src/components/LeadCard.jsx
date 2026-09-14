@@ -14,9 +14,14 @@ export default function LeadCard({ lead, stageColor, onOpen, onDragStart }) {
   const overdue = isOverdue(lead.nextActionDate);
   const today = isToday(lead.nextActionDate);
   const tempInfo = TEMPERATURES.find((t) => t.id === lead.temperature);
-  const meetingCount = lead.notes.filter((n) => n.type === "meeting").length;
+  const meetingNotes = lead.notes.filter((n) => n.type === "meeting");
+  const FUTURE_HINT = /yapılacak|planlan|alınacak|görüşülecek/i;
+  const doneMeetingNotes = meetingNotes.filter((n) => !FUTURE_HINT.test(n.text || ""));
+  const plannedMeetingNotes = meetingNotes.filter((n) => FUTURE_HINT.test(n.text || ""));
+  const meetingCount = doneMeetingNotes.length;
   const plannedMeeting =
-    lead.nextActionDate && (lead.nextActionNote || "").toLowerCase().includes("toplant");
+    plannedMeetingNotes.length > 0 ||
+    (lead.nextActionDate && (lead.nextActionNote || "").toLowerCase().includes("toplant"));
   const callCount = lead.notes.filter((n) => n.type === "call").length;
   const emailCount = lead.notes.filter((n) => n.type === "email").length;
 
