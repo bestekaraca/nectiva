@@ -11,6 +11,7 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
   const [tempFilter, setTempFilter] = useState("");
   const [activityFilter, setActivityFilter] = useState("");
   const [productFilter, setProductFilter] = useState("");
+  const [statsPeriod, setStatsPeriod] = useState("thisWeek");
 
   const filtered = leads.filter(
     (l) =>
@@ -43,19 +44,37 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
     d.setDate(d.getDate() - diff);
     return d.toISOString().slice(0, 10);
   };
-  const weekStart = mondayOf(new Date());
-  const weekEnd = (() => {
-    const d = new Date(weekStart + "T00:00:00");
-    d.setDate(d.getDate() + 7);
+  const addDaysStr = (dateStr, n) => {
+    const d = new Date(dateStr + "T00:00:00");
+    d.setDate(d.getDate() + n);
     return d.toISOString().slice(0, 10);
-  })();
-  const inWeek = (dateStr) => dateStr && dateStr >= weekStart && dateStr < weekEnd;
-  const allNotesThisWeek = leads.flatMap((l) => l.notes).filter((n) => inWeek(n.date));
+  };
+  const toISO = (d) => d.toISOString().slice(0, 10);
+
+  const today = new Date();
+  let statsRange;
+  if (statsPeriod === "thisWeek") {
+    const start = mondayOf(today);
+    statsRange = { start, end: addDaysStr(start, 7), label: "Bu Hafta" };
+  } else if (statsPeriod === "lastWeek") {
+    const start = addDaysStr(mondayOf(today), -7);
+    statsRange = { start, end: addDaysStr(start, 7), label: "Geçen Hafta" };
+  } else if (statsPeriod === "thisMonth") {
+    const start = toISO(new Date(today.getFullYear(), today.getMonth(), 1));
+    const end = toISO(new Date(today.getFullYear(), today.getMonth() + 1, 1));
+    statsRange = { start, end, label: "Bu Ay" };
+  } else {
+    const start = toISO(new Date(today.getFullYear(), today.getMonth() - 1, 1));
+    const end = toISO(new Date(today.getFullYear(), today.getMonth(), 1));
+    statsRange = { start, end, label: "Geçen Ay" };
+  }
+  const inRange = (dateStr) => dateStr && dateStr >= statsRange.start && dateStr < statsRange.end;
+  const notesInRange = leads.flatMap((l) => l.notes).filter((n) => inRange(n.date));
   const weeklyStats = {
-    call: allNotesThisWeek.filter((n) => n.type === "call").length,
-    email: allNotesThisWeek.filter((n) => n.type === "email").length,
-    meeting: allNotesThisWeek.filter((n) => n.type === "meeting").length,
-    meeting_planned: allNotesThisWeek.filter((n) => n.type === "meeting_planned").length,
+    call: notesInRange.filter((n) => n.type === "call").length,
+    email: notesInRange.filter((n) => n.type === "email").length,
+    meeting: notesInRange.filter((n) => n.type === "meeting").length,
+    meeting_planned: notesInRange.filter((n) => n.type === "meeting_planned").length,
   };
 
   const handleExport = async () => {
@@ -126,7 +145,16 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
       <StageFlowBar leads={leads} />
 
       <div className="flex flex-wrap items-center gap-3 mb-4 p-3 bg-white border border-mist rounded-xl">
-        <span className="text-xs font-semibold text-ink/50 shrink-0">Bu Hafta:</span>
+        <select
+          value={statsPeriod}
+          onChange={(e) => setStatsPeriod(e.target.value)}
+          className="text-xs font-semibold text-ink/50 border border-mist rounded-lg px-2 py-1 outline-none cursor-pointer shrink-0"
+        >
+          <option value="thisWeek">Bu Hafta</option>
+          <option value="lastWeek">Geçen Hafta</option>
+          <option value="thisMonth">Bu Ay</option>
+          <option value="lastMonth">Geçen Ay</option>
+        </select>
         <span className="text-xs font-medium text-blue-700">📞 {weeklyStats.call} Arama</span>
         <span className="text-xs font-medium text-violet-700">✉️ {weeklyStats.email} Mail</span>
         <span className="text-xs font-medium text-emerald-700">🤝 {weeklyStats.meeting} Toplantı Yapıldı</span>
