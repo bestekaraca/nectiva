@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { STAGES, TEMPERATURES, formatCurrency } from "../data/store";
+import { STAGES, TEMPERATURES, PRODUCTS, formatCurrency } from "../data/store";
 import { exportToExcel } from "../lib/exportExcel";
 import LeadCard from "./LeadCard";
 import StageFlowBar from "./StageFlowBar";
@@ -10,12 +10,14 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
   const [exporting, setExporting] = useState(false);
   const [tempFilter, setTempFilter] = useState("");
   const [activityFilter, setActivityFilter] = useState("");
+  const [productFilter, setProductFilter] = useState("");
 
   const filtered = leads.filter(
     (l) =>
       `${l.company} ${l.contactName}`.toLowerCase().includes(query.toLowerCase()) &&
       (!tempFilter || l.temperature === tempFilter) &&
-      (!activityFilter || l.notes.some((n) => n.type === activityFilter))
+      (!activityFilter || l.notes.some((n) => n.type === activityFilter)) &&
+      (!productFilter || l.products.includes(productFilter))
   );
 
   const handleDragStart = (e, leadId) => {
@@ -124,11 +126,24 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
           <option value="call">📞 Arama Yapılanlar</option>
           <option value="email">✉️ Mail Atılanlar</option>
         </select>
-        {(tempFilter || activityFilter) && (
+        <select
+          value={productFilter}
+          onChange={(e) => setProductFilter(e.target.value)}
+          className="input !w-auto text-sm"
+        >
+          <option value="">Ürün: Tümü</option>
+          {PRODUCTS.map((p) => (
+            <option key={p} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+        {(tempFilter || activityFilter || productFilter) && (
           <button
             onClick={() => {
               setTempFilter("");
               setActivityFilter("");
+              setProductFilter("");
             }}
             className="text-xs text-ink/40 hover:text-rose-500 font-medium"
           >
