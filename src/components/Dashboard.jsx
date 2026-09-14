@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { formatCurrency, isOverdue, isToday } from "../data/store";
 import GoalCard from "./GoalCard";
 import WeeklyActionPlan from "./WeeklyActionPlan";
@@ -27,6 +28,7 @@ export default function Dashboard({
   onAddTask,
   onAddNote,
 }) {
+  const [showGoal, setShowGoal] = useState(false);
   const activeLeads = leads.filter((l) => l.stage !== "kazanildi" && l.stage !== "kaybedildi");
   const pipelineValue = activeLeads.reduce((s, l) => s + (l.value || 0), 0);
   const wonValue = leads
@@ -45,7 +47,24 @@ export default function Dashboard({
       <h1 className="font-display font-semibold text-2xl text-ink mb-1">Panel</h1>
       <p className="text-sm text-ink/45 mb-6">Bugün nereye odaklanman gerektiğine bak.</p>
 
-      <GoalCard goal={goal} saleEntries={saleEntries} onAddSale={onAddSale} onDeleteSale={onDeleteSale} />
+      {showGoal ? (
+        <div className="mb-6">
+          <button
+            onClick={() => setShowGoal(false)}
+            className="text-xs text-ink/40 hover:text-ink mb-2 font-medium"
+          >
+            ✕ Gizle
+          </button>
+          <GoalCard goal={goal} saleEntries={saleEntries} onAddSale={onAddSale} onDeleteSale={onDeleteSale} />
+        </div>
+      ) : (
+        <button
+          onClick={() => setShowGoal(true)}
+          className="flex items-center gap-2 mb-6 px-4 py-2.5 bg-white border border-mist rounded-xl hover:border-violet-300 hover:shadow-md transition-all text-sm font-medium text-ink/60"
+        >
+          🎯 Yıllık Satış Hedefini Göster
+        </button>
+      )}
 
       <WeeklyActionPlan leads={leads} onAddTask={onAddTask} onOpenLead={onOpen} onAddNote={onAddNote} />
 
