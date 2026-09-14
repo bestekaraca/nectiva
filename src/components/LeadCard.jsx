@@ -15,6 +15,8 @@ export default function LeadCard({ lead, stageColor, onOpen, onDragStart }) {
   const today = isToday(lead.nextActionDate);
   const tempInfo = TEMPERATURES.find((t) => t.id === lead.temperature);
   const meetingCount = lead.notes.filter((n) => n.type === "meeting").length;
+  const plannedMeeting =
+    lead.nextActionDate && (lead.nextActionNote || "").toLowerCase().includes("toplant");
   const callCount = lead.notes.filter((n) => n.type === "call").length;
   const emailCount = lead.notes.filter((n) => n.type === "email").length;
 
@@ -60,6 +62,14 @@ export default function LeadCard({ lead, stageColor, onOpen, onDragStart }) {
               title={`${meetingCount} toplantı yapıldı`}
             >
               🤝 {meetingCount}
+            </span>
+          )}
+          {plannedMeeting && (
+            <span
+              className="text-[11px] font-medium px-1.5 py-0.5 rounded border bg-sky-50 text-sky-700 border-sky-200"
+              title="Toplantı planlandı (yapılacak)"
+            >
+              🗓️
             </span>
           )}
           {lead.nextActionDate && (
