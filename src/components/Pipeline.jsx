@@ -123,6 +123,7 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
         >
           <option value="">Aktivite: Tümü</option>
           <option value="meeting">🤝 Toplantı Yapılanlar</option>
+          <option value="meeting_planned">🗓️ Toplantı Planlanlar</option>
           <option value="call">📞 Arama Yapılanlar</option>
           <option value="email">✉️ Mail Atılanlar</option>
         </select>
