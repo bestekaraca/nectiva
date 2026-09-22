@@ -213,7 +213,9 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
 
       <div className="flex gap-4 overflow-x-auto pb-4 -mx-1 px-1">
         {STAGES.map((stage) => {
-          const stageLeads = filtered.filter((l) => l.stage === stage.id);
+          const stageLeads = filtered
+            .filter((l) => l.stage === stage.id)
+            .sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
           const stageValue = stageLeads.reduce((sum, l) => sum + (l.value || 0), 0);
           return (
             <div
