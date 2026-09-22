@@ -4,7 +4,7 @@ import { exportToExcel } from "../lib/exportExcel";
 import LeadCard from "./LeadCard";
 import StageFlowBar from "./StageFlowBar";
 
-export default function Pipeline({ leads, onMoveStage, onOpen }) {
+export default function Pipeline({ leads, onMoveStage, onOpen, onDeleteNote }) {
   const [dragOverStage, setDragOverStage] = useState(null);
   const [query, setQuery] = useState("");
   const [exporting, setExporting] = useState(false);
@@ -12,6 +12,7 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
   const [activityFilter, setActivityFilter] = useState("");
   const [productFilter, setProductFilter] = useState("");
   const [statsPeriod, setStatsPeriod] = useState("thisWeek");
+  const [drillType, setDrillType] = useState(null); // null | 'call' | 'email' | 'meeting' | 'meeting_planned'
 
   const filtered = leads.filter(
     (l) =>
@@ -69,7 +70,9 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
     statsRange = { start, end, label: "Geçen Ay" };
   }
   const inRange = (dateStr) => dateStr && dateStr >= statsRange.start && dateStr < statsRange.end;
-  const notesInRange = leads.flatMap((l) => l.notes).filter((n) => inRange(n.date));
+  const notesInRange = leads
+    .flatMap((l) => l.notes.map((n) => ({ ...n, company: l.company, leadId: l.id })))
+    .filter((n) => inRange(n.date));
   const weeklyStats = {
     call: notesInRange.filter((n) => n.type === "call").length,
     email: notesInRange.filter((n) => n.type === "email").length,
@@ -155,11 +158,87 @@ export default function Pipeline({ leads, onMoveStage, onOpen }) {
           <option value="thisMonth">Bu Ay</option>
           <option value="lastMonth">Geçen Ay</option>
         </select>
-        <span className="text-xs font-medium text-blue-700">📞 {weeklyStats.call} Arama</span>
-        <span className="text-xs font-medium text-violet-700">✉️ {weeklyStats.email} Mail</span>
-        <span className="text-xs font-medium text-emerald-700">🤝 {weeklyStats.meeting} Toplantı Yapıldı</span>
-        <span className="text-xs font-medium text-sky-700">🗓️ {weeklyStats.meeting_planned} Toplantı Alındı</span>
+        <button onClick={() => setDrillType("call")} className="text-xs font-medium text-blue-700 hover:underline">
+          📞 {weeklyStats.call} Arama
+        </button>
+        <button onClick={() => setDrillType("email")} className="text-xs font-medium text-violet-700 hover:underline">
+          ✉️ {weeklyStats.email} Mail
+        </button>
+        <button onClick={() => setDrillType("meeting")} className="text-xs font-medium text-emerald-700 hover:underline">
+          🤝 {weeklyStats.meeting} Toplantı Yapıldı
+        </button>
+        <button onClick={() => setDrillType("meeting_planned")} className="text-xs font-medium text-sky-700 hover:underline">
+          🗓️ {weeklyStats.meeting_planned} Toplantı Alındı
+        </button>
       </div>
+
+      {drillType && (
+        <div
+          className="fixed inset-0 bg-ink/25 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          onClick={() => setDrillType(null)}
+        >
+          <div
+            className="glass rounded-3xl w-full max-w-md max-h-[75vh] overflow-hidden shadow-glow-lg flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-5 border-b border-mist flex items-center justify-between">
+              <div>
+                <h2 className="font-display font-semibold text-lg text-ink">
+                  {
+                    {
+                      call: "📞 Aramalar",
+                      email: "✉️ Mailler",
+                      meeting: "🤝 Toplantı Yapılanlar",
+                      meeting_planned: "🗓️ Toplantı Alınanlar",
+                    }[drillType]
+                  }
+                </h2>
+                <p className="text-xs text-ink/40 mt-0.5">
+                  {statsRange.label} · {notesInRange.filter((n) => n.type === drillType).length} kayıt
+                </p>
+              </div>
+              <button onClick={() => setDrillType(null)} className="text-ink/40 hover:text-ink text-xl leading-none">
+                ×
+              </button>
+            </div>
+            <div className="overflow-y-auto p-5 flex flex-col gap-2">
+              {notesInRange.filter((n) => n.type === drillType).length === 0 && (
+                <div className="text-sm text-ink/30 text-center py-8">Bu dönemde kayıt yok.</div>
+              )}
+              {notesInRange
+                .filter((n) => n.type === drillType)
+                .sort((a, b) => (a.date < b.date ? 1 : -1))
+                .map((n) => (
+                  <div
+                    key={n.id}
+                    className="flex items-start justify-between gap-3 bg-white border border-mist rounded-lg px-3.5 py-2.5"
+                  >
+                    <button
+                      onClick={() => {
+                        const lead = leads.find((l) => l.id === n.leadId);
+                        if (lead) onOpen(lead);
+                        setDrillType(null);
+                      }}
+                      className="text-left min-w-0"
+                    >
+                      <div className="text-xs font-semibold text-violet-700 truncate hover:underline">
+                        {n.company}
+                      </div>
+                      <div className="text-sm text-ink/75">{n.text}</div>
+                      <div className="text-[11px] font-mono text-ink/35 mt-0.5">{n.date}</div>
+                    </button>
+                    <button
+                      onClick={() => onDeleteNote(n.leadId, n.id)}
+                      className="text-ink/25 hover:text-rose-500 text-sm shrink-0"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <select

@@ -481,6 +481,7 @@ export default function App() {
                 leads={leads}
                 onMoveStage={handleMoveStage}
                 onOpen={(l) => setActiveLeadId(l.id)}
+                onDeleteNote={handleDeleteNote}
               />
             )}
             {view === "contacts" && (
