@@ -12,7 +12,7 @@ export default function Sidebar({ view, setView, onNewLead, todayCount, userEmai
   ];
 
   return (
-    <aside className="w-full md:w-60 md:min-h-screen bg-gradient-to-b from-[#140F26] to-night border-r border-white/5 text-ivory flex md:flex-col shrink-0 relative overflow-hidden">
+    <aside className="w-full md:w-60 md:h-screen md:sticky md:top-0 md:overflow-y-auto bg-gradient-to-b from-[#140F26] to-night border-r border-white/5 text-ivory flex md:flex-col shrink-0 relative overflow-hidden">
       <div className="pointer-events-none absolute -top-20 -left-20 w-72 h-72 rounded-full bg-violet-700 blob opacity-30" />
 
       <div className="relative px-5 pt-6 pb-4 hidden md:flex items-center gap-2.5">
