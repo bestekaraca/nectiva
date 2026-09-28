@@ -17,6 +17,7 @@ const STAGE_HEX = {
   blue: "#3B82F6",
   violet: "#8B5CF6",
   slate: "#94A3B8",
+  cyan: "#06B6D4",
   amber: "#F59E0B",
   fuchsia: "#D946EF",
   teal: "#10B981",
