@@ -3,11 +3,11 @@ const STORAGE_KEY = "nexivra_sales_leads_v1";
 export const STAGES = [
   { id: "yeni", label: "Yeni", color: "blue" },
   { id: "iletisimde", label: "İletişimde", color: "violet" },
-  { id: "freeze", label: "Freeze", color: "slate" },
   { id: "demo", label: "Demo/POC", color: "cyan" },
   { id: "teklif", label: "Teklif", color: "amber" },
   { id: "muzakere", label: "Müzakere", color: "fuchsia" },
   { id: "kazanildi", label: "Kazanıldı", color: "teal" },
+  { id: "freeze", label: "Freeze", color: "slate" },
   { id: "kaybedildi", label: "Kaybedildi", color: "brick" },
 ];
 
