@@ -22,6 +22,10 @@ export default function LeadCard({ lead, stageColor, onOpen, onDragStart }) {
     (lead.nextActionDate && (lead.nextActionNote || "").toLowerCase().includes("toplant"));
   const callCount = lead.notes.filter((n) => n.type === "call").length;
   const emailCount = lead.notes.filter((n) => n.type === "email").length;
+  // "TİDE" / "TIDE" / "tide" gibi yazım farklarını aynı kabul et
+  const normTag = (s) =>
+    String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/ı/g, "i");
+  const isTide = (lead.tags || []).some((t) => normTag(t) === "tide");
 
   return (
     <div
@@ -30,6 +34,11 @@ export default function LeadCard({ lead, stageColor, onOpen, onDragStart }) {
       onClick={() => onOpen(lead)}
       className={`relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:rounded-l-card ${stripeColor[stageColor]} glass rounded-card pl-3.5 pr-3 py-3 cursor-pointer hover:shadow-glow-sm hover:-translate-y-0.5 transition-all`}
     >
+      {isTide && (
+        <div className="text-[10px] font-bold tracking-widest text-cyan-500 mb-0.5" title="TİDE Kongresi">
+          TİDE
+        </div>
+      )}
       <div className="flex items-center gap-1.5">
         {tempInfo && <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${tempInfo.dot}`} title={tempInfo.label} />}
         <div className="font-semibold text-sm text-ink leading-tight">{lead.company}</div>
