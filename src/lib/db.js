@@ -638,3 +638,56 @@ export async function deleteNote(id) {
   const { error } = await supabase.from("notes").delete().eq("id", id);
   if (error) throw error;
 }
+
+// --- Weekly Ozet (haftalik toplanti maddeleri) --------------------------------
+
+const rowToWeekly = (r) => ({
+  id: r.id,
+  weekStart: r.week_start,
+  sortOrder: r.sort_order || 0,
+  company: r.company || "",
+  text: r.text || "",
+  status: r.status || "acik",
+});
+
+export async function fetchWeeklyItems() {
+  const { data, error } = await supabase
+    .from("weekly_items")
+    .select("*")
+    .order("week_start", { ascending: false })
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return data.map(rowToWeekly);
+}
+
+export async function insertWeeklyItem({ weekStart, company, text, status, sortOrder }, userId) {
+  const { data, error } = await supabase
+    .from("weekly_items")
+    .insert({
+      user_id: userId,
+      week_start: weekStart,
+      company: company || "",
+      text,
+      status: status || "acik",
+      sort_order: sortOrder || 0,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return rowToWeekly(data);
+}
+
+export async function updateWeeklyItem(id, patch) {
+  const row = {};
+  if ("company" in patch) row.company = patch.company;
+  if ("text" in patch) row.text = patch.text;
+  if ("status" in patch) row.status = patch.status;
+  const { error } = await supabase.from("weekly_items").update(row).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteWeeklyItem(id) {
+  const { error } = await supabase.from("weekly_items").delete().eq("id", id);
+  if (error) throw error;
+}

@@ -46,6 +46,10 @@ import {
   fetchMonthlyPlanNotes,
   upsertMonthlyPlanNote,
   fetchScorecardItems,
+  fetchWeeklyItems,
+  insertWeeklyItem,
+  updateWeeklyItem,
+  deleteWeeklyItem,
   insertScorecardItem,
   updateScorecardActual,
   deleteScorecardItem,
@@ -58,6 +62,7 @@ import Contacts from "./components/Contacts";
 import DailyTasks from "./components/DailyTasks";
 import Marketing from "./components/Marketing";
 import MonthlyPlanning from "./components/MonthlyPlanning";
+import WeeklyDigest from "./components/WeeklyDigest";
 const LinkedInStrategy = lazy(() => import("./components/LinkedInStrategy"));
 import LeadModal from "./components/LeadModal";
 import NewLeadModal from "./components/NewLeadModal";
@@ -82,6 +87,8 @@ export default function App() {
   const [monthlyTargets, setMonthlyTargets] = useState([]);
   const [monthlyPlanNotes, setMonthlyPlanNotes] = useState([]);
   const [scorecardItems, setScorecardItems] = useState([]);
+  const [weeklyItems, setWeeklyItems] = useState([]);
+  const [weeklyLoadError, setWeeklyLoadError] = useState(false);
   const [loadingLeads, setLoadingLeads] = useState(false);
   const [loadError, setLoadError] = useState(null);
   const [view, setView] = useState("dashboard");
@@ -113,6 +120,7 @@ export default function App() {
     fetchMonthlyTargets().then(setMonthlyTargets).catch((e) => setLoadError(e.message));
     fetchMonthlyPlanNotes().then(setMonthlyPlanNotes).catch((e) => setLoadError(e.message));
     fetchScorecardItems().then(setScorecardItems).catch((e) => setLoadError(e.message));
+    fetchWeeklyItems().then((r) => { setWeeklyItems(r); setWeeklyLoadError(false); }).catch(() => setWeeklyLoadError(true));
   }, [session]);
 
   if (session === undefined) {
@@ -414,6 +422,30 @@ export default function App() {
     });
   };
 
+  const handleAddWeeklyItem = async (payload) => {
+    const item = await insertWeeklyItem(payload, session.user.id);
+    setWeeklyItems((prev) => [...prev, item]);
+    return item;
+  };
+
+  const handleUpdateWeeklyItem = async (id, patch) => {
+    setWeeklyItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
+    try {
+      await updateWeeklyItem(id, patch);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
+  const handleDeleteWeeklyItem = async (id) => {
+    setWeeklyItems((prev) => prev.filter((i) => i.id !== id));
+    try {
+      await deleteWeeklyItem(id);
+    } catch (e) {
+      setLoadError(e.message);
+    }
+  };
+
   const handleAddScorecardItem = async (payload) => {
     const item = await insertScorecardItem(payload, session.user.id);
     setScorecardItems((prev) => [...prev, item]);
@@ -529,6 +561,17 @@ export default function App() {
                 onDeleteScorecardItem={handleDeleteScorecardItem}
                 onDeleteNote={handleDeleteNote}
                 onDeleteActivity={handleDeleteActivity}
+              />
+            )}
+            {view === "weekly" && (
+              <WeeklyDigest
+                items={weeklyItems}
+                leads={leads}
+                loadError={weeklyLoadError}
+                onAdd={handleAddWeeklyItem}
+                onUpdate={handleUpdateWeeklyItem}
+                onDelete={handleDeleteWeeklyItem}
+                onOpenLead={(l) => setActiveLeadId(l.id)}
               />
             )}
             {view === "marketing" && (

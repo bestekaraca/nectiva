@@ -9,6 +9,7 @@ export default function Sidebar({ view, setView, onNewLead, todayCount, userEmai
     { id: "monthly", label: "Aylık Planlama" },
     { id: "marketing", label: "Marketing" },
     { id: "reports", label: "Rapor" },
+    { id: "weekly", label: "Weekly Özet" },
   ];
 
   return (
