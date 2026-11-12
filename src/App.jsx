@@ -61,7 +61,6 @@ import Pipeline from "./components/Pipeline";
 import Contacts from "./components/Contacts";
 import DailyTasks from "./components/DailyTasks";
 import Marketing from "./components/Marketing";
-import MonthlyPlanning from "./components/MonthlyPlanning";
 import WeeklyDigest from "./components/WeeklyDigest";
 const LinkedInStrategy = lazy(() => import("./components/LinkedInStrategy"));
 import LeadModal from "./components/LeadModal";
@@ -117,9 +116,6 @@ export default function App() {
     fetchMarketingEmails().then(setMarketingEmails).catch((e) => setLoadError(e.message));
     fetchMarketNotes().then(setMarketNotes).catch((e) => setLoadError(e.message));
     fetchStrategyRows().then(setStrategyData).catch((e) => setLoadError(e.message));
-    fetchMonthlyTargets().then(setMonthlyTargets).catch((e) => setLoadError(e.message));
-    fetchMonthlyPlanNotes().then(setMonthlyPlanNotes).catch((e) => setLoadError(e.message));
-    fetchScorecardItems().then(setScorecardItems).catch((e) => setLoadError(e.message));
     fetchWeeklyItems().then((r) => { setWeeklyItems(r); setWeeklyLoadError(false); }).catch(() => setWeeklyLoadError(true));
   }, [session]);
 
@@ -535,32 +531,6 @@ export default function App() {
                 onUpdateTaskDescription={handleUpdateTaskDescription}
                 onToggleTask={handleToggleTask}
                 onDeleteTask={handleDeleteTask}
-              />
-            )}
-            {view === "monthly" && (
-              <MonthlyPlanning
-                leads={leads}
-                activityLogs={activityLogs}
-                tasks={tasks}
-                onAddTask={handleAddTask}
-                onToggleTask={handleToggleTask}
-                onDeleteTask={handleDeleteTask}
-                goal={goal}
-                saleEntries={saleEntries}
-                content={marketingContent}
-                campaigns={campaigns}
-                onAddContent={handleAddContent}
-                onUpdateContentStatus={handleUpdateContentStatus}
-                monthlyTargets={monthlyTargets}
-                onSaveMonthlyTarget={handleSaveMonthlyTarget}
-                monthlyPlanNotes={monthlyPlanNotes}
-                onSavePlanNote={handleSavePlanNote}
-                scorecardItems={scorecardItems}
-                onAddScorecardItem={handleAddScorecardItem}
-                onUpdateScorecardActual={handleUpdateScorecardActual}
-                onDeleteScorecardItem={handleDeleteScorecardItem}
-                onDeleteNote={handleDeleteNote}
-                onDeleteActivity={handleDeleteActivity}
               />
             )}
             {view === "weekly" && (
