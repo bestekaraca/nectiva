@@ -28,7 +28,7 @@ function rowToLead(row) {
     nextActionNote: row.next_action_note || "",
     createdAt: row.created_at,
     notes: (row.notes || [])
-      .map((n) => ({ id: n.id, date: n.date, text: n.text, type: n.type || "note" }))
+      .map((n) => ({ id: n.id, date: n.date, text: n.text, type: n.type || "note", source: n.source || "" }))
       .sort((a, b) => (a.date < b.date ? 1 : -1)),
     purchases: (row.purchases || [])
       .map((p) => ({ id: p.id, date: p.date, description: p.description, amount: p.amount }))
@@ -112,14 +112,19 @@ export async function deleteLead(id) {
   if (error) throw error;
 }
 
-export async function insertNote(leadId, text, type = "note") {
-  const { data, error } = await supabase
-    .from("notes")
-    .insert({ lead_id: leadId, text, type })
-    .select()
-    .single();
+export async function insertNote(leadId, text, type = "note", date = null, source = null) {
+  const row = { lead_id: leadId, text, type };
+  if (date) row.date = date;
+  const attempt = (r) => supabase.from("notes").insert(r).select().single();
+  let usedSource = source || "";
+  let { data, error } = await attempt(source ? { ...row, source } : row);
+  // notes.source kolonu henuz eklenmediyse, kaydi kaynak bilgisi olmadan yine de kaydet
+  if (error && source && /source/i.test(error.message || "")) {
+    usedSource = "";
+    ({ data, error } = await attempt(row));
+  }
   if (error) throw error;
-  return { id: data.id, date: data.date, text: data.text, type: data.type };
+  return { id: data.id, date: data.date, text: data.text, type: data.type, source: data.source || usedSource };
 }
 
 export async function insertPurchase(leadId, description, amount) {

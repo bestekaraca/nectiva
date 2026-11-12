@@ -62,6 +62,7 @@ import Contacts from "./components/Contacts";
 import DailyTasks from "./components/DailyTasks";
 import Marketing from "./components/Marketing";
 import WeeklyDigest from "./components/WeeklyDigest";
+import ActivityJournal from "./components/ActivityJournal";
 const LinkedInStrategy = lazy(() => import("./components/LinkedInStrategy"));
 import LeadModal from "./components/LeadModal";
 import NewLeadModal from "./components/NewLeadModal";
@@ -186,8 +187,8 @@ export default function App() {
     }
   };
 
-  const handleAddNote = async (leadId, text, type = "note") => {
-    const note = await insertNote(leadId, text, type);
+  const handleAddNote = async (leadId, text, type = "note", date = null, source = null) => {
+    const note = await insertNote(leadId, text, type, date, source);
     setLeads((prev) =>
       prev.map((l) => (l.id === leadId ? { ...l, notes: [note, ...l.notes] } : l))
     );
@@ -493,6 +494,7 @@ export default function App() {
             {view === "dashboard" && (
               <Dashboard
                 leads={leads}
+                onOpenActivity={() => setView("activity")}
                 onOpen={(l) => setActiveLeadId(l.id)}
                 goal={goal}
                 saleEntries={saleEntries}
@@ -531,6 +533,17 @@ export default function App() {
                 onUpdateTaskDescription={handleUpdateTaskDescription}
                 onToggleTask={handleToggleTask}
                 onDeleteTask={handleDeleteTask}
+              />
+            )}
+            {view === "activity" && (
+              <ActivityJournal
+                leads={leads}
+                activityLogs={activityLogs}
+                onAddNote={handleAddNote}
+                onAddActivity={handleAddActivity}
+                onDeleteNote={handleDeleteNote}
+                onDeleteActivity={handleDeleteActivity}
+                onOpenLead={(l) => setActiveLeadId(l.id)}
               />
             )}
             {view === "weekly" && (

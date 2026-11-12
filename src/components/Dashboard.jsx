@@ -18,6 +18,7 @@ function addDays(dateStr, n) {
 
 export default function Dashboard({
   leads,
+  onOpenActivity,
   onOpen,
   goal,
   saleEntries,
@@ -46,6 +47,15 @@ export default function Dashboard({
     <div>
       <h1 className="font-display font-semibold text-2xl text-ink mb-1">Panel</h1>
       <p className="text-sm text-ink/45 mb-6">Bugün nereye odaklanman gerektiğine bak.</p>
+
+      {new Date().getDay() === 5 && onOpenActivity && (
+        <button
+          onClick={onOpenActivity}
+          className="w-full text-left mb-6 px-4 py-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-sm font-medium hover:shadow-md transition-shadow"
+        >
+          🎉 Bugün Cuma: haftalık aktivite özetin hazır. Aç →
+        </button>
+      )}
 
       {showGoal ? (
         <div className="mb-6">
