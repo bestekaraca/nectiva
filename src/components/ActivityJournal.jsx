@@ -80,6 +80,7 @@ export default function ActivityJournal({
   const [error, setError] = useState("");
   const [showPlain, setShowPlain] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [filters, setFilters] = useState([]); // boşsa hepsi
 
   // --- Firma eşleştirme (yazdığın firma pipeline'daki hangi fırsat?) ---
   const normLeads = useMemo(() => leads.map((l) => ({ lead: l, n: norm(l.company) })), [leads]);
@@ -217,14 +218,22 @@ export default function ActivityJournal({
   };
 
   // --- Gün gün liste ---
+  const typeCounts = ACTIVITY_TYPES.map((t) => ({ ...t, n: items.filter((i) => i.type === t.id).length }));
+  const visible = useMemo(
+    () => (filters.length ? items.filter((i) => filters.includes(i.type)) : items),
+    [items, filters]
+  );
+  const toggleFilter = (id) =>
+    setFilters((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id]));
+
   const days = useMemo(() => {
     const m = new Map();
-    for (const i of items) {
+    for (const i of visible) {
       if (!m.has(i.date)) m.set(i.date, []);
       m.get(i.date).push(i);
     }
     return [...m.entries()].sort((a, b) => (a[0] < b[0] ? 1 : -1));
-  }, [items]);
+  }, [visible]);
 
   return (
     <div>
@@ -377,19 +386,32 @@ export default function ActivityJournal({
           <>
             <div className="flex flex-wrap gap-2 mb-3">
               {[
-                ["📞", summary.call, "Arama", "bg-blue-50 text-blue-700 border-blue-200"],
-                ["✉️", summary.email, "Mail", "bg-violet-50 text-violet-700 border-violet-200"],
-                ["🤝", summary.meeting, "Toplantı", "bg-emerald-50 text-emerald-700 border-emerald-200"],
-                ["🗓️", summary.planned, "Toplantı alındı", "bg-sky-50 text-sky-700 border-sky-200"],
-                ["📄", summary.proposal, "Teklif", "bg-amber-50 text-amber-700 border-amber-200"],
-                ["🏢", summary.companies, "Firma", "bg-slate-50 text-slate-600 border-slate-200"],
+                ["📞", summary.call, "Arama", "bg-blue-50 text-blue-700 border-blue-200", "call"],
+                ["✉️", summary.email, "Mail", "bg-violet-50 text-violet-700 border-violet-200", "email"],
+                ["🤝", summary.meeting, "Toplantı", "bg-emerald-50 text-emerald-700 border-emerald-200", "meeting"],
+                ["🗓️", summary.planned, "Toplantı alındı", "bg-sky-50 text-sky-700 border-sky-200", "meeting_planned"],
+                ["📄", summary.proposal, "Teklif", "bg-amber-50 text-amber-700 border-amber-200", "proposal"],
+                ["🏢", summary.companies, "Firma", "bg-slate-50 text-slate-600 border-slate-200", null],
               ]
                 .filter((c) => c[1] > 0)
-                .map(([icon, n, label, cls]) => (
-                  <span key={label} className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${cls}`}>
-                    {icon} {n} {label}
-                  </span>
-                ))}
+                .map(([icon, n, label, cls, tid]) =>
+                  tid ? (
+                    <button
+                      key={label}
+                      onClick={() => toggleFilter(tid)}
+                      title="Aşağıdaki listede sadece bunu göster"
+                      className={`text-xs font-semibold px-2.5 py-1 rounded-full border hover:shadow-sm ${cls} ${
+                        filters.includes(tid) ? "ring-2 ring-violet-400" : ""
+                      }`}
+                    >
+                      {icon} {n} {label}
+                    </button>
+                  ) : (
+                    <span key={label} className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${cls}`}>
+                      {icon} {n} {label}
+                    </span>
+                  )
+                )}
             </div>
             <div className="flex flex-col gap-2">
               {summary.groups.map(([name, arr]) => {
@@ -417,9 +439,47 @@ export default function ActivityJournal({
         )}
       </div>
 
+      {/* Filtre */}
+      {items.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5 mb-4">
+          <button
+            onClick={() => setFilters([])}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+              filters.length === 0
+                ? "bg-violet-600 text-white border-violet-600"
+                : "bg-white text-ink/60 border-mist hover:border-violet-300"
+            }`}
+          >
+            Tümü <span className="opacity-70">{items.length}</span>
+          </button>
+          {typeCounts
+            .filter((t) => t.n > 0)
+            .map((t) => (
+              <button
+                key={t.id}
+                onClick={() => toggleFilter(t.id)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                  filters.includes(t.id)
+                    ? "bg-violet-600 text-white border-violet-600"
+                    : "bg-white text-ink/60 border-mist hover:border-violet-300"
+                }`}
+              >
+                {t.icon} {t.label} <span className="opacity-70">{t.n}</span>
+              </button>
+            ))}
+          {filters.length > 0 && (
+            <span className="text-xs text-ink/35 ml-1">{visible.length} kayıt gösteriliyor</span>
+          )}
+        </div>
+      )}
+
       {/* Gün gün geçmiş */}
       <div className="flex flex-col gap-4">
-        {days.length === 0 && <div className="text-sm text-ink/30 text-center py-8">Bu hafta için kayıt yok.</div>}
+        {days.length === 0 && (
+          <div className="text-sm text-ink/30 text-center py-8">
+            {filters.length ? "Bu filtreyle kayıt yok." : "Bu hafta için kayıt yok."}
+          </div>
+        )}
         {days.map(([d, arr]) => (
           <div key={d}>
             <div className="text-xs font-semibold text-ink/45 mb-1.5 flex items-center gap-2">
